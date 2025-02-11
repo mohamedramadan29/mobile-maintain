@@ -134,10 +134,10 @@ class InvoiceController extends Controller
                 ########### Send Message To WhatsApp
                 // إنشاء رابط عام للفاتورة
 
-                $invoice_link = url('/invoice/view/' . $invoice->id);
+                $invoice_link = url('dashboard/invoice/view/' . $invoice->id);
 
                 // تنسيق الرابط لجعله قابلًا للنقر
-                $invoice_link = "<" . $invoice_link . ">";
+               // $invoice_link = "<" . $invoice_link . ">";
                 $new_phone = preg_replace('/^0/', '', $invoice->phone);
                 // إضافة رمز البلد +966
                 $new_phone = '966' . $new_phone;
