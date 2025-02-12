@@ -103,3 +103,17 @@ code[class*='language-'], pre[class*='language-'] {
 .required_span{
     color:red;
 }
+.public_invoice{
+
+}
+
+.public_invoice .invoice-company-details{}
+.public_invoice .invoice-company-details img{
+    width: 200px;
+}
+@media(max-width:991px){
+    .public_invoice .invoice-company-details img{
+        width: 150px;
+    }
+
+}

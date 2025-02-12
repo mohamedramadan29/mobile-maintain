@@ -37,7 +37,7 @@
                                 <div class="card-header">
                                     <h4 class="card-title" id="basic-layout-form"> تفاصيل الفاتورة </h4>
 
-                                    <h4 class="card-title" id="basic-layout-form">  -- نتائج فحص الجهاز  -- </h4>
+                                    <h4 class="card-title" id="basic-layout-form"> -- نتائج فحص الجهاز -- </h4>
                                     <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
                                 </div>
                                 <!--################### Start Add ChecksResults ###################-->
@@ -55,10 +55,10 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($problems as $problem)
+                                            @foreach ($checks as $check)
                                                 @php
                                                     $checkResult = $invoice->checkResults
-                                                        ->where('problem_id', $problem->id)
+                                                        ->where('problem_id', $check->id)
                                                         ->where('invoice_id', $invoice->id)
                                                         ->first();
                                                 @endphp
@@ -66,30 +66,33 @@
                                                     <td> {{ $loop->iteration }}</td>
                                                     <td>
                                                         <input readonly disabled type="hidden" name="problem_id[]"
-                                                            value="{{ $problem->id }}">
-                                                        <input readonly type="text" value="{{ $problem->name }}"
+                                                            value="{{ $check->id }}">
+                                                        <input readonly type="text" value="{{ $check->name }}"
                                                             class="form-control" name="check_problem_name[]">
                                                     </td>
                                                     <td>
-                                                        <input readonly disabled type="radio" value="1" class="form-control"
-                                                            name="work_{{ $problem->id }}[]"
+                                                        <input readonly disabled type="radio" value="1"
+                                                            class="form-control" name="work_{{ $check->id }}[]"
                                                             {{ isset($checkResult) && $checkResult->work == 1 ? 'checked' : '' }}>
                                                     </td>
                                                     <td>
-                                                        <input readonly disabled type="radio" value="0" class="form-control"
-                                                            name="work_{{ $problem->id }}[]"
+                                                        <input readonly disabled type="radio" value="0"
+                                                            class="form-control" name="work_{{ $check->id }}[]"
                                                             {{ isset($checkResult) && $checkResult->work == 0 ? 'checked' : '' }}>
                                                     </td>
                                                     <td>
-                                                        <input readonly disabled type="text" value="{{ $checkResult->notes ?? '' }}"
-                                                            class="form-control" name="notes[]">
+                                                        <input readonly disabled type="text"
+                                                            value="{{ $checkResult->notes ?? '' }}" class="form-control"
+                                                            name="notes[]">
                                                     </td>
                                                     <td>
-                                                        <input readonly disabled type="text" value="{{ $checkResult->after_check ?? '' }}"
+                                                        <input readonly disabled type="text"
+                                                            value="{{ $checkResult->after_check ?? '' }}"
                                                             class="form-control" name="after_check[]">
                                                     </td>
                                                 </tr>
                                             @endforeach
+
                                         </tbody>
                                     </table>
                                 </div>

@@ -107,7 +107,7 @@
                                   data-i18n="nav.users.user_profile"> فواتيري
                               </a>
                           </li>
-                          <li class="{{ Route::is('dashboard.invoices.create') ? 'active' : '' }}">
+                          <li class="{{ Route::is('dashboard.tech_invoices.index') ? 'active' : '' }}">
                               <a class="menu-item" href="{{ route('dashboard.tech_invoices.available') }}"
                                   data-i18n="nav.users.user_profile"> الفواتير المتاحة
                               </a>

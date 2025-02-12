@@ -64,8 +64,7 @@
                                                                         <input type="hidden" name="problem_id[]"
                                                                             value="{{ $check->id }}">
                                                                         <input readonly type="text"
-                                                                            value="{{ $check->name }}"
-                                                                            class="form-control"
+                                                                            value="{{ $check->name }}" class="form-control"
                                                                             name="check_problem_name[]">
                                                                     </td>
                                                                     <td>
@@ -96,12 +95,12 @@
                                                     </table>
                                                 </div>
                                                 <!--################### End Add ChecksResults #####################-->
-
                                                 <!-- باقي الحقول -->
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="name"> اسم العميل <span class="required_span"> *  </span> </label>
+                                                            <label for="name"> اسم العميل <span class="required_span"> *
+                                                                </span> </label>
                                                             <input required type="text" id="name"
                                                                 class="form-control" placeholder="" name="name"
                                                                 value="{{ old('name') }}">
@@ -109,15 +108,49 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="phone"> رقم الهاتف <span class="required_span"> *  </span>  </label>
-                                                            <input required type="number" id="phone"
-                                                                class="form-control" placeholder="" name="phone"
-                                                                value="{{ old('phone') }}">
+                                                            <label for="phone"> رقم الهاتف <span class="required_span">
+                                                                    *</span> </label>
+                                                            <input required type="text" id="phone"
+                                                                class="form-control" placeholder="مثال: 0500000000"
+                                                                name="phone" value="{{ old('phone') }}" maxlength="10"
+                                                                oninput="validatePhoneNumber(this)">
+                                                            <small id="phone-error" class="text-danger"
+                                                                style="display: none;">يجب أن يكون الرقم مكونًا من 10 أرقام
+                                                                ويبدأ بـ 0</small>
                                                         </div>
+
+                                                        <script>
+                                                            function validatePhoneNumber(input) {
+                                                                let phone = input.value;
+                                                                let errorMsg = document.getElementById("phone-error");
+
+                                                                // السماح فقط بالأرقام
+                                                                input.value = input.value.replace(/\D/g, '');
+
+                                                                // التأكد من أن الرقم يبدأ بـ 0
+                                                                if (input.value.length > 0 && input.value.charAt(0) !== '0') {
+                                                                    input.value = '0';
+                                                                }
+
+                                                                // منع تجاوز 10 أرقام
+                                                                if (input.value.length > 10) {
+                                                                    input.value = input.value.slice(0, 10);
+                                                                }
+
+                                                                // إظهار رسالة الخطأ إن لم يكن الرقم صحيحًا
+                                                                if (!/^0\d{9}$/.test(input.value)) {
+                                                                    errorMsg.style.display = "block";
+                                                                } else {
+                                                                    errorMsg.style.display = "none";
+                                                                }
+                                                            }
+                                                        </script>
                                                     </div>
+
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="title"> اسم الجهاز <span class="required_span"> *  </span>  </label>
+                                                            <label for="title"> اسم الجهاز <span class="required_span"> *
+                                                                </span> </label>
                                                             <input required type="text" id="title"
                                                                 class="form-control" placeholder="" name="title"
                                                                 value="{{ old('title') }}">
@@ -125,7 +158,8 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="title"> حدد الاعطال <span class="required_span"> *  </span>  </label>
+                                                            <label for="title"> حدد الاعطال <span
+                                                                    class="required_span"> * </span> </label>
                                                             <div class="skin skin-square">
                                                                 <div
                                                                     class="col-md-12 col-sm-12 d-flex justify-content-around">
@@ -152,14 +186,16 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="price"> السعر الاولي <span class="required_span"> *  </span> </label>
+                                                            <label for="price"> السعر الاولي <span
+                                                                    class="required_span"> * </span> </label>
                                                             <input required type="number" step="0.01" id="price"
                                                                 class="form-control" placeholder="" name="price"
                                                                 value="{{ old('price') }}">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label for="price"> تاريخ ووقت التسليم <span class="required_span"> *  </span>  </label>
+                                                        <label for="price"> تاريخ ووقت التسليم <span
+                                                                class="required_span"> * </span> </label>
                                                         <div class="justify-between d-flex">
                                                             <div class="form-group">
                                                                 <div class="position-relative has-icon-left">
@@ -185,8 +221,10 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="price"> الحالة <span class="required_span"> *  </span>  </label>
-                                                            <select required name="status" id="" class="form-control">
+                                                            <label for="price"> الحالة <span class="required_span"> *
+                                                                </span> </label>
+                                                            <select required name="status" id=""
+                                                                class="form-control">
                                                                 <option value="رف الاستلام"
                                                                     {{ old('status') == 'رف الاستلام' ? 'selected' : '' }}>
                                                                     رف الاستلام</option>
@@ -199,9 +237,10 @@
                                                 <div class="row">
                                                     <div class="col-lg-12">
                                                         <div class="form-group">
-                                                            <label for="address"> اضافة مرفقات <span class="required_span"> *  </span>  </label>
-                                                            <input required type="file" name="files[]" class="form-control"
-                                                                multiple>
+                                                            <label for="address"> اضافة مرفقات <span
+                                                                    class="required_span"> * </span> </label>
+                                                            <input required type="file" name="files[]"
+                                                                class="form-control" multiple>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -209,7 +248,7 @@
                                                 <!-- عنصر التوقيع -->
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label>توقيع العميل <span class="required_span"> *  </span>  </label>
+                                                        <label>توقيع العميل <span class="required_span"> * </span> </label>
                                                         <div id="signature-pad" class="signature-pad">
                                                             <div class="signature-pad-body">
                                                                 <canvas></canvas>

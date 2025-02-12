@@ -35,10 +35,7 @@
                             <div class="text-right col-md-6 col-sm-6">
                                 <h2> رقم الفاتورة </h2>
                                 <p class="pb-3"> INV-{{ $invoice->id }}</p>
-                                <ul class="px-0 list-unstyled">
-                                    <li> المبلغ </li>
-                                    <li class="lead text-bold-800"> {{ number_format($invoice->price, 2) }} ريال </li>
-                                </ul>
+
                             </div>
                         </div>
                         <!--/ Invoice Company Details -->
@@ -116,16 +113,18 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-5 col-sm-12">
-                                    <p class="lead"> المبلغ الكلي المستحق </p>
+                                <div class="col-md-5 col-12">
+                                    <p class="lead">المبلغ الكلي المستحق</p>
                                     <div class="table-responsive">
-                                        <table class="table">
+                                        <table class="table table-bordered">
                                             <tbody>
                                                 <tr>
-                                                    <td> السعر الاولي </td>
-                                                    <td class="text-right"> {{ number_format($invoice->price, 2) }} ريال
+                                                    {{-- <td>المبلغ المدخل (شامل الضريبة)</td> --}}
+                                                    <td> المبلغ الاولي  </td>
+                                                    <td class="text-right">{{ number_format($invoice->price, 2) }} ريال
                                                     </td>
                                                 </tr>
+
                                                 @php
                                                     $sub_total = 0;
                                                 @endphp
@@ -135,21 +134,35 @@
                                                             $sub_total += $file->price;
                                                         @endphp
                                                         <tr>
-                                                            <td> {{ $file->title }} </td>
-                                                            <td class="text-right"> {{ number_format($file->price, 2) }}
-                                                                ريال
-                                                            </td>
+                                                            <td>{{ $file->title }}</td>
+                                                            <td class="text-right">{{ number_format($file->price, 2) }}
+                                                                ريال</td>
                                                         </tr>
                                                     @endforeach
                                                 @endif
 
                                                 @php
                                                     $total_price = $invoice->price + $sub_total;
+                                                    $base_price = $total_price / 1.15; // استخراج المبلغ الأساسي قبل الضريبة
+                                                    $vat = $total_price - $base_price; // حساب قيمة الضريبة المضافة
                                                 @endphp
+
                                                 <tr>
-                                                    <td class="text-bold-800">المجموع الكلي </td>
+                                                    <td class="text-bold-800">المبلغ الأساسي (قبل الضريبة)</td>
                                                     <td class="text-right text-bold-800">
-                                                        {{ number_format($total_price, 2) }} ريال </td>
+                                                        {{ number_format($base_price, 2) }} ريال</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>ضريبة القيمة المضافة (15%)</td>
+                                                    <td class="text-right text-danger">{{ number_format($vat, 2) }} ريال
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td class="text-bold-800">الإجمالي (شامل الضريبة)</td>
+                                                    <td class="text-right text-bold-800">
+                                                        {{ number_format($total_price, 2) }} ريال</td>
                                                 </tr>
                                             </tbody>
                                         </table>

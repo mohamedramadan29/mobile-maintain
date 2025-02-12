@@ -38,7 +38,8 @@ class TechInvoicesController extends Controller
     {
         $invoice = Invoice::find($id);
         $problems = ProblemCategory::all();
-        return view('dashboard.tech_invoices.show', compact('invoice', 'problems'));
+        $checks = CheckText::all();
+        return view('dashboard.tech_invoices.show', compact('invoice', 'problems','checks'));
     }
 
     public function checkout($id)

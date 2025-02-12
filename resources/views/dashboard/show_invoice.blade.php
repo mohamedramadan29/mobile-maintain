@@ -2,39 +2,35 @@
 @section('title', ' طباعة الفاتورة ')
 @section('content')
     <div class="app-content content" style="margin-right:0px">
-        <div class="content-wrapper">
+        <div class="content-wrapper public_invoice">
             <div class="content-body">
                 <input type="hidden" value="{{ $invoice->name }}" id="customername">
                 <section class="card">
                     <div id="invoice-template" class="card-body">
                         <!-- Invoice Company Details -->
-                        <div id="invoice-company-details d-flex" class="row">
-                            <div class="text-left col-md-6 col-sm-6">
+                        <div id="invoice-company-details d-flex" class="row invoice-company-details">
+                            <div class="text-left col-md-6 col-6">
                                 <div class="media">
-                                    <img width="200px" src="{{ asset('assets/admin/') }}/images/logo.png"
+                                    <img width="" src="{{ asset('assets/admin/') }}/images/logo.png"
                                         alt="company logo" class="" />
                                 </div>
                             </div>
-                            <div class="text-right col-md-6 col-sm-6">
+                            <div class="text-right col-md-6 col-6">
                                 <h2> رقم الفاتورة </h2>
-                                <p class="pb-3"> INV-{{ $invoice->id }}</p>
-                                <ul class="px-0 list-unstyled">
-                                    <li> المبلغ </li>
-                                    <li class="lead text-bold-800"> {{ number_format($invoice->price, 2) }} ريال </li>
-                                </ul>
+                                <p class="pb-1"> INV-{{ $invoice->id }}</p>
                             </div>
                         </div>
                         <!--/ Invoice Company Details -->
                         <!-- Invoice Customer Details -->
                         <div id="invoice-customer-details" class="pt-2 row">
-                            <div class="text-left col-md-6 col-sm-6">
+                            <div class="text-left col-md-6 col-6">
                                 <p class="text-muted"> الي السيد / ة </p>
                                 <ul class="px-0 list-unstyled">
                                     <li class="text-bold-800"> {{ $invoice->name }}</li>
                                     <li> {{ $invoice->phone }} </li>
                                 </ul>
                             </div>
-                            <div class="text-right col-md-6 col-sm-6">
+                            <div class="text-right col-md-6 col-6">
                                 <p>
                                     <span class="text-muted"> تاريخ الفاتورة :</span> {{ $invoice->created_at }}
                                 </p>
@@ -45,6 +41,67 @@
                             </div>
                         </div>
                         <!--/ Invoice Customer Details -->
+
+                        <!---------------  Start Invoice Checks ---------------->
+                        <div class="">
+                            <h4 class="card-title" id="basic-layout-form"> <strong> نتائج فحص الجهاز </strong> </h4>
+                            <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
+                        </div>
+                        <!--################### Start Add ChecksResults ###################-->
+                        <div class="row table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th> # </th>
+                                        <th> اساسيات الفحص </th>
+                                        <th> يعمل </th>
+                                        <th> لا يعمل </th>
+                                        <th> ملاحظات </th>
+                                        <th> بعد الفحص </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($checks as $check)
+                                        @php
+                                            $checkResult = $invoice->checkResults
+                                                ->where('problem_id', $check->id)
+                                                ->where('invoice_id', $invoice->id)
+                                                ->first();
+                                        @endphp
+                                        <tr>
+                                            <td> {{ $loop->iteration }}</td>
+                                            <td>
+                                                <p>
+                                                    {{ $check->name }}
+                                                </p>
+                                            </td>
+                                            <td>
+                                                <input readonly disabled type="radio" value="1" class="form-control"
+                                                    name="work_{{ $check->id }}[]"
+                                                    {{ isset($checkResult) && $checkResult->work == 1 ? 'checked' : '' }}>
+                                            </td>
+                                            <td>
+                                                <input readonly disabled type="radio" value="0" class="form-control"
+                                                    name="work_{{ $check->id }}[]"
+                                                    {{ isset($checkResult) && $checkResult->work == 0 ? 'checked' : '' }}>
+                                            </td>
+                                            <td>
+                                                <p>
+                                                    {{ $checkResult->notes ?? '' }}
+                                                </p>
+                                            </td>
+                                            <td>
+                                                <p>
+                                                    {{ $checkResult->after_check ?? '' }}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <!--################### End Add ChecksResults #####################-->
+                        <!---------------- End Invoice Checks ------------>
                         <!-- Invoice Items Details -->
                         <div id="invoice-items-details" class="pt-2">
                             <div class="row">
@@ -98,16 +155,18 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-5 col-sm-12">
-                                    <p class="lead"> المبلغ الكلي المستحق </p>
+                                <div class="col-md-5 col-12">
+                                    <p class="lead">المبلغ الكلي المستحق</p>
                                     <div class="table-responsive">
-                                        <table class="table">
+                                        <table class="table table-bordered">
                                             <tbody>
                                                 <tr>
-                                                    <td> السعر الاولي </td>
-                                                    <td class="text-right"> {{ number_format($invoice->price, 2) }} ريال
+                                                    {{-- <td>المبلغ المدخل (شامل الضريبة)</td> --}}
+                                                    <td> المبلغ الاولي  </td>
+                                                    <td class="text-right">{{ number_format($invoice->price, 2) }} ريال
                                                     </td>
                                                 </tr>
+
                                                 @php
                                                     $sub_total = 0;
                                                 @endphp
@@ -117,26 +176,41 @@
                                                             $sub_total += $file->price;
                                                         @endphp
                                                         <tr>
-                                                            <td> {{ $file->title }} </td>
-                                                            <td class="text-right"> {{ number_format($file->price, 2) }}
-                                                                ريال
-                                                            </td>
+                                                            <td>{{ $file->title }}</td>
+                                                            <td class="text-right">{{ number_format($file->price, 2) }}
+                                                                ريال</td>
                                                         </tr>
                                                     @endforeach
                                                 @endif
 
                                                 @php
                                                     $total_price = $invoice->price + $sub_total;
+                                                    $base_price = $total_price / 1.15; // استخراج المبلغ الأساسي قبل الضريبة
+                                                    $vat = $total_price - $base_price; // حساب قيمة الضريبة المضافة
                                                 @endphp
+
                                                 <tr>
-                                                    <td class="text-bold-800">المجموع الكلي </td>
+                                                    <td class="text-bold-800">المبلغ الأساسي (قبل الضريبة)</td>
                                                     <td class="text-right text-bold-800">
-                                                        {{ number_format($total_price, 2) }} ريال </td>
+                                                        {{ number_format($base_price, 2) }} ريال</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>ضريبة القيمة المضافة (15%)</td>
+                                                    <td class="text-right text-danger">{{ number_format($vat, 2) }} ريال
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td class="text-bold-800">الإجمالي (شامل الضريبة)</td>
+                                                    <td class="text-right text-bold-800">
+                                                        {{ number_format($total_price, 2) }} ريال</td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
 
