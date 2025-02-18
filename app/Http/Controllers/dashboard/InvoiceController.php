@@ -36,10 +36,10 @@ class InvoiceController extends Controller
 
     public function create(Request $request)
     {
-        try {
-            if ($request->isMethod('post')) {
+        if ($request->isMethod('post')) {
+            try {
                 $data = $request->all();
-                // dd($data);
+                //  dd($data);
                 $rules = [
                     'name' => 'required',
                     'phone' => 'required',
@@ -99,10 +99,10 @@ class InvoiceController extends Controller
                 $invoice->signature = $filesiguture;
                 $invoice->save();
                 ############ Start Insert Files ################
-                if ($request->hasFile('files')) {
-                    $files = $request->file('files');
-                    foreach ($files as $file) {
-                        $filename = $this->saveImage($file, public_path('assets/uploads/invoices_files'));
+                if ($request->hasFile('files_images')) {
+                    // $files = $request->file('files');
+                    foreach ($request->file('files_images') as $image) {
+                        $filename = $this->saveImage($image, public_path('assets/uploads/invoices_files'));
                         $invoice_image = new InvoiceImage();
                         $invoice_image->invoice_id = $invoice->id;
                         $invoice_image->image = $filename;
@@ -130,14 +130,10 @@ class InvoiceController extends Controller
                         $check->save();
                     }
                 }
-
                 ########### Send Message To WhatsApp
                 // إنشاء رابط عام للفاتورة
 
                 $invoice_link = url('dashboard/invoice/view/' . $invoice->id);
-
-                // تنسيق الرابط لجعله قابلًا للنقر
-               // $invoice_link = "<" . $invoice_link . ">";
                 $new_phone = preg_replace('/^0/', '', $invoice->phone);
                 // إضافة رمز البلد +966
                 $new_phone = '966' . $new_phone;
@@ -174,13 +170,14 @@ class InvoiceController extends Controller
                 $response = curl_exec($curl);
                 $err = curl_error($curl);
                 curl_close($curl);
-
                 DB::commit();
                 return $this->success_message(' تم اضافة الفاتورة بنجاح');
+            } catch (Exception $e) {
+                return Redirect()->back()->withInput()->withErrors($e->getMessage());
+                //return $this->exception_message($e);
             }
-        } catch (Exception $e) {
-            return $this->exception_message($e);
         }
+
         $problems = ProblemCategory::all();
         $checks = CheckText::all();
         return view('dashboard.invoices.create', compact('problems', 'checks'));
@@ -231,10 +228,11 @@ class InvoiceController extends Controller
                 $invoice->status = $data['status'];
                 $invoice->save();
                 ############ Start Insert Files ################
-                if ($request->hasFile('files')) {
-                    $files = $request->file('files');
-                    foreach ($files as $file) {
-                        $filename = $this->saveImage($file, public_path('assets/uploads/invoices_files'));
+                ############ Start Insert Files ################
+                if ($request->hasFile('files_images')) {
+                    // $files = $request->file('files');
+                    foreach ($request->file('files_images') as $image) {
+                        $filename = $this->saveImage($image, public_path('assets/uploads/invoices_files'));
                         $invoice_image = new InvoiceImage();
                         $invoice_image->invoice_id = $invoice->id;
                         $invoice_image->image = $filename;
@@ -242,6 +240,7 @@ class InvoiceController extends Controller
                         $invoice_image->save();
                     }
                 }
+
                 ############# Add Invoice Step ###############
                 $invoice_step = new InvoiceSteps();
                 $invoice_step->invoice_id = $invoice->id;
@@ -351,20 +350,17 @@ class InvoiceController extends Controller
             // إعدادات حجم الورقة بناءً على المحتوى
             $mpdf = new Mpdf([
                 'mode' => 'utf-8',
-                'default_font' => 'Cairo',
-                'format' => [80, 70], // عرض وطول الورقة (80 مم × 150 مم)، يمكن تغييره حسب البيانات
-                'margin_left' => 5,
-                'margin_right' => 5,
-                'margin_top' => 5,
-                'margin_bottom' => 5,
+                'default_font' => 'Zain',
+                'format' => [50, 25], // عرض وطول الورقة (80 مم × 150 مم)، يمكن تغييره حسب البيانات
+                'margin_left' => 0,
+                'margin_right' => 0,
+                'margin_top' => 0,
+                'margin_bottom' => 0,
             ]);
-
             // إرسال البيانات إلى ملف العرض (View)
             $html = view('dashboard.invoices.barcode_pdf', compact('invoice', 'barcode'))->render();
-
             // كتابة الـ HTML في PDF
             $mpdf->WriteHTML($html);
-
             // عرض الـ PDF مباشرة أو تحميله
             return $mpdf->Output("Invoice_{$invoice->id}.pdf", 'I');
         } catch (Exception $e) {

@@ -43,6 +43,7 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th> الاسم </th>
+                                                    <th> عدد الدقائق للاصلاح </th>
                                                     <th> العمليات </th>
                                                 </tr>
                                             </thead>
@@ -51,6 +52,7 @@
                                                     <tr>
                                                         <th scope="row">{{ $loop->iteration }}</th>
                                                         <td> {{ $problem->name }} </td>
+                                                        <td>{{ $problem->solved_time }} دقيقة </td>
                                                         <td>
                                                             <button type="button" class="btn btn-info btn-sm"
                                                                 data-toggle="modal"

@@ -32,6 +32,11 @@
                     <div class="row match-height">
                         <div class="col-md-12">
                             <div class="card">
+                                @if ($errors->any())
+                                    @foreach ($errors->all() as $error)
+                                        <div class="alert alert-danger">{{ $error }}</div>
+                                    @endforeach
+                                @endif
                                 <div class="card-header">
                                     <h4 class="card-title" id="basic-layout-form"> اضافة فاتورة جديدة </h4>
                                     <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i> </a>
@@ -239,11 +244,59 @@
                                                         <div class="form-group">
                                                             <label for="address"> اضافة مرفقات <span
                                                                     class="required_span"> * </span> </label>
-                                                            <input required type="file" name="files[]"
-                                                                class="form-control" multiple>
+                                                            <input required type="file" name="files_images[]"
+                                                                class="form-control" multiple id="imageInput">
                                                         </div>
+                                                        <div id="imagePreview" class="flex-wrap mt-3 d-flex"></div>
                                                     </div>
                                                 </div>
+
+                                                <script>
+                                                    let imageInput = document.getElementById('imageInput');
+                                                    let imagePreview = document.getElementById('imagePreview');
+                                                    let dt = new DataTransfer(); // لتخزين الملفات المرفوعة
+
+                                                    imageInput.addEventListener('change', function(event) {
+                                                        Array.from(event.target.files).forEach(file => {
+                                                            let reader = new FileReader();
+                                                            reader.onload = function(e) {
+                                                                let imgContainer = document.createElement("div");
+                                                                imgContainer.classList.add("position-relative", "m-2");
+
+                                                                let img = document.createElement("img");
+                                                                img.src = e.target.result;
+                                                                img.classList.add("rounded", "shadow", "border", "p-1");
+                                                                img.style.width = "120px";
+                                                                img.style.height = "120px";
+
+                                                                let removeBtn = document.createElement("span");
+                                                                removeBtn.innerHTML = "&times;";
+                                                                removeBtn.classList.add("position-absolute", "remove-button", "top-0", "end-0",
+                                                                    "bg-danger",
+                                                                    "text-white", "rounded-circle", "p-1");
+                                                                removeBtn.style.cursor = "pointer";
+
+                                                                removeBtn.onclick = function() {
+                                                                    let index = Array.from(dt.files).findIndex(f => f.name === file.name);
+                                                                    if (index > -1) {
+                                                                        dt.items.remove(index);
+                                                                        imageInput.files = dt.files;
+                                                                    }
+                                                                    imgContainer.remove();
+                                                                };
+
+                                                                imgContainer.appendChild(img);
+                                                                imgContainer.appendChild(removeBtn);
+                                                                imagePreview.appendChild(imgContainer);
+
+                                                                dt.items.add(file);
+                                                                imageInput.files = dt.files; // تحديث الملفات داخل input
+                                                            };
+                                                            reader.readAsDataURL(file);
+                                                        });
+                                                    });
+                                                </script>
+
 
                                                 <!-- عنصر التوقيع -->
                                                 <div class="col-md-6">
@@ -325,6 +378,17 @@
             </div>
         </div>
     </div>
+    <style>
+        .remove-button {
+            cursor: pointer;
+            width: 33px;
+            height: 33px;
+            line-height: 9px;
+            text-align: center;
+            left: -15px;
+            top: -12px;
+        }
+    </style>
 @endsection
 @section('js')
     <script src="{{ asset('assets/admin/') }}/vendors/js/forms/icheck/icheck.min.js" type="text/javascript"></script>

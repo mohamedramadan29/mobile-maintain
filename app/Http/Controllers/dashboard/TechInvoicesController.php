@@ -4,12 +4,13 @@ namespace App\Http\Controllers\dashboard;
 
 use Exception;
 use Illuminate\Http\Request;
+use App\Jobs\SendReviewMessage;
 use App\Models\dashboard\Invoice;
 use App\Http\Traits\Message_Trait;
 use App\Http\Traits\Upload_Images;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
 use App\Models\dashboard\CheckText;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\dashboard\InvoiceImage;
 use App\Models\dashboard\InvoiceSteps;
@@ -39,7 +40,7 @@ class TechInvoicesController extends Controller
         $invoice = Invoice::find($id);
         $problems = ProblemCategory::all();
         $checks = CheckText::all();
-        return view('dashboard.tech_invoices.show', compact('invoice', 'problems','checks'));
+        return view('dashboard.tech_invoices.show', compact('invoice', 'problems', 'checks'));
     }
 
     public function checkout($id)
@@ -78,6 +79,7 @@ class TechInvoicesController extends Controller
     {
         $invoice = Invoice::find($id);
         if ($request->isMethod('post')) {
+            //dd($request->all());
             try {
                 DB::beginTransaction();
                 $invoice->status = $request->status;
@@ -90,6 +92,48 @@ class TechInvoicesController extends Controller
                 $invoice_step->admin_id = Auth::id();
                 $invoice_step->step_details = '  تم تحديث حالة الجهاز الي   . $request->status;';
                 $invoice_step->save();
+                ############### Send Message To Client If Device Correct Or Not Or Device Status  ####################
+
+                ########### Send Message To WhatsApp
+                // إنشاء رابط عام للفاتورة
+
+                $invoice_link = url('dashboard/invoice/view/' . $invoice->id);
+                $new_phone = preg_replace('/^0/', '', $invoice->phone);
+                // إضافة رمز البلد +966
+                $new_phone = '966' . $new_phone;
+                //$new_phone = $invoice->phone;
+
+                // تنسيق رسالة واتساب بطريقة مميزة
+                $message = "📄 *اهلا بيك * 📄\n\n";
+                $message .= "👤 *العميل:* " . $invoice->name . "\n";
+                $message .= "📞 * حالة الجهاز الخاص بك الان  :* " . $invoice->status . "\n";
+                $message .= "🖋 *ملاحظات الفني :* " . ($invoice->tech_notes ?? "لا توجد ملاحظات") . "\n\n";
+                $message .= "🔗 *رابط متابعة وتفاصيل الفاتورة:* " . $invoice_link . "\n";
+                // تعريف المتغير
+                $params = array(
+                    'instanceid' => '138484',
+                    'token' => '573f5335-db32-422f-8a7f-efc7a18654f9',
+                    'phone' => $new_phone,
+                    'body' => $message,
+                );
+                $queryString = http_build_query($params); // تحويل المصفوفة إلى سلسلة نصية
+                $curl = curl_init();
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => "https://api.4whats.net/sendMessage/?" . $queryString, // إضافة سلسلة الاستعلام إلى عنوان URL
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => "GET",
+                ));
+                $response = curl_exec($curl);
+                $err = curl_error($curl);
+                curl_close($curl);
+                if ($request->status === "تم الاصلاح") {
+                    // جدولة إرسال رسالة التقييم بعد 20 دقيقة
+                    SendReviewMessage::dispatch($invoice)->delay(now()->addMinutes(1));
+                }
                 DB::commit();
                 return $this->success_message('تم تحديث حالة الجهاز بنجاح');
             } catch (Exception $e) {
@@ -98,7 +142,7 @@ class TechInvoicesController extends Controller
         }
         $problems = ProblemCategory::all();
         $checks = CheckText::all();
-        return view('dashboard.tech_invoices.update', compact('invoice', 'problems','checks'));
+        return view('dashboard.tech_invoices.update', compact('invoice', 'problems', 'checks'));
     }
 
     public function addfile(Request $request, $id)

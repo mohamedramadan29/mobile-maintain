@@ -20,9 +20,13 @@ class ProblemCategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:problem_categories,name',
+            'solved_time'=>'required'
         ]);
         ProblemCategory::create(
-            ['name' => $request->name]
+            [
+                'name' => $request->name,
+                'solved_time'=>$request->solved_time,
+                ]
         );
         return $this->success_message(' تم اضافة القسم بنجاح');
     }
@@ -31,6 +35,7 @@ class ProblemCategoryController extends Controller
         $data = $request->all();
         $problem = ProblemCategory::find($id);
         $problem->name = $data['name'];
+        $problem->solved_time = $data['solved_time'];
         $problem->save();
         return $this->success_message(' تم تعديل القسم بنجاح');
     }

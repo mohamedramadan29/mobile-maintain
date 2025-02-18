@@ -5,8 +5,26 @@
               <li class="nav-item {{ Route::is('dashboard.welcome') ? 'active' : '' }}"><a
                       href="{{ route('dashboard.welcome') }}"><i class="la la-home"></i><span class="menu-title"
                           data-i18n="nav.dash.main">الرئيسية</span></a>
-
               </li>
+              @can('invoices')
+                  <li class="nav-item {{ Route::is('dashboard.invoices.*') ? 'active' : '' }}"><a href="#"><i
+                              class="la la-file-text"></i><span class="menu-title" data-i18n="nav.users.main"> ادارة
+                              الفواتير
+                          </span></a>
+                      <ul class="menu-content">
+                          <li class="{{ Route::is('dashboard.invoices.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.invoices.index') }}"
+                                  data-i18n="nav.users.user_profile"> جميع الفواتير
+                              </a>
+                          </li>
+                          <li class="{{ Route::is('dashboard.invoices.create') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.invoices.create') }}"
+                                  data-i18n="nav.users.user_profile"> اضافة فاتورة
+                              </a>
+                          </li>
+                      </ul>
+                  </li>
+              @endcan
               @can('roles')
                   <li class="nav-item {{ Route::is('dashboard.roles.*') ? 'active' : '' }}"><a href="#"><i
                               class="la la-television"></i><span class="menu-title" data-i18n="nav.role.main"> الصلاحيات
@@ -77,25 +95,7 @@
                   </li>
               @endcan
 
-              @can('invoices')
-                  <li class="nav-item {{ Route::is('dashboard.invoices.*') ? 'active' : '' }}"><a href="#"><i
-                              class="la la-file-text"></i><span class="menu-title" data-i18n="nav.users.main"> ادارة
-                              الفواتير
-                          </span></a>
-                      <ul class="menu-content">
-                          <li class="{{ Route::is('dashboard.invoices.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.invoices.index') }}"
-                                  data-i18n="nav.users.user_profile"> جميع الفواتير
-                              </a>
-                          </li>
-                          <li class="{{ Route::is('dashboard.invoices.create') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.invoices.create') }}"
-                                  data-i18n="nav.users.user_profile"> اضافة فاتورة
-                              </a>
-                          </li>
-                      </ul>
-                  </li>
-              @endcan
+
               @can('tech_invoices')
                   <li class="nav-item {{ Route::is('dashboard.tech_invoices.*') ? 'active' : '' }}"><a href="#"><i
                               class="la la-file-text"></i><span class="menu-title" data-i18n="nav.users.main"> ادارة

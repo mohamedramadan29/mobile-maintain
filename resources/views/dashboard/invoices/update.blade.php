@@ -72,8 +72,7 @@
                                                                         <input type="hidden" name="problem_id[]"
                                                                             value="{{ $check->id }}">
                                                                         <input readonly type="text"
-                                                                            value="{{ $check->name }}"
-                                                                            class="form-control"
+                                                                            value="{{ $check->name }}" class="form-control"
                                                                             name="check_problem_name[]">
                                                                     </td>
                                                                     <td>
@@ -107,7 +106,8 @@
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="name"> اسم العميل <span class="required_span"> * </span> </label>
+                                                            <label for="name"> اسم العميل <span class="required_span"> *
+                                                                </span> </label>
                                                             <input required type="text" id="name"
                                                                 class="form-control" placeholder="" name="name"
                                                                 value="{{ $invoice->name }}">
@@ -115,7 +115,8 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="phone"> رقم الهاتف <span class="required_span"> * </span> </label>
+                                                            <label for="phone"> رقم الهاتف <span class="required_span"> *
+                                                                </span> </label>
                                                             <input required type="text" id="phone"
                                                                 class="form-control" placeholder="" name="phone"
                                                                 value="{{ $invoice->phone }}">
@@ -123,7 +124,8 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="title"> اسم الجهاز <span class="required_span"> * </span> </label>
+                                                            <label for="title"> اسم الجهاز <span class="required_span"> *
+                                                                </span> </label>
                                                             <input required type="text" id="title"
                                                                 class="form-control" placeholder="" name="title"
                                                                 value="{{ $invoice->title }}">
@@ -131,7 +133,8 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="title"> حدد الاعطال <span class="required_span"> * </span> </label>
+                                                            <label for="title"> حدد الاعطال <span class="required_span">
+                                                                    * </span> </label>
                                                             <div class="skin skin-square">
                                                                 <div
                                                                     class="col-md-12 col-sm-12 d-flex justify-content-around">
@@ -159,14 +162,16 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="price"> السعر الاولي <span class="required_span"> * </span> </label>
+                                                            <label for="price"> السعر الاولي <span
+                                                                    class="required_span"> * </span> </label>
                                                             <input required type="number" step="0.01" id="price"
                                                                 class="form-control" placeholder="" name="price"
                                                                 value="{{ $invoice->price }}">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label for="price"> تاريخ ووقت التسليم <span class="required_span"> * </span> </label>
+                                                        <label for="price"> تاريخ ووقت التسليم <span
+                                                                class="required_span"> * </span> </label>
                                                         <div class="justify-between d-flex">
                                                             <div class="form-group">
                                                                 <div class="position-relative has-icon-left">
@@ -199,18 +204,66 @@
                                                         </div>
                                                     </div>
                                                     <img width="100" height="100"
-                                                        src="{{ asset('assets/uploads/invoices_files/'.$invoice->signature) }}" alt="">
+                                                        src="{{ asset('assets/uploads/invoices_files/' . $invoice->signature) }}"
+                                                        alt="">
 
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-lg-12">
                                                         <div class="form-group">
-                                                            <label for="address"> اضافة مرفقات <span class="required_span"> * </span> </label>
-                                                            <input type="file" name="files[]" class="form-control"
-                                                                multiple>
+                                                            <label for="address"> اضافة مرفقات <span
+                                                                    class="required_span"> * </span> </label>
+                                                            <input required type="file" name="files_images[]"
+                                                                class="form-control" multiple id="imageInput">
                                                         </div>
+                                                        <div id="imagePreview" class="flex-wrap mt-3 d-flex"></div>
                                                     </div>
                                                 </div>
+                                                <script>
+                                                    let imageInput = document.getElementById('imageInput');
+                                                    let imagePreview = document.getElementById('imagePreview');
+                                                    let dt = new DataTransfer(); // لتخزين الملفات المرفوعة
+
+                                                    imageInput.addEventListener('change', function(event) {
+                                                        Array.from(event.target.files).forEach(file => {
+                                                            let reader = new FileReader();
+                                                            reader.onload = function(e) {
+                                                                let imgContainer = document.createElement("div");
+                                                                imgContainer.classList.add("position-relative", "m-2");
+
+                                                                let img = document.createElement("img");
+                                                                img.src = e.target.result;
+                                                                img.classList.add("rounded", "shadow", "border", "p-1");
+                                                                img.style.width = "120px";
+                                                                img.style.height = "120px";
+
+                                                                let removeBtn = document.createElement("span");
+                                                                removeBtn.innerHTML = "&times;";
+                                                                removeBtn.classList.add("position-absolute", "remove-button", "top-0", "end-0",
+                                                                    "bg-danger",
+                                                                    "text-white", "rounded-circle", "p-1");
+                                                                removeBtn.style.cursor = "pointer";
+
+                                                                removeBtn.onclick = function() {
+                                                                    let index = Array.from(dt.files).findIndex(f => f.name === file.name);
+                                                                    if (index > -1) {
+                                                                        dt.items.remove(index);
+                                                                        imageInput.files = dt.files;
+                                                                    }
+                                                                    imgContainer.remove();
+                                                                };
+
+                                                                imgContainer.appendChild(img);
+                                                                imgContainer.appendChild(removeBtn);
+                                                                imagePreview.appendChild(imgContainer);
+
+                                                                dt.items.add(file);
+                                                                imageInput.files = dt.files; // تحديث الملفات داخل input
+                                                            };
+                                                            reader.readAsDataURL(file);
+                                                        });
+                                                    });
+                                                </script>
                                                 <div class="row">
                                                     <div class="col-lg-12">
                                                         <div class="form-check">
@@ -295,6 +348,17 @@
             </div>
         </div>
     </div>
+    <style>
+        .remove-button {
+            cursor: pointer;
+            width: 33px;
+            height: 33px;
+            line-height: 9px;
+            text-align: center;
+            left: -15px;
+            top: -12px;
+        }
+    </style>
 @endsection
 @section('js')
     <script src="{{ asset('assets/admin/') }}/vendors/js/forms/icheck/icheck.min.js" type="text/javascript"></script>

@@ -18,6 +18,10 @@
                         <label> الاسم </label>
                         <input type="text" class="form-control" name="name" value="">
                     </div>
+                    <div>
+                        <label> عدد الدقائق للاصلاح  </label>
+                        <input type="number" min="1" class="form-control" name="solved_time" value="">
+                    </div>
                     <div class="modal-footer">
                         <button type="button" class="btn grey btn-outline-secondary" data-dismiss="modal">رجوع
                         </button>
