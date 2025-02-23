@@ -3,24 +3,25 @@
 namespace App\Http\Controllers\dashboard;
 
 use Exception;
+use Mpdf\Mpdf;
 use Illuminate\Http\Request;
 use App\Models\dashboard\Admin;
 use App\Models\dashboard\Invoice;
+use App\Models\dashboard\Message;
 use App\Http\Traits\Message_Trait;
 use App\Http\Traits\Upload_Images;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
 use App\Models\dashboard\CheckText;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Intervention\Image\Facades\Image;
 use App\Models\dashboard\InvoiceCheck;
 use App\Models\dashboard\InvoiceImage;
 use App\Models\dashboard\InvoiceSteps;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 use App\Models\dashboard\ProblemCategory;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Http;
-use Mpdf\Mpdf;
-use Picqer\Barcode\BarcodeGeneratorPNG;
 // use Intervention\Image\Facades\Image;
 class InvoiceController extends Controller
 {
@@ -36,6 +37,9 @@ class InvoiceController extends Controller
 
     public function create(Request $request)
     {
+        ///$message_temp = Message::where('message_type', 'اضافة فاتورة')->select('template_text')->first();
+        $message_temp = Message::where('message_type', 'اضافة فاتورة')->value('template_text');
+        // dd($message_temp);
         if ($request->isMethod('post')) {
             try {
                 $data = $request->all();
@@ -137,18 +141,30 @@ class InvoiceController extends Controller
                 $new_phone = preg_replace('/^0/', '', $invoice->phone);
                 // إضافة رمز البلد +966
                 $new_phone = '966' . $new_phone;
-                //$new_phone = $invoice->phone;
+                // $new_phone = '201002292856';
 
+
+                //$new_phone = $invoice->phone;
                 // تنسيق رسالة واتساب بطريقة مميزة
-                $message = "📄 *تفاصيل فاتورتك* 📄\n\n";
-                $message .= "👤 *العميل:* " . $invoice->name . "\n";
-                $message .= "📞 *رقم الهاتف:* " . $invoice->phone . "\n";
-                $message .= "📅 *تاريخ التسليم:* " . $invoice->date_delivery . "\n";
-                $message .= "⏰ *وقت التسليم:* " . $invoice->time_delivery . "\n";
-                //$message .= "💰 *السعر:* " . number_format($invoice->price, 2) . " ريال\n";
-                //$message .= "📌 *حالة الفاتورة:* " . $invoice->status . "\n\n";
-                $message .= "🖋 *الملاحظات:* " . ($invoice->description ?? "لا توجد ملاحظات") . "\n\n";
-                $message .= "🔗 *رابط الفاتورة:* " . $invoice_link . "\n";
+                // $message = "📄 *تفاصيل فاتورتك* 📄\n\n";
+                // $message .= "👤 *العميل:* " . $invoice->name . "\n";
+                // $message .= "📞 *رقم الهاتف:* " . $invoice->phone . "\n";
+                // $message .= "📅 *تاريخ التسليم:* " . $invoice->date_delivery . "\n";
+                // $message .= "⏰ *وقت التسليم:* " . $invoice->time_delivery . "\n";
+                // //$message .= "💰 *السعر:* " . number_format($invoice->price, 2) . " ريال\n";
+                // //$message .= "📌 *حالة الفاتورة:* " . $invoice->status . "\n\n";
+                // $message .= "🖋 *الملاحظات:* " . ($invoice->description ?? "لا توجد ملاحظات") . "\n\n";
+                // $message .= "🔗 *رابط الفاتورة:* " . $invoice_link . "\n";
+                ########### Dynamic Message
+                // استبدال المتغيرات بالقيم الفعلية
+
+                $message = str_replace(
+                    ['{name}', '{phone}', '{date_delivery}', '{time_delivery}', '{description}', '{invoice_link}'],
+                    [$invoice->name, $invoice->phone, $invoice->date_delivery, $invoice->time_delivery, $invoice->description ?? "لا توجد ملاحظات", $invoice_link],
+                    $message_temp
+                );
+                // dd($message);
+
                 // تعريف المتغير
                 $params = array(
                     'instanceid' => '138484',

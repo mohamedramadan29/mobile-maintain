@@ -100,6 +100,45 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-------------- Signutre And Images Files -------------->
+                        <div class="row">
+                            <div class="table-responsive col-sm-12">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th> توقيع العميل </th>
+                                            <th class="text-right"> مرفقات الجهاز </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <img width="100" height="100"
+                                                    src="{{ asset('assets/uploads/invoices_files/' . $invoice->signature) }}"
+                                                    alt="">
+                                            </td>
+                                            <td class="text-right">
+                                                <div class="flex-row d-flex justify-content-center">
+                                                    @foreach ($invoice->files as $file)
+                                                        <img style="border: 1px solid #ccc;border-radius: 10px;padding: 2px;margin-left: 5px"
+                                                            width="100px" height="100px" class="img-border"
+                                                            src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
+                                                            alt="">
+                                                    @endforeach
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-------------- End Signute ---------->
+
+
+
                         <!--################### End Add ChecksResults #####################-->
                         <!---------------- End Invoice Checks ------------>
                         <!-- Invoice Items Details -->
@@ -162,7 +201,7 @@
                                             <tbody>
                                                 <tr>
                                                     {{-- <td>المبلغ المدخل (شامل الضريبة)</td> --}}
-                                                    <td> المبلغ الاولي  </td>
+                                                    <td> المبلغ الاولي </td>
                                                     <td class="text-right">{{ number_format($invoice->price, 2) }} ريال
                                                     </td>
                                                 </tr>

@@ -13,6 +13,7 @@ use App\Http\Controllers\dashboard\PublicInvoiceController;
 use App\Http\Controllers\dashboard\ProblemCategoryController;
 use App\Http\Controllers\dashboard\auth\ResetPasswordController;
 use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
+use App\Http\Controllers\dashboard\MessageController;
 
 Route::group([
     'prefix' => '/dashboard',
@@ -136,6 +137,14 @@ Route::group([
             });
         });
         ################# End Tech Invoices #####################
+        ################# Start Messages #####################
+        Route::group(['middleware'=>'can:admins','prefix'=>'messages','as'=>'messages.'],function(){
+            Route::controller(MessageController::class)->group(function () {
+                Route::get('index','index')->name('index');
+                Route::match(['post','get'],'update/{id}','update')->name('update');
+            });
+        });
+        ################# End Messages ######################
     });
 
 

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\dashboard\Invoice;
+use App\Models\dashboard\Message;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Queue\SerializesModels;
@@ -28,27 +29,28 @@ class SendReviewMessage implements ShouldQueue
     {
         try {
 
-            // إنشاء رابط التقييم على Google Maps
-            $google_map_review_link = "https://maps.app.goo.gl/gMLTFSnBZ9Shjs2q8?g_st=ic"; // ضع رابط التقييم الخاص بك
+            $message_temp = Message::where('message_type', 'التقيم')->value('template_text');
 
-            // استخراج بيانات الفاتورة
             $new_phone = preg_replace('/^0/', '', $this->invoice->phone);
+            // إضافة رمز البلد +966
             $new_phone = '966' . $new_phone;
 
-            // رسالة التقييم
-            $message = "🌟 *مرحبًا استاذ " . $this->invoice->name . "* 🌟\n\n";
-            $message .= "نود معرفة رأيك حول الخدمة التي قدمناها لك. 😃\n\n";
-            $message .= "يمكنك تقييمنا عبر الرابط التالي:\n";
-            $message .= "🔗 *رابط التقييم:* " . $google_map_review_link . "\n\n";
-            $message .= "شكرًا لك على وقتك! 💙";
+            //$new_phone = '201011642731';
 
-            // إرسال الرسالة عبر API واتساب
-            $params = [
+            $message = str_replace(
+                ['{name}'],
+                [$this->invoice->name],
+                $message_temp
+            );
+            // dd($message);
+
+            // تعريف المتغير
+            $params = array(
                 'instanceid' => '138484',
                 'token' => '573f5335-db32-422f-8a7f-efc7a18654f9',
                 'phone' => $new_phone,
                 'body' => $message,
-            ];
+            );
             $queryString = http_build_query($params); // تحويل المصفوفة إلى سلسلة نصية
             $curl = curl_init();
             curl_setopt_array($curl, array(
@@ -63,6 +65,7 @@ class SendReviewMessage implements ShouldQueue
             $response = curl_exec($curl);
             $err = curl_error($curl);
             curl_close($curl);
+
             Log::info("رسالة التقييم أُرسلت بنجاح إلى " . $new_phone);
         } catch (\Exception $e) {
             Log::error("خطأ في ارسال رسالة التقييم: " . $e->getMessage());

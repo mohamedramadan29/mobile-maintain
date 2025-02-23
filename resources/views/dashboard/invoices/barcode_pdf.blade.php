@@ -4,7 +4,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Zain:ital,wght@0,200;0,300;0,400;0,700;0,800;0,900;1,300;1,400&display=swap');
         body {
-            font-family: "Zain", serif;
+            font-family: 'Zain', sans-serif;
             text-align: right;
         }
     </style>
@@ -14,7 +14,19 @@
 
 <body>
     <div class="text-center">
-        <h4 class="invoice_header">فاتورة  : {{ $invoice->id }}</h4>
+
+        <table class="table" style="margin-bottom: 1px;padding: 0px">
+            <tbody style="padding: 0;margin: 0">
+                <tr style="background-color: #000">
+                    <td>
+                        <img width="15px" src="{{ asset('assets/admin/') }}/images/logo_mobile.png" alt="">
+                    </td>
+                    <td style="text-align: right">
+                        <h4 class="invoice_header">فاتورة : {{ $invoice->id }}</h4>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
         <p class="invoice_title"> {{ $invoice->title }}</p>
         <p class="problems">
             @foreach (json_decode($invoice->problems) as $problem)
@@ -23,16 +35,14 @@
             @endforeach
         </p>
         <div class="barcode_users">
-            <table class="table">
+            <table class="table" style="border-collapse: collapse; width: 100%;">
                 <tbody>
                     <tr>
-                        <td>
-                            <div class="data">
-                                <p> {{ $invoice->name }} </p>
-                                <p> {{ $invoice->phone }} </p>
-                            </div>
+                        <td style="text-align: center;">
+                            <p> {{ $invoice->name }} </p>
+                            <p> {{ $invoice->phone }} </p>
                         </td>
-                        <td>
+                        <td style="text-align: right;margin:auto;">
                             <img src="data:image/png;base64,{{ base64_encode($barcode) }}" />
                         </td>
                     </tr>
@@ -81,16 +91,16 @@
         }
 
 
-        .barcode_users .user_info {
-            border: 1px solid #000;
-        }
+
 
         .barcode_users .user_info p {
             font-size: 10px;
             margin: 0;
             padding: 2px;
         }
+
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 
 </html>

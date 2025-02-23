@@ -1,5 +1,5 @@
   <!-- ////////////////////////////////////////////////////////////////////////////-->
-  <div class="main-menu menu-fixed menu-dark menu-accordion menu-shadow " data-scroll-to-active="true">
+  <div class="main-menu menu-fixed menu-dark menu-accordion menu-shadow" data-scroll-to-active="true">
       <div class="main-menu-content">
           <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
               <li class="nav-item {{ Route::is('dashboard.welcome') ? 'active' : '' }}"><a
@@ -38,6 +38,19 @@
                               <a class="menu-item" href="{{ route('dashboard.roles.create') }}"
                                   data-i18n="nav.templates.vert.classic_menu"> <i class="la la-plus"></i> <span
                                       class="menu-title""> اضافة صلاحية </a>
+                          </li>
+                      </ul>
+                  </li>
+              @endcan
+
+              @can('admins')
+                  <li class="nav-item {{ Route::is('dashboard.messages.*') ? 'active' : '' }}"><a href="#"><i
+                              class="la la-television"></i><span class="menu-title" data-i18n="nav.role.main"> ادارة الرسائل
+                          </span></a>
+                      <ul class="menu-content">
+                          <li class="{{ Route::is('dashboard.roles.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.messages.index') }}" data-i18n="nav.role.index">
+                                 جميع الرسائل </a>
                           </li>
                       </ul>
                   </li>

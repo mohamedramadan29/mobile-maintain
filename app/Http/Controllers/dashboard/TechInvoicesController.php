@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Http\Request;
 use App\Jobs\SendReviewMessage;
 use App\Models\dashboard\Invoice;
+use App\Models\dashboard\Message;
 use App\Http\Traits\Message_Trait;
 use App\Http\Traits\Upload_Images;
 use Illuminate\Support\Facades\DB;
@@ -45,6 +46,8 @@ class TechInvoicesController extends Controller
 
     public function checkout($id)
     {
+        $message_temp = Message::where('message_type', 'تحت الصيانة')->value('template_text');
+        // dd($message_temp);
         ############# Check If This User Have More Invoice Or Not ##############
         try {
             DB::beginTransaction();
@@ -60,6 +63,41 @@ class TechInvoicesController extends Controller
             $invoice->checkout_time = now();
             $invoice->save();
 
+            ########## Send Message To Client
+
+            $invoice_link = url('dashboard/invoice/view/' . $invoice->id);
+            $new_phone = preg_replace('/^0/', '', $invoice->phone);
+            // إضافة رمز البلد +966
+            $new_phone = '966' . $new_phone;
+
+            $message = str_replace(
+                ['{name}', '{status}', '{invoice_link}'],
+                [$invoice->name, $invoice->status, $invoice_link],
+                $message_temp
+            );
+            // dd($message);
+
+            // تعريف المتغير
+            $params = array(
+                'instanceid' => '138484',
+                'token' => '573f5335-db32-422f-8a7f-efc7a18654f9',
+                'phone' => $new_phone,
+                'body' => $message,
+            );
+            $queryString = http_build_query($params); // تحويل المصفوفة إلى سلسلة نصية
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://api.4whats.net/sendMessage/?" . $queryString, // إضافة سلسلة الاستعلام إلى عنوان URL
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "GET",
+            ));
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+            curl_close($curl);
             ############# Add Invoice Step ###############
             $invoice_step = new InvoiceSteps();
             $invoice_step->invoice_id = $invoice->id;
@@ -77,6 +115,8 @@ class TechInvoicesController extends Controller
     ################ Update After Repair ##################
     public function update(Request $request, $id)
     {
+        $message_temp = Message::where('message_type', 'استلام الجهاز')->value('template_text');
+        //dd($message_temp);
         $invoice = Invoice::find($id);
         if ($request->isMethod('post')) {
             //dd($request->all());
@@ -97,18 +137,22 @@ class TechInvoicesController extends Controller
                 ########### Send Message To WhatsApp
                 // إنشاء رابط عام للفاتورة
 
+                ########## Send Message To Client
+
                 $invoice_link = url('dashboard/invoice/view/' . $invoice->id);
                 $new_phone = preg_replace('/^0/', '', $invoice->phone);
                 // إضافة رمز البلد +966
                 $new_phone = '966' . $new_phone;
-                //$new_phone = $invoice->phone;
 
-                // تنسيق رسالة واتساب بطريقة مميزة
-                $message = "📄 *اهلا بيك * 📄\n\n";
-                $message .= "👤 *العميل:* " . $invoice->name . "\n";
-                $message .= "📞 * حالة الجهاز الخاص بك الان  :* " . $invoice->status . "\n";
-                $message .= "🖋 *ملاحظات الفني :* " . ($invoice->tech_notes ?? "لا توجد ملاحظات") . "\n\n";
-                $message .= "🔗 *رابط متابعة وتفاصيل الفاتورة:* " . $invoice_link . "\n";
+                // $new_phone = '201011642731';
+
+                $message = str_replace(
+                    ['{name}', '{status}', '{invoice_link}'],
+                    [$invoice->name, $invoice->status, $invoice_link],
+                    $message_temp
+                );
+                // dd($message);
+
                 // تعريف المتغير
                 $params = array(
                     'instanceid' => '138484',
