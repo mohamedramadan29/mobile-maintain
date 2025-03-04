@@ -17,6 +17,11 @@
                                   data-i18n="nav.users.user_profile"> جميع الفواتير
                               </a>
                           </li>
+                          <li class="{{ Route::is('dashboard.invoices.invoice-haif-time') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.invoices.invoice-haif-time') }}"
+                                  data-i18n="nav.users.user_profile"> فواتير مر عليها نصف الوقت او اكثر
+                              </a>
+                          </li>
                           <li class="{{ Route::is('dashboard.invoices.create') ? 'active' : '' }}">
                               <a class="menu-item" href="{{ route('dashboard.invoices.create') }}"
                                   data-i18n="nav.users.user_profile"> اضافة فاتورة
@@ -49,8 +54,9 @@
                           </span></a>
                       <ul class="menu-content">
                           <li class="{{ Route::is('dashboard.roles.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.messages.index') }}" data-i18n="nav.role.index">
-                                 جميع الرسائل </a>
+                              <a class="menu-item" href="{{ route('dashboard.messages.index') }}"
+                                  data-i18n="nav.role.index">
+                                  جميع الرسائل </a>
                           </li>
                       </ul>
                   </li>
@@ -106,6 +112,32 @@
 
                       </ul>
                   </li>
+                  <li class="nav-item {{ Route::is('dashboard.speed_device.*') ? 'active' : '' }}"><a href="#"><i
+                              class="la la-puzzle-piece"></i><span class="menu-title" data-i18n="nav.users.main"> ادارة
+                              جهاز سريع
+                          </span></a>
+                      <ul class="menu-content">
+                          <li class="{{ Route::is('dashboard.speed_device.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.speed_device.index') }}"
+                                  data-i18n="nav.users.user_profile"> جهاز سريع
+                              </a>
+                          </li>
+                      </ul>
+                  </li>
+                  <li class="nav-item {{ Route::is('dashboard.programe_device.*') ? 'active' : '' }}"><a
+                          href="#"><i class="la la-puzzle-piece"></i><span class="menu-title"
+                              data-i18n="nav.users.main"> ادارة
+                              جهاز برمجة
+                          </span></a>
+                      <ul class="menu-content">
+                          <li class="{{ Route::is('dashboard.programe_device.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.programe_device.index') }}"
+                                  data-i18n="nav.users.user_profile"> جهاز برمجة
+                              </a>
+                          </li>
+
+                      </ul>
+                  </li>
               @endcan
 
 
@@ -125,6 +157,23 @@
                                   data-i18n="nav.users.user_profile"> الفواتير المتاحة
                               </a>
                           </li>
+                      </ul>
+                  </li>
+              @endcan
+
+              @can('tech_invoices')
+                  <li class="nav-item {{ Route::is('dashboard.invoices.*') ? 'active' : '' }}"><a href="#"><i
+                              class="la la-file-text"></i><span class="menu-title" data-i18n="nav.users.main"> ادارة
+                              الفواتير
+                          </span></a>
+                      <ul class="menu-content">
+
+                          <li class="{{ Route::is('dashboard.invoices.invoice-haif-time') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.invoices.invoice-haif-time') }}"
+                                  data-i18n="nav.users.user_profile"> فواتير مر عليها نصف الوقت او اكثر
+                              </a>
+                          </li>
+
                       </ul>
                   </li>
               @endcan

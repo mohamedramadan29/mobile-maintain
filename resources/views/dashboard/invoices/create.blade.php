@@ -100,11 +100,122 @@
                                                     </table>
                                                 </div>
                                                 <!--################### End Add ChecksResults #####################-->
+                                                <!--################### Start Speed Device Check  ###################-->
+                                                <div class="row">
+                                                    <h5> جهاز سريع <span class="required_span"> * </span> </h5>
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th> # </th>
+                                                                <th> اساسيات الفحص </th>
+                                                                <th> يعمل </th>
+                                                                <th> لا يعمل </th>
+                                                                <th> ملاحظات </th>
+                                                                <th> بعد الفحص </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($speed_devices as $speed)
+                                                                <tr>
+                                                                    <td> {{ $loop->iteration }}</td>
+                                                                    <td>
+                                                                        <input type="hidden" name="speed_id[]"
+                                                                            value="{{ $speed->id }}">
+                                                                        <input readonly type="text"
+                                                                            value="{{ $speed->name }}"
+                                                                            class="form-control" name="check_speed_name[]">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input required type="radio" value="1"
+                                                                            class="form-control"
+                                                                            name="speedwork_{{ $speed->id }}[]"
+                                                                            {{ old('speedwork_' . $speed->id) == '1' ? 'checked' : '' }}>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input required type="radio" value="0"
+                                                                            class="form-control"
+                                                                            name="speedwork_{{ $speed->id }}[]"
+                                                                            {{ old('speedwork_' . $speed->id) == '0' ? 'checked' : '' }}>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text"
+                                                                            value="{{ old('speed_notes.' . $loop->index) }}"
+                                                                            class="form-control" name="speed_notes[]">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text"
+                                                                            value="{{ old('after_check_speed.' . $loop->index) }}"
+                                                                            class="form-control" name="after_check_speed[]">
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <!--################### End Speed Device Check  #####################-->
+
+                                                <!--################### Start Programe Device Check  ###################-->
+                                                <div class="row">
+                                                    <h5> جهاز برمجة <span class="required_span"> * </span> </h5>
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th> # </th>
+                                                                <th> اساسيات الفحص </th>
+                                                                <th> يعمل </th>
+                                                                <th> لا يعمل </th>
+                                                                <th> ملاحظات </th>
+                                                                <th> بعد الفحص </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($programe_devices as $programe)
+                                                                <tr>
+                                                                    <td> {{ $loop->iteration }}</td>
+                                                                    <td>
+                                                                        <input type="hidden" name="programe_id[]"
+                                                                            value="{{ $programe->id }}">
+                                                                        <input readonly type="text"
+                                                                            value="{{ $programe->name }}"
+                                                                            class="form-control"
+                                                                            name="check_programe_name[]">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input required type="radio" value="1"
+                                                                            class="form-control"
+                                                                            name="programework_{{ $programe->id }}[]"
+                                                                            {{ old('programework_' . $programe->id) == '1' ? 'checked' : '' }}>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input required type="radio" value="0"
+                                                                            class="form-control"
+                                                                            name="programework_{{ $programe->id }}[]"
+                                                                            {{ old('programework_' . $programe->id) == '0' ? 'checked' : '' }}>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text"
+                                                                            value="{{ old('programe_notes.' . $loop->index) }}"
+                                                                            class="form-control" name="programe_notes[]">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text"
+                                                                            value="{{ old('after_check_programe.' . $loop->index) }}"
+                                                                            class="form-control"
+                                                                            name="after_check_programe[]">
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <!--################### End Programe Device Check  #####################-->
+
                                                 <!-- باقي الحقول -->
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="name"> اسم العميل <span class="required_span"> *
+                                                            <label for="name"> اسم العميل <span class="required_span">
+                                                                    *
                                                                 </span> </label>
                                                             <input required type="text" id="name"
                                                                 class="form-control" placeholder="" name="name"
@@ -117,13 +228,12 @@
                                                                     *</span> </label>
                                                             <input required type="text" id="phone"
                                                                 class="form-control" placeholder="مثال: 0500000000"
-                                                                name="phone" value="{{ old('phone') }}" maxlength="10"
-                                                                oninput="validatePhoneNumber(this)">
+                                                                name="phone" value="{{ old('phone') }}"
+                                                                maxlength="10" oninput="validatePhoneNumber(this)">
                                                             <small id="phone-error" class="text-danger"
                                                                 style="display: none;">يجب أن يكون الرقم مكونًا من 10 أرقام
                                                                 ويبدأ بـ 0</small>
                                                         </div>
-
                                                         <script>
                                                             function validatePhoneNumber(input) {
                                                                 let phone = input.value;
@@ -154,7 +264,8 @@
 
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="title"> اسم الجهاز <span class="required_span"> *
+                                                            <label for="title"> اسم الجهاز <span class="required_span">
+                                                                    *
                                                                 </span> </label>
                                                             <input required type="text" id="title"
                                                                 class="form-control" placeholder="" name="title"
@@ -234,6 +345,47 @@
                                                                     {{ old('status') == 'رف الاستلام' ? 'selected' : '' }}>
                                                                     رف الاستلام</option>
                                                             </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="name"> رمز الجهاز </label>
+                                                            <input required type="text" id="device_text_password"
+                                                                class="form-control" placeholder=""
+                                                                name="device_text_password"
+                                                                value="{{ old('device_text_password') }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <div class="d-flex">
+                                                                <input type="number" min="1" max="12"
+                                                                    name="pattern[]" value="{{ old('pattern.0') }}">
+                                                                <input type="number" min="1" max="12"
+                                                                    name="pattern[]" value="{{ old('pattern.1') }}">
+                                                                <input type="number" min="1" max="12"
+                                                                    name="pattern[]" value="{{ old('pattern.2') }}">
+                                                            </div>
+                                                            <div class="d-flex">
+                                                                <input type="number" min="1" max="12"
+                                                                    name="pattern[]" value="{{ old('pattern.3') }}">
+                                                                <input type="number" min="1" max="12"
+                                                                    name="pattern[]" value="{{ old('pattern.4') }}">
+                                                                <input type="number" min="1" max="12"
+                                                                    name="pattern[]" value="{{ old('pattern.5') }}">
+                                                            </div>
+                                                            <div class="d-flex">
+                                                                <input type="number" min="1" max="12"
+                                                                    name="pattern[]" value="{{ old('pattern.6') }}">
+                                                                <input type="number" min="1" max="12"
+                                                                    name="pattern[]" value="{{ old('pattern.7') }}">
+                                                                <input type="number" min="1" max="12"
+                                                                    name="pattern[]" value="{{ old('pattern.8') }}">
+                                                            </div>
+
                                                         </div>
                                                     </div>
                                                 </div>

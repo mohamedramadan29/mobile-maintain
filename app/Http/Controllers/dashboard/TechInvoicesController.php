@@ -13,10 +13,14 @@ use Illuminate\Support\Facades\DB;
 use App\Models\dashboard\CheckText;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\dashboard\SpeedDevice;
 use App\Models\dashboard\InvoiceImage;
 use App\Models\dashboard\InvoiceSteps;
+use App\Models\dashboard\ProgrameDevice;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\dashboard\ProblemCategory;
+use App\Models\dashboard\InvoiceSpeedCheck;
+use App\Models\dashboard\InvoicePrograneCheck;
 
 class TechInvoicesController extends Controller
 {
@@ -41,7 +45,9 @@ class TechInvoicesController extends Controller
         $invoice = Invoice::find($id);
         $problems = ProblemCategory::all();
         $checks = CheckText::all();
-        return view('dashboard.tech_invoices.show', compact('invoice', 'problems', 'checks'));
+        $speed_devices = SpeedDevice::all();
+        $programe_devices = ProgrameDevice::all();
+        return view('dashboard.tech_invoices.show', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices'));
     }
 
     public function checkout($id)
@@ -186,7 +192,9 @@ class TechInvoicesController extends Controller
         }
         $problems = ProblemCategory::all();
         $checks = CheckText::all();
-        return view('dashboard.tech_invoices.update', compact('invoice', 'problems', 'checks'));
+        $speed_devices = SpeedDevice::all();
+        $programe_devices = ProgrameDevice::all();
+        return view('dashboard.tech_invoices.update', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices'));
     }
 
     public function addfile(Request $request, $id)
@@ -208,6 +216,15 @@ class TechInvoicesController extends Controller
         } catch (Exception $e) {
             return $this->exception_message($e);
         }
+    }
+
+    public function ClientConnect(Request $request, $id)
+    {
+        $invoice = Invoice::find($id);
+        $invoice->client_connect = $request->client_connect;
+        $invoice->client_connect_notes = $request->client_connect_notes;
+        $invoice->save();
+        return $this->success_message(' تم تحديث حالة التواصل مع العميل بنجاح  ');
     }
 
 }

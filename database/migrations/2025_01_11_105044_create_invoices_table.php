@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -30,6 +29,10 @@ return new class extends Migration
             $table->timestamp('checkout_time')->nullable();
             $table->timestamp('checkout_end_time')->nullable();
             $table->text('tech_notes')->nullable();
+            $table->string('device_password_text')->nullable();
+            $table->string('device_pattern')->nullable();
+            $table->tinyInteger('client_connect')->nullable()->default(0);
+            $table->text('client_connect_notes')->nullable();
             $table->timestamps();
         });
     }

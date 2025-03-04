@@ -45,60 +45,190 @@
                                             enctype="multipart/form-data">
                                             @csrf
                                             <div class="form-body">
-                                           <!--################### Start Add ChecksResults ###################-->
-                                <div class="row">
+                                                <!--################### Start Add ChecksResults ###################-->
+                                                <div class="row">
 
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th> # </th>
-                                                <th> اساسيات الفحص </th>
-                                                <th> يعمل </th>
-                                                <th> لا يعمل </th>
-                                                <th> ملاحظات </th>
-                                                <th> بعد الفحص </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($checks as $check)
-                                                @php
-                                                    $checkResult = $invoice->checkResults
-                                                        ->where('problem_id', $check->id)
-                                                        ->where('invoice_id', $invoice->id)
-                                                        ->first();
-                                                @endphp
-                                                <tr>
-                                                    <td> {{ $loop->iteration }}</td>
-                                                    <td>
-                                                        <input readonly disabled type="hidden" name="problem_id[]"
-                                                            value="{{ $check->id }}">
-                                                        <input readonly type="text" value="{{ $check->name }}"
-                                                            class="form-control" name="check_problem_name[]">
-                                                    </td>
-                                                    <td>
-                                                        <input readonly disabled type="radio" value="1" class="form-control"
-                                                            name="work_{{ $check->id }}[]"
-                                                            {{ isset($checkResult) && $checkResult->work == 1 ? 'checked' : '' }}>
-                                                    </td>
-                                                    <td>
-                                                        <input readonly disabled type="radio" value="0" class="form-control"
-                                                            name="work_{{ $check->id }}[]"
-                                                            {{ isset($checkResult) && $checkResult->work == 0 ? 'checked' : '' }}>
-                                                    </td>
-                                                    <td>
-                                                        <input readonly disabled type="text" value="{{ $checkResult->notes ?? '' }}"
-                                                            class="form-control" name="notes[]">
-                                                    </td>
-                                                    <td>
-                                                        <input readonly disabled type="text" value="{{ $checkResult->after_check ?? '' }}"
-                                                            class="form-control" name="after_check[]">
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <!--################### End Add ChecksResults #####################-->
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th> # </th>
+                                                                <th> اساسيات الفحص </th>
+                                                                <th> يعمل </th>
+                                                                <th> لا يعمل </th>
+                                                                <th> ملاحظات </th>
+                                                                <th> بعد الفحص </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($checks as $check)
+                                                                @php
+                                                                    $checkResult = $invoice->checkResults
+                                                                        ->where('problem_id', $check->id)
+                                                                        ->where('invoice_id', $invoice->id)
+                                                                        ->first();
+                                                                @endphp
+                                                                <tr>
+                                                                    <td> {{ $loop->iteration }}</td>
+                                                                    <td>
+                                                                        <input readonly disabled type="hidden"
+                                                                            name="problem_id[]" value="{{ $check->id }}">
+                                                                        <input readonly type="text"
+                                                                            value="{{ $check->name }}" class="form-control"
+                                                                            name="check_problem_name[]">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input readonly disabled type="radio"
+                                                                            value="1" class="form-control"
+                                                                            name="work_{{ $check->id }}[]"
+                                                                            {{ isset($checkResult) && $checkResult->work == 1 ? 'checked' : '' }}>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input readonly disabled type="radio"
+                                                                            value="0" class="form-control"
+                                                                            name="work_{{ $check->id }}[]"
+                                                                            {{ isset($checkResult) && $checkResult->work == 0 ? 'checked' : '' }}>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input readonly disabled type="text"
+                                                                            value="{{ $checkResult->notes ?? '' }}"
+                                                                            class="form-control" name="notes[]">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input readonly disabled type="text"
+                                                                            value="{{ $checkResult->after_check ?? '' }}"
+                                                                            class="form-control" name="after_check[]">
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <!--################### End Add ChecksResults #####################-->
+                                                <!--################### Start Speed Device Check  ###################-->
+                                                <div class="row">
+                                                    <h5> جهاز سريع <span class="required_span"> * </span> </h5>
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th> # </th>
+                                                                <th> اساسيات الفحص </th>
+                                                                <th> يعمل </th>
+                                                                <th> لا يعمل </th>
+                                                                <th> ملاحظات </th>
+                                                                <th> بعد الفحص </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($speed_devices as $speed)
+                                                                @php
+                                                                    $speedResult = $invoice
+                                                                        ->speedResults()
+                                                                        ->where('speed_id', $speed->id)
+                                                                        ->where('invoice_id', $invoice->id)
+                                                                        ->first();
+                                                                @endphp
+                                                                <tr>
+                                                                    <td> {{ $loop->iteration }}</td>
+                                                                    <td>
+                                                                        <input type="hidden" name="speed_id[]"
+                                                                            value="{{ $speed->id }}">
+                                                                        <input readonly disabled type="text"
+                                                                            value="{{ $speed->name }}"
+                                                                            class="form-control" name="check_speed_name[]">
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input readonly disabled type="radio"
+                                                                            value="1" class="form-control"
+                                                                            name="speedwork_{{ $speed->id }}"
+                                                                            {{ isset($speedResult) && $speedResult->work == 1 ? 'checked' : '' }}
+                                                                            </td>
+                                                                    <td>
+                                                                        <input readonly disabled type="radio"
+                                                                            value="0" class="form-control"
+                                                                            name="speedwork_{{ $speed->id }}"
+                                                                            {{ isset($speedResult) && $speedResult->work == 0 ? 'checked' : '' }}>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input readonly disabled type="text"
+                                                                            value="{{ $speedResult->notes ?? '' }}"
+                                                                            class="form-control" name="speed_notes[]">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input readonly disabled type="text"
+                                                                            value="{{ $speedResult->after_check ?? '' }}"
+                                                                            class="form-control" name="after_check_speed[]">
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <!--################### End Speed Device Check  #####################-->
+
+                                                <!--################### Start Programe Device Check  ###################-->
+                                                <div class="row">
+                                                    <h5> جهاز برمجة <span class="required_span"> * </span> </h5>
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th> # </th>
+                                                                <th> اساسيات الفحص </th>
+                                                                <th> يعمل </th>
+                                                                <th> لا يعمل </th>
+                                                                <th> ملاحظات </th>
+                                                                <th> بعد الفحص </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($programe_devices as $programe)
+                                                                @php
+                                                                    $programeResult = $invoice
+                                                                        ->programeResults()
+                                                                        ->where('programe_id', $programe->id)
+                                                                        ->where('invoice_id', $invoice->id)
+                                                                        ->first();
+                                                                @endphp
+                                                                <tr>
+                                                                    <td> {{ $loop->iteration }}</td>
+                                                                    <td>
+                                                                        <input type="hidden" name="programe_id[]"
+                                                                            value="{{ $programe->id }}">
+                                                                        <input readonly disabled type="text"
+                                                                            value="{{ $programe->name }}"
+                                                                            class="form-control"
+                                                                            name="check_programe_name[]">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input readonly disabled type="radio"
+                                                                            value="1" class="form-control"
+                                                                            name="programework_{{ $programe->id }}[]"
+                                                                            {{ isset($programeResult) && $programeResult->work == 1 ? 'checked' : '' }}>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input readonly disabled type="radio"
+                                                                            value="0" class="form-control"
+                                                                            name="programework_{{ $programe->id }}[]"
+                                                                            {{ isset($programeResult) && $programeResult->work == 0 ? 'checked' : '' }}>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input readonly disabled type="text"
+                                                                            value="{{ $programeResult->notes ?? '' }}"
+                                                                            class="form-control" name="programe_notes[]">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input readonly disabled type="text"
+                                                                            value="{{ $programeResult->after_check ?? '' }}"
+                                                                            class="form-control"
+                                                                            name="after_check_programe[]">
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <!--################### End Programe Device Check  #####################-->
+
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
@@ -150,8 +280,7 @@
                                                                 <option
                                                                     {{ $invoice->status == 'لم يتم الاصلاح' ? 'selected' : '' }}
                                                                     value="لم يتم الاصلاح">لم يتم الاصلاح</option>
-                                                                <option
-                                                                    {{ $invoice->status == 'معلق' ? 'selected' : '' }}
+                                                                <option {{ $invoice->status == 'معلق' ? 'selected' : '' }}
                                                                     value="معلق">معلق</option>
                                                             </select>
                                                         </div>
@@ -165,6 +294,37 @@
                                             </div>
                                         </form>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title"> حالة التواصل مع العميل </h4>
+                                    <br>
+                                    <form action="{{ route('dashboard.tech_invoices.client-connect',$invoice->id) }}" method="post">
+                                        @csrf
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <select name="client_connect" id="" class="form-control">
+                                                    <option value="" selected disabled> -- حدد -- </option>
+                                                    <option value="1" @selected($invoice->client_connect == 1)> تم التواصل
+                                                    </option>
+                                                    <option value="0" @selected($invoice->client_connect == 0)> لم يتم التواصل
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="title"> ملاحظات التواصل </label>
+                                                <textarea name="client_connect_notes" id="" class="form-control">{{ $invoice->client_connect_notes }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-actions">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="la la-check-square-o"></i> حفظ
+                                            </button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                             <div class="card">
@@ -184,12 +344,14 @@
                                                     <div class="form-group">
                                                         <label for="address"> صورة المرفق <span class="required_span"> *
                                                             </span> </label>
-                                                        <input required type="file" name="file" class="form-control">
+                                                        <input required type="file" name="file"
+                                                            class="form-control">
                                                     </div>
                                                 </div>
                                                 <div class="col-6">
                                                     <div class="form-group">
-                                                        <label for="address"> اضف عنوان للمرفق <span class="required_span">
+                                                        <label for="address"> اضف عنوان للمرفق <span
+                                                                class="required_span">
                                                                 * </span> </label>
                                                         <input required type="text" id="title"
                                                             class="form-control" placeholder="" name="title"
@@ -229,7 +391,7 @@
                                                         عنوان المرفق
                                                     </th>
                                                     <th>
-                                                         السعر
+                                                        السعر
                                                     </th>
                                                     <th>
                                                         تفاصيل اضافية
@@ -253,7 +415,7 @@
                                                             {{ $file->title }}
                                                         </td>
                                                         <td>
-                                                            {{ number_format($file->price,2) }} ريال
+                                                            {{ number_format($file->price, 2) }} ريال
                                                         </td>
                                                         <td>
                                                             {{ $file->description }}

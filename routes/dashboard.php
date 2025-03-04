@@ -14,6 +14,10 @@ use App\Http\Controllers\dashboard\ProblemCategoryController;
 use App\Http\Controllers\dashboard\auth\ResetPasswordController;
 use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
 use App\Http\Controllers\dashboard\MessageController;
+use App\Http\Controllers\dashboard\NotificationController;
+use App\Http\Controllers\dashboard\ProgrameDeviceController;
+use App\Http\Controllers\dashboard\SpeedDeviceController;
+use App\Models\dashboard\SpeedDevice;
 
 Route::group([
     'prefix' => '/dashboard',
@@ -32,6 +36,7 @@ Route::group([
     Route::controller(PublicInvoiceController::class)->group(function () {
         Route::get('invoice/view/{id}', 'PublicInvoice')->name('show_invoice');
     });
+    Route::view('terms', 'dashboard.terms')->name('terms');
     ############################## End Public Invoice Controller ############
     ################### Reset Password #############
     Route::controller(ForgetPasswordController::class)->group(function () {
@@ -52,8 +57,8 @@ Route::group([
     ############################### Start Admin Auth Route  ###############
     Route::group(['middleware' => 'auth:admin'], function () {
         Route::controller(AuthController::class)->group(function () {
-            Route::match(['post','get'],'update_profile', 'update_profile')->name('update_profile');
-            Route::match(['post','get'],'update_password', 'update_password')->name('update_password');
+            Route::match(['post', 'get'], 'update_profile', 'update_profile')->name('update_profile');
+            Route::match(['post', 'get'], 'update_password', 'update_password')->name('update_password');
         });
 
         ############################### Start Welcome  Controller ###############
@@ -100,8 +105,8 @@ Route::group([
             });
         });
         ##################### End Problem Category ###################
-         ###################### Start Check Text  #################
-         Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'check_text', 'as' => 'check_text.'], function () {
+        ###################### Start Check Text  #################
+        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'check_text', 'as' => 'check_text.'], function () {
             Route::controller(CheckTextController::class)->group(function () {
                 Route::get('index', 'index')->name('index');
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
@@ -110,6 +115,26 @@ Route::group([
             });
         });
         ##################### End Check Text  ###################
+        ###################### Start Speed Device   #################
+        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'speed_device', 'as' => 'speed_device.'], function () {
+            Route::controller(SpeedDeviceController::class)->group(function () {
+                Route::get('index', 'index')->name('index');
+                Route::match(['get', 'post'], 'create', 'create')->name('create');
+                Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
+                Route::post('destroy/{id}', 'destroy')->name('destroy');
+            });
+        });
+        ##################### End Speed Device   ###################
+        ###################### Start Programe Device   #################
+        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'programe_device', 'as' => 'programe_device.'], function () {
+            Route::controller(ProgrameDeviceController::class)->group(function () {
+                Route::get('index', 'index')->name('index');
+                Route::match(['get', 'post'], 'create', 'create')->name('create');
+                Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
+                Route::post('destroy/{id}', 'destroy')->name('destroy');
+            });
+        });
+        ##################### End Programe Device  ###################
         ################### Start Invoices #######################
         Route::group(['middleware' => 'can:invoices', 'prefix' => 'invoices', 'as' => 'invoices.'], function () {
             Route::controller(InvoiceController::class)->group(function () {
@@ -117,6 +142,7 @@ Route::group([
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
                 Route::post('destroy/{id}', 'destroy')->name('destroy');
+                Route::get('invoice-haif-time', 'InvoicesHaifTime')->name('invoice-haif-time')->middleware('can:tech_invoices');
                 Route::post('delete_file/{id}', 'delete_file')->name('delete_file');
                 Route::get('print/{id}', 'print')->name('print');
                 Route::get('print_barcode/{id}', 'print_barcode')->name('print_barcode');
@@ -124,6 +150,13 @@ Route::group([
                 Route::post('add_tech/{id}', 'add_tech')->name('add_tech');
             });
         });
+
+        Route::group(['middleware' => 'can:tech_invoices', 'prefix' => 'invoices', 'as' => 'invoices.'], function () {
+            Route::controller(InvoiceController::class)->group(function () {
+                Route::get('invoice-haif-time', 'InvoicesHaifTime')->name('invoice-haif-time');
+            });
+        });
+
         ################# End Invoices #######################
         ################## Start Tech Invoices ###############
         Route::group(['middleware' => 'can:tech_invoices', 'prefix' => 'tech_invoices', 'as' => 'tech_invoices.'], function () {
@@ -134,17 +167,23 @@ Route::group([
                 Route::post('checkout/{id}', 'checkout')->name('checkout');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
                 Route::post('addfile/{id}', 'AddFile')->name('addfile');
+                Route::post('client-connect/{id}','ClientConnect')->name('client-connect');
             });
         });
         ################# End Tech Invoices #####################
         ################# Start Messages #####################
-        Route::group(['middleware'=>'can:admins','prefix'=>'messages','as'=>'messages.'],function(){
+        Route::group(['middleware' => 'can:admins', 'prefix' => 'messages', 'as' => 'messages.'], function () {
             Route::controller(MessageController::class)->group(function () {
-                Route::get('index','index')->name('index');
-                Route::match(['post','get'],'update/{id}','update')->name('update');
+                Route::get('index', 'index')->name('index');
+                Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
             });
         });
         ################# End Messages ######################
+        ################ Start Notification Controller ############
+        Route::controller(NotificationController::class)->group(function () {
+            Route::get('all_read', 'AllRead')->name('all_read');
+        });
+        ################ End Notification Controller ##############
     });
 
 

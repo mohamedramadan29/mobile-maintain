@@ -216,6 +216,8 @@
                                 <div class="col-md-7 col-sm-12">
                                     <h6> الشروط والاحكام </h6>
                                     <p> يجب إحضار الفاتورة عند استلام الجهاز. </p>
+                                    <p> <a target="_blank" href="{{ url('/dashboard/terms') }}"> قراءة الشروط والاحكام </a>
+                                    </p>
                                 </div>
                                 <div class="text-center col-md-5 col-sm-12">
                                     <button onclick="setPrintTitle(); window.print();" type="button"

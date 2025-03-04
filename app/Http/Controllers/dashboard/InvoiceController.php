@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\dashboard;
 
+use App\Models\dashboard\InvoicePrograneCheck;
+use App\Models\dashboard\InvoiceSpeedCheck;
 use Exception;
 use Mpdf\Mpdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\dashboard\Admin;
 use App\Models\dashboard\Invoice;
@@ -15,26 +18,36 @@ use App\Models\dashboard\CheckText;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use App\Models\dashboard\SpeedDevice;
 use Intervention\Image\Facades\Image;
 use App\Models\dashboard\InvoiceCheck;
 use App\Models\dashboard\InvoiceImage;
 use App\Models\dashboard\InvoiceSteps;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 use App\Models\dashboard\ProblemCategory;
-use Illuminate\Support\Facades\Validator;
+use App\Models\dashboard\ProgrameDevice;
 // use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Validator;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
 class InvoiceController extends Controller
 {
     use Message_Trait;
     use Upload_Images;
-
-    public function index()
+    public function index(Request $request)
     {
-        $invoices = Invoice::orderBy('id', 'desc')->paginate(10);
+        $query = Invoice::query();
+
+        // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
+        if ($request->has('invoice_status') && !empty($request->invoice_status)) {
+            $query->where('status', $request->invoice_status);
+        }
+
+        $invoices = $query->orderBy('id', 'desc')->paginate(10);
         $techs = Admin::where('type', 'فني')->get();
+
         return view('dashboard.invoices.index', compact('invoices', 'techs'));
     }
-
     public function create(Request $request)
     {
         ///$message_temp = Message::where('message_type', 'اضافة فاتورة')->select('template_text')->first();
@@ -43,7 +56,8 @@ class InvoiceController extends Controller
         if ($request->isMethod('post')) {
             try {
                 $data = $request->all();
-                //  dd($data);
+
+                ///  dd($data);
                 $rules = [
                     'name' => 'required',
                     'phone' => 'required',
@@ -87,6 +101,9 @@ class InvoiceController extends Controller
 
                 // حفظ الصورة في المسار المحدد
                 file_put_contents($signuturepath, $imageData);
+                // تحويل المصفوفة إلى JSON قبل التخزين
+                $patternJson = json_encode($data['pattern']);
+
                 DB::beginTransaction();
                 $invoice = new Invoice();
                 $invoice->invoice_number = 1;
@@ -101,6 +118,8 @@ class InvoiceController extends Controller
                 $invoice->status = $data['status'];
                 $invoice->admin_recieved_id = Auth::id();
                 $invoice->signature = $filesiguture;
+                $invoice->device_password_text = $data['device_text_password'];
+                $invoice->device_pattern = $patternJson;
                 $invoice->save();
                 ############ Start Insert Files ################
                 if ($request->hasFile('files_images')) {
@@ -132,6 +151,32 @@ class InvoiceController extends Controller
                         $check->notes = $data['notes'][$index] ?? null;
                         $check->after_check = $data['after_check'][$index] ?? null;
                         $check->save();
+                    }
+                }
+                // إضافة نتائج الفحص للجهاز السريع
+                if (isset($data['speed_id']) && is_array($data['speed_id'])) {
+                    foreach ($data['speed_id'] as $index => $speedId) {
+                        $checkSpeed = new InvoiceSpeedCheck();
+                        $checkSpeed->invoice_id = $invoice->id;
+                        $checkSpeed->speed_id = $speedId;
+                        $checkSpeed->problem_name = $data['check_speed_name'][$index] ?? '';
+                        $checkSpeed->work = isset($data["speedwork_{$speedId}"]) ? reset($data["speedwork_{$speedId}"]) : 0;
+                        $checkSpeed->notes = $data['speed_notes'][$index] ?? null;
+                        $checkSpeed->after_check = $data['after_check_speed'][$index] ?? null;
+                        $checkSpeed->save();
+                    }
+                }
+                // إضافة نتائج الفحص للجهاز البرمجة
+                if (isset($data['programe_id']) && is_array($data['programe_id'])) {
+                    foreach ($data['programe_id'] as $index => $programeId) {
+                        $checkPrograme = new InvoicePrograneCheck();
+                        $checkPrograme->invoice_id = $invoice->id;
+                        $checkPrograme->programe_id = $programeId;
+                        $checkPrograme->problem_name = $data['check_programe_name'][$index] ?? '';
+                        $checkPrograme->work = isset($data["programework_{$programeId}"]) ? reset($data["programework_{$programeId}"]) : 0;
+                        $checkPrograme->notes = $data['programe_notes'][$index] ?? null;
+                        $checkPrograme->after_check = $data['after_check_programe'][$index] ?? null;
+                        $checkPrograme->save();
                     }
                 }
                 ########### Send Message To WhatsApp
@@ -196,14 +241,18 @@ class InvoiceController extends Controller
 
         $problems = ProblemCategory::all();
         $checks = CheckText::all();
-        return view('dashboard.invoices.create', compact('problems', 'checks'));
+        $speed_devices = SpeedDevice::all();
+        $programe_devices = ProgrameDevice::all();
+        return view('dashboard.invoices.create', compact('problems', 'checks', 'speed_devices', 'programe_devices'));
     }
 
     public function update(Request $request, $id)
     {
-        try {
-            if ($request->isMethod('post')) {
+        $invoice = Invoice::find($id);
+        if ($request->isMethod('post')) {
+            try {
                 $data = $request->all();
+                // dd($data);
                 $rules = [
                     'name' => 'required',
                     'phone' => 'required',
@@ -232,7 +281,8 @@ class InvoiceController extends Controller
                     return redirect()->back()->withErrors($validator)->withInput();
                 }
                 DB::beginTransaction();
-                $invoice = Invoice::find($id);
+                // تحويل المصفوفة إلى JSON قبل التخزين
+                $patternJson = json_encode($data['pattern']);
                 $invoice->name = $data['name'];
                 $invoice->phone = $data['phone'];
                 $invoice->title = $data['title'];
@@ -242,6 +292,8 @@ class InvoiceController extends Controller
                 $invoice->date_delivery = $data['date_delivery'];
                 $invoice->time_delivery = $data['time_delivery'];
                 $invoice->status = $data['status'];
+                $invoice->device_password_text = $data['device_text_password'];
+                $invoice->device_pattern = $patternJson;
                 $invoice->save();
                 ############ Start Insert Files ################
                 ############ Start Insert Files ################
@@ -266,30 +318,65 @@ class InvoiceController extends Controller
                 // إضافة الفحوصات أو تعديلها
                 if (isset($data['problem_id']) && is_array($data['problem_id'])) {
                     foreach ($data['problem_id'] as $index => $problem_id) {
-                        $checkResult = InvoiceCheck::updateOrCreate(
+                        InvoiceCheck::updateOrCreate(
                             [
                                 'invoice_id' => $invoice->id,
                                 'problem_id' => $problem_id,
                             ],
                             [
-                                'work' => $data['work_' . $problem_id][0] ?? null,
-                                'notes' => $data['notes'][$index] ?? '',
-                                'after_check' => $data['after_check'][$index] ?? '',
+                                'work' => $data['work_' . $problem_id] ?? null, // تأكد من أن القيمة موجودة
+                                'notes' => $data['notes'][$index] ?? '', // استخدام الترتيب الصحيح للمصفوفة
+                                'after_check' => $data['after_check'][$index] ?? '', // استخدام الترتيب الصحيح للمصفوفة
                             ]
                         );
                     }
                 }
 
+                // إضافة نتائج الفحص للجهاز السريع
+                if (isset($data['speed_id']) && is_array($data['speed_id'])) {
+                    foreach ($data['speed_id'] as $index => $speedId) {
+                        InvoiceSpeedCheck::updateOrCreate(
+                            [
+                                "invoice_id" => $invoice->id,
+                                "speed_id" => $speedId,
+                            ],
+                            [
+                                // "problem_name" => $data['check_speed_name'][$index] ?? '',
+                                "work" => $data['speedwork_' . $speedId] ?? null,
+                                "notes" => $data['speed_notes'][$index] ?? '',
+                                "after_check" => $data['after_check_speed'][$index] ?? '',
+                            ]
+                        );
+                    }
+                }
+                // إضافة نتائج الفحص للجهاز البرمجة
+                if (isset($data['programe_id']) && is_array($data['programe_id'])) {
+                    foreach ($data['programe_id'] as $index => $programeId) {
+                        $checkPrograme = InvoicePrograneCheck::updateOrCreate(
+                            [
+                                "invoice_id" => $invoice->id,
+                                "programe_id" => $programeId,
+                            ],
+                            [
+                                "problem_name" => $data['check_programe_name'][$index] ?? '',
+                                "work" => isset($data["programework_{$programeId}"]) ? reset($data["programework_{$programeId}"]) : 0,
+                                "notes" => $data['programe_notes'][$index] ?? null,
+                                "after_check" => $data['after_check_programe'][$index] ?? null,
+                            ]
+                        );
+                    }
+                }
                 DB::commit();
                 return $this->success_message(' تم تعديل الفاتورة بنجاح');
+            } catch (Exception $e) {
+                return $this->exception_message($e);
             }
-        } catch (Exception $e) {
-            return $this->exception_message($e);
         }
-        $invoice = Invoice::find($id);
         $checks = CheckText::all();
         $problems = ProblemCategory::all();
-        return view('dashboard.invoices.update', compact('invoice', 'problems', 'checks'));
+        $speed_devices = SpeedDevice::all();
+        $programe_devices = ProgrameDevice::all();
+        return view('dashboard.invoices.update', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices'));
     }
     public function destroy($id)
     {
@@ -349,39 +436,68 @@ class InvoiceController extends Controller
         $invoice_step->save();
         DB::commit();
         return $this->success_message('تم تعين فني من جانب المدير  بنجاح');
-
     }
 
     ################# Start Print BarCode ################
-
-
     public function print_barcode($id)
     {
         try {
             $invoice = Invoice::findOrFail($id);
+            // توليد رابط الفاتورة
+            $invoiceUrl = url('dashboard/invoice/view/' . $invoice->id);
+            // توليد QR Code وتحويله إلى Base64
+            // $qrCode = QrCode::format('png')->size(200)->generate($invoiceUrl);
+            $qrCode = QrCode::format('png')
+                ->size(100) // تقليل الحجم ليلائم العرض
+                ->margin(0) // إزالة الهوامش
+                ->generate($invoiceUrl);
+            $qrCodeBase64 = base64_encode($qrCode);
+            $qrCodeBase64 = base64_encode($qrCode);
 
-            // توليد الباركود باستخدام مكتبة Picqer
-            $generator = new BarcodeGeneratorPNG();
-            $barcode = $generator->getBarcode((string) $invoice->id, $generator::TYPE_CODE_128);
-            // إعدادات حجم الورقة بناءً على المحتوى
+            // إعداد PDF باستخدام Mpdf
             $mpdf = new Mpdf([
                 'mode' => 'utf-8',
                 'default_font' => 'Zain',
-                'format' => [50, 25], // عرض وطول الورقة (80 مم × 150 مم)، يمكن تغييره حسب البيانات
+                'format' => [50, 25],
                 'margin_left' => 0,
                 'margin_right' => 0,
                 'margin_top' => 0,
                 'margin_bottom' => 0,
             ]);
-            // إرسال البيانات إلى ملف العرض (View)
-            $html = view('dashboard.invoices.barcode_pdf', compact('invoice', 'barcode'))->render();
+
+            // إرسال البيانات إلى View
+            $html = view('dashboard.invoices.barcode_pdf', compact('invoice', 'qrCodeBase64'))->render();
+
             // كتابة الـ HTML في PDF
             $mpdf->WriteHTML($html);
+
             // عرض الـ PDF مباشرة أو تحميله
             return $mpdf->Output("Invoice_{$invoice->id}.pdf", 'I');
+
         } catch (Exception $e) {
             return back()->withErrors('حدث خطأ أثناء الطباعة: ' . $e->getMessage());
         }
     }
     ################### End Print BarCode ################
+
+    ################### Start Invoice Haif time ###############
+
+    public function InvoicesHaifTime()
+    {
+        //$invoices = Invoice::orderBy('id', 'desc')->paginate(10);
+        $invoices = Invoice::where('status', 'رف الاستلام')->get()->filter(function ($invoice) {
+            $deliveryDateTime = Carbon::parse($invoice->date_delivery . ' ' . $invoice->time_delivery);
+            $createdDateTime = Carbon::parse($invoice->created_at);
+            // حساب نصف الوقت بدقة أكبر
+            $halfTime = $createdDateTime->copy()->addMinutes($createdDateTime->diffInMinutes($deliveryDateTime) / 2);
+            // الشرط الأول: تجاوز نصف الوقت
+            $halfTimePassed = Carbon::now()->greaterThanOrEqualTo($halfTime);
+            // الشرط الثاني: الوقت انتهى بالفعل
+            $deliveryTimePassed = Carbon::now()->greaterThanOrEqualTo($deliveryDateTime);
+            return $halfTimePassed || $deliveryTimePassed;
+        });
+        $techs = Admin::where('type', 'فني')->get();
+        return view('dashboard.invoices.invoice_haif_time', compact('invoices', 'techs'));
+    }
+    ################## End  Invoices Haif Time
 }

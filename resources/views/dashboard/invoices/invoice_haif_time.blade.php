@@ -1,5 +1,5 @@
 @extends('dashboard.layouts.app')
-@section('title', ' الفواتير ')
+@section('title', ' فواتير مر عليها نصف الوقت او اكثر ')
 @section('css')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/tables/datatable/datatables.min.css">
 @endsection
@@ -8,13 +8,14 @@
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block"> ادارة الفواتير </h3>
+                    <h3 class="mb-0 content-header-title d-inline-block"> فواتير مر عليها نصف الوقت او اكثر ومازالت في رف
+                        الاستلام</h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item active"> ادارة الفواتير
+                                <li class="breadcrumb-item active"> فواتير مر عليها نصف الوقت او اكثر ومازالت في رف الاستلام
                                 </li>
                             </ol>
                         </div>
@@ -30,41 +31,6 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <div class="card-header d-flex align-items-center justify-content-between">
-                                <a href="{{ route('dashboard.invoices.create') }}" class="btn btn-primary"> اضافة فاتورة
-                                </a>
-                                <form action="{{ route('dashboard.invoices.index') }}" method="get">
-                                    <div class="d-flex align-items-center justify-content-center">
-                                        <div class="form-group" style="margin-left: 20px">
-                                            <label> حالة الفاتورة </label>
-                                            <select name="invoice_status" class="form-control">
-                                                <option value="" selected disabled> -- حدد حالة الفاتورة -- </option>
-                                                <option value="رف الاستلام"
-                                                    {{ request('invoice_status') == 'رف الاستلام' ? 'selected' : '' }}>رف
-                                                    الاستلام</option>
-                                                <option value="تحت الصيانة"
-                                                    {{ request('invoice_status') == 'تحت الصيانة' ? 'selected' : '' }}> تحت
-                                                    الصيانة </option>
-                                                <option value="تم الاصلاح"
-                                                    {{ request('invoice_status') == 'تم الاصلاح' ? 'selected' : '' }}>تم
-                                                    الاصلاح</option>
-                                                <option value="لم يتم الاصلاح"
-                                                    {{ request('invoice_status') == 'لم يتم الاصلاح' ? 'selected' : '' }}>لم
-                                                    يتم الاصلاح</option>
-                                                <option value="معلق"
-                                                    {{ request('invoice_status') == 'معلق' ? 'selected' : '' }}>معلق
-                                                </option>
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <button type="submit" style="margin-top: 25px"
-                                                class="btn btn-primary btn-sm">بحث <i class="la la-search"></i></button>
-                                        </div>
-                                    </div>
-
-                                </form>
-                            </div>
                             <div class="card-content collapse show">
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -80,7 +46,7 @@
                                                     <th> المشاكل </th>
                                                     <th> الحالة </th>
                                                     <th> الاستقبال </th>
-                                                    <th> الفني </th>
+                                                    <th> تاريخ ووقت التسليم  </th>
                                                     <th> العمليات </th>
                                                 </tr>
                                             </thead>
@@ -126,15 +92,7 @@
                                                             {{ $invoice->Recieved->name }}
                                                         </td>
                                                         <td>
-                                                            @if (!$invoice->admin_repair_id)
-                                                                لا يوجد
-                                                                <button class="btn btn-warning btn-sm" type="button"
-                                                                    data-toggle="modal"
-                                                                    data-target="#add_tech_invoice_{{ $invoice->id }}">
-                                                                    تعين فني </button>
-                                                            @else
-                                                                {{ $invoice->Technical->name }}
-                                                            @endif
+                                                            {{ $invoice->date_delivery }} - {{ $invoice->time_delivery }}
                                                         </td>
                                                         <td>
                                                             <div class="mb-1 mr-1 btn-group">
@@ -175,7 +133,7 @@
                                                 @endforelse
                                             </tbody>
                                         </table>
-                                        {{ $invoices->links() }}
+                                         
                                     </div>
                                 </div>
 
@@ -202,9 +160,27 @@
         $(document).ready(function() {
             if (!$.fn.DataTable.isDataTable('#DataTables_Table_0')) {
                 $('#DataTables_Table_0').DataTable({
-                    language: lang === 'ar' ? {
-                        url: '//cdn.datatables.net/plug-ins/2.2.2/i18n/ar.json',
-                    } : {},
+                    language: {
+                        processing: "جاري المعالجة...",
+                        search: "بحث:",
+                        lengthMenu: "عرض _MENU_ سجل لكل صفحة",
+                        info: "عرض _START_ إلى _END_ من أصل _TOTAL_ سجل",
+                        infoEmpty: "عرض 0 إلى 0 من أصل 0 سجل",
+                        infoFiltered: "(تمت تصفيته من إجمالي _MAX_ سجلات)",
+                        loadingRecords: "جاري التحميل...",
+                        zeroRecords: "لا توجد سجلات مطابقة",
+                        emptyTable: "لا توجد بيانات متاحة في الجدول",
+                        paginate: {
+                            first: "الأول",
+                            previous: "السابق",
+                            next: "التالي",
+                            last: "الأخير"
+                        },
+                        aria: {
+                            sortAscending: ": تفعيل لترتيب العمود تصاعدياً",
+                            sortDescending: ": تفعيل لترتيب العمود تنازلياً"
+                        }
+                    }
                 });
             }
         });

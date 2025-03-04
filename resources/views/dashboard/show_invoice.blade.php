@@ -210,17 +210,19 @@
                                                     $sub_total = 0;
                                                 @endphp
                                                 @if ($invoice->files->count() > 0)
-                                                    @foreach ($invoice->files as $file)
-                                                        @php
-                                                            $sub_total += $file->price;
-                                                        @endphp
+                                                @foreach ($invoice->files as $file)
+                                                    @php
+                                                        $sub_total += $file->price;
+                                                    @endphp
+                                                    @if ($file->price != 0)
                                                         <tr>
                                                             <td>{{ $file->title }}</td>
                                                             <td class="text-right">{{ number_format($file->price, 2) }}
                                                                 ريال</td>
                                                         </tr>
-                                                    @endforeach
-                                                @endif
+                                                    @endif
+                                                @endforeach
+                                            @endif
 
                                                 @php
                                                     $total_price = $invoice->price + $sub_total;
@@ -252,7 +254,17 @@
 
                             </div>
                         </div>
-
+                        <!-- Invoice Footer -->
+                        <div id="invoice-footer">
+                            <div class="row">
+                                <div class="col-md-7 col-sm-12">
+                                    <h6> الشروط والاحكام </h6>
+                                    <p> يجب إحضار الفاتورة عند استلام الجهاز. </p>
+                                    <p> <a target="_blank" href="{{ url('/dashboard/terms') }}"> قراءة الشروط والاحكام </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>
