@@ -1,23 +1,24 @@
 <?php
 
 use App\Models\dashboard\CheckText;
+use App\Models\dashboard\SpeedDevice;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\dashboard\AdminController;
 use App\Http\Controllers\dashboard\RolesController;
 use App\Http\Controllers\dashboard\InvoiceController;
+use App\Http\Controllers\dashboard\MessageController;
+use App\Http\Controllers\dashboard\SettingController;
 use App\Http\Controllers\dashboard\WelcomeController;
 use App\Http\Controllers\dashboard\auth\AuthController;
 use App\Http\Controllers\dashboard\CheckTextController;
+use App\Http\Controllers\dashboard\SpeedDeviceController;
+use App\Http\Controllers\dashboard\NotificationController;
 use App\Http\Controllers\dashboard\TechInvoicesController;
 use App\Http\Controllers\dashboard\PublicInvoiceController;
+use App\Http\Controllers\dashboard\ProgrameDeviceController;
 use App\Http\Controllers\dashboard\ProblemCategoryController;
 use App\Http\Controllers\dashboard\auth\ResetPasswordController;
 use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
-use App\Http\Controllers\dashboard\MessageController;
-use App\Http\Controllers\dashboard\NotificationController;
-use App\Http\Controllers\dashboard\ProgrameDeviceController;
-use App\Http\Controllers\dashboard\SpeedDeviceController;
-use App\Models\dashboard\SpeedDevice;
 
 Route::group([
     'prefix' => '/dashboard',
@@ -184,6 +185,12 @@ Route::group([
             Route::get('all_read', 'AllRead')->name('all_read');
         });
         ################ End Notification Controller ##############
+        ################# Start Setting Controller ###############
+        Route::controller(SettingController::class)->group(function () {
+            Route::get('setting', 'index')->name('setting.index');
+            Route::post('setting/update', 'update')->name('setting.update');
+        });
+        ################# End Setting Controller ###############
     });
 
 

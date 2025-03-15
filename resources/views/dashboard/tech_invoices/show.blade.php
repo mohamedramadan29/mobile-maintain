@@ -41,7 +41,7 @@
                                     <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
                                 </div>
                                 <!--################### Start Add ChecksResults ###################-->
-                                <div class="row">
+                                <div class="row" id="full_check" style="{{ $invoice->checkout_type === 'فحص كامل' ? 'display: block' : 'display: none' }}">
 
                                     <table class="table">
                                         <thead>
@@ -97,7 +97,7 @@
                                     </table>
                                 </div>
                                 <!--################### Start Speed Device Check  ###################-->
-                                <div class="row">
+                                <div class="row" id="speed_check" style="{{ $invoice->checkout_type === 'فحص جهاز سريع' ? 'display: block' : 'display: none' }}">
                                     <h5> جهاز سريع <span class="required_span"> * </span> </h5>
                                     <table class="table">
                                         <thead>
@@ -156,7 +156,7 @@
                                 <!--################### End Speed Device Check  #####################-->
 
                                 <!--################### Start Programe Device Check  ###################-->
-                                <div class="row">
+                                <div class="row" id="programe_check" style="{{ $invoice->checkout_type === 'فحص جهاز برمجة' ? 'display: block' : 'display: none' }}">
                                     <h5> جهاز برمجة <span class="required_span"> * </span> </h5>
                                     <table class="table">
                                         <thead>

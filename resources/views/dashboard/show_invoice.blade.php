@@ -137,7 +137,9 @@
 
                         <!-------------- End Signute ---------->
 
-
+                        @php
+                            $settings = App\Models\dashboard\Setting::first();
+                        @endphp
 
                         <!--################### End Add ChecksResults #####################-->
                         <!---------------- End Invoice Checks ------------>
@@ -182,11 +184,11 @@
                                                 <tbody>
                                                     <tr>
                                                         <td> قسم الصيانة :</td>
-                                                        <td class="text-right"> 0507170175 </td>
+                                                        <td class="text-right"> {{ $settings->phone1 }} </td>
                                                     </tr>
                                                     <tr>
                                                         <td> الإدارة :</td>
-                                                        <td class="text-right"> 0577894369 </td>
+                                                        <td class="text-right"> {{ $settings->phone2 }} </td>
                                                     </tr>
 
                                                 </tbody>
@@ -230,7 +232,7 @@
                                                     $vat = $total_price - $base_price; // حساب قيمة الضريبة المضافة
                                                 @endphp
 
-                                                <tr>
+                                                {{-- <tr>
                                                     <td class="text-bold-800">المبلغ الأساسي (قبل الضريبة)</td>
                                                     <td class="text-right text-bold-800">
                                                         {{ number_format($base_price, 2) }} ريال</td>
@@ -240,7 +242,7 @@
                                                     <td>ضريبة القيمة المضافة (15%)</td>
                                                     <td class="text-right text-danger">{{ number_format($vat, 2) }} ريال
                                                     </td>
-                                                </tr>
+                                                </tr> --}}
 
                                                 <tr>
                                                     <td class="text-bold-800">الإجمالي (شامل الضريبة)</td>

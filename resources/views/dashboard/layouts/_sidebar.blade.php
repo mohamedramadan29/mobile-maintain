@@ -196,6 +196,20 @@
                   </ul>
               </li>
 
+              @can('admins')
+                  <li class="nav-item {{ Route::is('dashboard.setting.*') ? 'active' : '' }}"><a href="#"><i
+                              class="la la-television"></i><span class="menu-title" data-i18n="nav.role.main"> ادارة الاعدادات
+                          </span></a>
+                      <ul class="menu-content">
+                          <li class="{{ Route::is('dashboard.setting.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.setting.index') }}"
+                                  data-i18n="nav.role.index">
+                                  الاعدادات </a>
+                          </li>
+                      </ul>
+                  </li>
+              @endcan
+
           </ul>
       </div>
   </div>

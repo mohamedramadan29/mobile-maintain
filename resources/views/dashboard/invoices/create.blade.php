@@ -47,8 +47,30 @@
                                             action="{{ route('dashboard.invoices.create') }}" enctype="multipart/form-data">
                                             @csrf
                                             <div class="form-body">
-                                                <!--################### Start Add ChecksResults ###################-->
                                                 <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for=""> حدد نوع الفحص </label>
+                                                            <select required name="checkout_type" id="checkout_type"
+                                                                class="form-control">
+                                                                <option value="" selected disabled> حدد نوع الفحص
+                                                                </option>
+                                                                <option
+                                                                    {{ old('checkout_type') == 'فحص كامل' ? 'selected' : '' }}
+                                                                    value="فحص كامل"> فحص كامل </option>
+                                                                <option
+                                                                    {{ old('checkout_type') == 'فحص جهاز برمجة' ? 'selected' : '' }}
+                                                                    value="فحص جهاز برمجة"> فحص جهاز برمجة </option>
+                                                                <option
+                                                                    {{ old('checkout_type') == 'فحص جهاز سريع' ? 'selected' : '' }}
+                                                                    value="فحص جهاز سريع"> فحص جهاز سريع </option>
+                                                            </select>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--################### Start Add ChecksResults ###################-->
+                                                <div class="row" id="full_check" style="display: none;">
                                                     <h5> فحص الجهاز <span class="required_span"> * </span> </h5>
                                                     <table class="table">
                                                         <thead>
@@ -69,17 +91,18 @@
                                                                         <input type="hidden" name="problem_id[]"
                                                                             value="{{ $check->id }}">
                                                                         <input readonly type="text"
-                                                                            value="{{ $check->name }}" class="form-control"
+                                                                            value="{{ $check->name }}"
+                                                                            class="form-control"
                                                                             name="check_problem_name[]">
                                                                     </td>
                                                                     <td>
-                                                                        <input required type="radio" value="1"
+                                                                        <input type="radio" value="1"
                                                                             class="form-control"
                                                                             name="work_{{ $check->id }}[]"
                                                                             {{ old('work_' . $check->id) == '1' ? 'checked' : '' }}>
                                                                     </td>
                                                                     <td>
-                                                                        <input required type="radio" value="0"
+                                                                        <input type="radio" value="0"
                                                                             class="form-control"
                                                                             name="work_{{ $check->id }}[]"
                                                                             {{ old('work_' . $check->id) == '0' ? 'checked' : '' }}>
@@ -101,7 +124,7 @@
                                                 </div>
                                                 <!--################### End Add ChecksResults #####################-->
                                                 <!--################### Start Speed Device Check  ###################-->
-                                                <div class="row">
+                                                <div class="row" id="speed_check" style="display: none;">
                                                     <h5> جهاز سريع <span class="required_span"> * </span> </h5>
                                                     <table class="table">
                                                         <thead>
@@ -126,13 +149,13 @@
                                                                             class="form-control" name="check_speed_name[]">
                                                                     </td>
                                                                     <td>
-                                                                        <input required type="radio" value="1"
+                                                                        <input type="radio" value="1"
                                                                             class="form-control"
                                                                             name="speedwork_{{ $speed->id }}[]"
                                                                             {{ old('speedwork_' . $speed->id) == '1' ? 'checked' : '' }}>
                                                                     </td>
                                                                     <td>
-                                                                        <input required type="radio" value="0"
+                                                                        <input type="radio" value="0"
                                                                             class="form-control"
                                                                             name="speedwork_{{ $speed->id }}[]"
                                                                             {{ old('speedwork_' . $speed->id) == '0' ? 'checked' : '' }}>
@@ -145,7 +168,8 @@
                                                                     <td>
                                                                         <input type="text"
                                                                             value="{{ old('after_check_speed.' . $loop->index) }}"
-                                                                            class="form-control" name="after_check_speed[]">
+                                                                            class="form-control"
+                                                                            name="after_check_speed[]">
                                                                     </td>
                                                                 </tr>
                                                             @endforeach
@@ -153,9 +177,8 @@
                                                     </table>
                                                 </div>
                                                 <!--################### End Speed Device Check  #####################-->
-
                                                 <!--################### Start Programe Device Check  ###################-->
-                                                <div class="row">
+                                                <div class="row" id="programe_check" style="display: none;">
                                                     <h5> جهاز برمجة <span class="required_span"> * </span> </h5>
                                                     <table class="table">
                                                         <thead>
@@ -181,13 +204,13 @@
                                                                             name="check_programe_name[]">
                                                                     </td>
                                                                     <td>
-                                                                        <input required type="radio" value="1"
+                                                                        <input type="radio" value="1"
                                                                             class="form-control"
                                                                             name="programework_{{ $programe->id }}[]"
                                                                             {{ old('programework_' . $programe->id) == '1' ? 'checked' : '' }}>
                                                                     </td>
                                                                     <td>
-                                                                        <input required type="radio" value="0"
+                                                                        <input type="radio" value="0"
                                                                             class="form-control"
                                                                             name="programework_{{ $programe->id }}[]"
                                                                             {{ old('programework_' . $programe->id) == '0' ? 'checked' : '' }}>
@@ -353,7 +376,7 @@
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="name"> رمز الجهاز </label>
-                                                            <input required type="text" id="device_text_password"
+                                                            <input type="text" id="device_text_password"
                                                                 class="form-control" placeholder=""
                                                                 name="device_text_password"
                                                                 value="{{ old('device_text_password') }}">
@@ -546,4 +569,23 @@
     <script src="{{ asset('assets/admin/') }}/vendors/js/forms/icheck/icheck.min.js" type="text/javascript"></script>
     <script src="{{ asset('assets/admin/') }}/js/scripts/forms/checkbox-radio.js" type="text/javascript"></script>
 
+    <script>
+        $(document).ready(function() {
+            $('#checkout_type').change(function() {
+                if ($(this).val() == 'فحص كامل') {
+                    $('#full_check').show();
+                    $('#programe_check').hide();
+                    $('#speed_check').hide();
+                } else if ($(this).val() == 'فحص جهاز برمجة') {
+                    $('#programe_check').show();
+                    $('#full_check').hide();
+                    $('#speed_check').hide();
+                } else if ($(this).val() == 'فحص جهاز سريع') {
+                    $('#speed_check').show();
+                    $('#full_check').hide();
+                    $('#programe_check').hide();
+                }
+            });
+        });
+    </script>
 @endsection

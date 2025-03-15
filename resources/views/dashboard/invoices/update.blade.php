@@ -44,8 +44,31 @@
                                             enctype="multipart/form-data">
                                             @csrf
                                             <div class="form-body">
-                                                <!--################### Start Add ChecksResults ###################-->
                                                 <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for=""> حدد نوع الفحص </label>
+                                                            <select required name="checkout_type" id="checkout_type"
+                                                                class="form-control">
+                                                                <option value="" selected disabled> حدد نوع الفحص
+                                                                </option>
+                                                                <option
+                                                                    {{ $invoice->checkout_type == 'فحص كامل' ? 'selected' : '' }}
+                                                                    value="فحص كامل"> فحص كامل </option>
+                                                                <option
+                                                                    {{ $invoice->checkout_type == 'فحص جهاز برمجة' ? 'selected' : '' }}
+                                                                    value="فحص جهاز برمجة"> فحص جهاز برمجة </option>
+                                                                <option
+                                                                    {{ $invoice->checkout_type == 'فحص جهاز سريع' ? 'selected' : '' }}
+                                                                    value="فحص جهاز سريع"> فحص جهاز سريع </option>
+                                                            </select>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--################### Start Add ChecksResults ###################-->
+                                                <div class="row" id="full_check" style="{{ $invoice->checkout_type === 'فحص كامل' ? 'display: block' : 'display: none' }}"
+                                                    >
                                                     <h5> فحص الجهاز <span class="required_span"> * </span> </h5>
                                                     <table class="table">
                                                         <thead>
@@ -74,7 +97,8 @@
                                                                         <input type="hidden" name="problem_id[]"
                                                                             value="{{ $check->id }}">
                                                                         <input readonly type="text"
-                                                                            value="{{ $check->name }}" class="form-control"
+                                                                            value="{{ $check->name }}"
+                                                                            class="form-control"
                                                                             name="check_problem_name[]">
                                                                     </td>
                                                                     <td>
@@ -106,7 +130,8 @@
                                                 </div>
                                                 <!--################### End Add ChecksResults #####################-->
                                                 <!--################### Start Speed Device Check  ###################-->
-                                                <div class="row">
+                                                <div class="row" id="speed_check"
+                                                    style="{{ $invoice->checkout_type === 'فحص جهاز سريع' ? 'display: block' : 'display: none' }}">
                                                     <h5> جهاز سريع <span class="required_span"> * </span> </h5>
                                                     <table class="table">
                                                         <thead>
@@ -158,7 +183,8 @@
                                                                     <td>
                                                                         <input type="text"
                                                                             value="{{ $speedResult->after_check ?? '' }}"
-                                                                            class="form-control" name="after_check_speed[]">
+                                                                            class="form-control"
+                                                                            name="after_check_speed[]">
                                                                     </td>
                                                                 </tr>
                                                             @endforeach
@@ -168,7 +194,8 @@
                                                 <!--################### End Speed Device Check  #####################-->
 
                                                 <!--################### Start Programe Device Check  ###################-->
-                                                <div class="row">
+                                                <div class="row" id="programe_check"
+                                                    style="{{ $invoice->checkout_type === 'فحص جهاز برمجة' ? 'display: block' : 'display: none' }}">
                                                     <h5> جهاز برمجة <span class="required_span"> * </span> </h5>
                                                     <table class="table">
                                                         <thead>
@@ -476,11 +503,13 @@
                                 <div class="card-header">
                                     <h4 class="card-title"> حالة التواصل مع العميل </h4>
                                     <br>
-                                    <form action="{{ route('dashboard.tech_invoices.client-connect',$invoice->id) }}" method="post">
+                                    <form action="{{ route('dashboard.tech_invoices.client-connect', $invoice->id) }}"
+                                        method="post">
                                         @csrf
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <select disabled name="client_connect" id="" class="form-control">
+                                                <select disabled name="client_connect" id=""
+                                                    class="form-control">
                                                     <option value="" selected disabled> -- حدد -- </option>
                                                     <option value="1" @selected($invoice->client_connect == 1)> تم التواصل
                                                     </option>
@@ -578,5 +607,25 @@
 @section('js')
     <script src="{{ asset('assets/admin/') }}/vendors/js/forms/icheck/icheck.min.js" type="text/javascript"></script>
     <script src="{{ asset('assets/admin/') }}/js/scripts/forms/checkbox-radio.js" type="text/javascript"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#checkout_type').change(function() {
+                if ($(this).val() == 'فحص كامل') {
+                    $('#full_check').show();
+                    $('#programe_check').hide();
+                    $('#speed_check').hide();
+                } else if ($(this).val() == 'فحص جهاز برمجة') {
+                    $('#programe_check').show();
+                    $('#full_check').hide();
+                    $('#speed_check').hide();
+                } else if ($(this).val() == 'فحص جهاز سريع') {
+                    $('#speed_check').show();
+                    $('#programe_check').hide();
+                    $('#full_check').hide();
+                }
+            });
+        });
+    </script>
 
 @endsection

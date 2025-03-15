@@ -69,6 +69,7 @@ class InvoiceController extends Controller
                     'time_delivery' => 'required',
                     'status' => 'required',
                     'signature' => 'required', // إضافة التوقيع
+                    'checkout_type' => 'required',
                 ];
                 $messages = [
                     'name.required' => 'من فضلك ادخل اسم العميل ',
@@ -81,6 +82,7 @@ class InvoiceController extends Controller
                     'time_delivery.required' => 'من فضلك ادخل وقت الاستلام ',
                     'status.required' => 'من فضلك ادخل حالة الفاتورة ',
                     'signature.required' => 'يرجى توقيع الفاتورة قبل الحفظ.',
+                    'checkout_type.required' => 'من فضلك ادخل نوع الفحص ',
                 ];
                 $validator = Validator::make($data, $rules, $messages);
                 if ($validator->fails()) {
@@ -120,6 +122,7 @@ class InvoiceController extends Controller
                 $invoice->signature = $filesiguture;
                 $invoice->device_password_text = $data['device_text_password'];
                 $invoice->device_pattern = $patternJson;
+                $invoice->checkout_type = $data['checkout_type'];
                 $invoice->save();
                 ############ Start Insert Files ################
                 if ($request->hasFile('files_images')) {
@@ -140,43 +143,50 @@ class InvoiceController extends Controller
                 $invoice_step->step_details = ' تم اضافة الفاتورة  ';
                 $invoice_step->save();
 
-                // إضافة نتائج الفحص
-                if (isset($data['problem_id']) && is_array($data['problem_id'])) {
-                    foreach ($data['problem_id'] as $index => $problemId) {
-                        $check = new InvoiceCheck();
-                        $check->invoice_id = $invoice->id;
-                        $check->problem_id = $problemId;
-                        $check->problem_name = $data['check_problem_name'][$index] ?? '';
-                        $check->work = isset($data["work_{$problemId}"]) ? reset($data["work_{$problemId}"]) : 0;
-                        $check->notes = $data['notes'][$index] ?? null;
-                        $check->after_check = $data['after_check'][$index] ?? null;
-                        $check->save();
+
+                if ($invoice->checkout_type == 'فحص كامل') {
+                    // إضافة نتائج الفحص
+                    if (isset($data['problem_id']) && is_array($data['problem_id'])) {
+                        foreach ($data['problem_id'] as $index => $problemId) {
+                            $check = new InvoiceCheck();
+                            $check->invoice_id = $invoice->id;
+                            $check->problem_id = $problemId;
+                            $check->problem_name = $data['check_problem_name'][$index] ?? '';
+                            $check->work = isset($data["work_{$problemId}"]) ? reset($data["work_{$problemId}"]) : 0;
+                            $check->notes = $data['notes'][$index] ?? null;
+                            $check->after_check = $data['after_check'][$index] ?? null;
+                            $check->save();
+                        }
                     }
                 }
-                // إضافة نتائج الفحص للجهاز السريع
-                if (isset($data['speed_id']) && is_array($data['speed_id'])) {
-                    foreach ($data['speed_id'] as $index => $speedId) {
-                        $checkSpeed = new InvoiceSpeedCheck();
-                        $checkSpeed->invoice_id = $invoice->id;
-                        $checkSpeed->speed_id = $speedId;
-                        $checkSpeed->problem_name = $data['check_speed_name'][$index] ?? '';
-                        $checkSpeed->work = isset($data["speedwork_{$speedId}"]) ? reset($data["speedwork_{$speedId}"]) : 0;
-                        $checkSpeed->notes = $data['speed_notes'][$index] ?? null;
-                        $checkSpeed->after_check = $data['after_check_speed'][$index] ?? null;
-                        $checkSpeed->save();
+                if ($invoice->checkout_type == 'فحص جهاز سريع') {
+                    // إضافة نتائج الفحص للجهاز السريع
+                    if (isset($data['speed_id']) && is_array($data['speed_id'])) {
+                        foreach ($data['speed_id'] as $index => $speedId) {
+                            $checkSpeed = new InvoiceSpeedCheck();
+                            $checkSpeed->invoice_id = $invoice->id;
+                            $checkSpeed->speed_id = $speedId;
+                            $checkSpeed->problem_name = $data['check_speed_name'][$index] ?? '';
+                            $checkSpeed->work = isset($data["speedwork_{$speedId}"]) ? reset($data["speedwork_{$speedId}"]) : 0;
+                            $checkSpeed->notes = $data['speed_notes'][$index] ?? null;
+                            $checkSpeed->after_check = $data['after_check_speed'][$index] ?? null;
+                            $checkSpeed->save();
+                        }
                     }
                 }
-                // إضافة نتائج الفحص للجهاز البرمجة
-                if (isset($data['programe_id']) && is_array($data['programe_id'])) {
-                    foreach ($data['programe_id'] as $index => $programeId) {
-                        $checkPrograme = new InvoicePrograneCheck();
-                        $checkPrograme->invoice_id = $invoice->id;
-                        $checkPrograme->programe_id = $programeId;
-                        $checkPrograme->problem_name = $data['check_programe_name'][$index] ?? '';
-                        $checkPrograme->work = isset($data["programework_{$programeId}"]) ? reset($data["programework_{$programeId}"]) : 0;
-                        $checkPrograme->notes = $data['programe_notes'][$index] ?? null;
-                        $checkPrograme->after_check = $data['after_check_programe'][$index] ?? null;
-                        $checkPrograme->save();
+                if ($invoice->checkout_type == 'فحص جهاز برمجة') {
+                    // إضافة نتائج الفحص للجهاز البرمجة
+                    if (isset($data['programe_id']) && is_array($data['programe_id'])) {
+                        foreach ($data['programe_id'] as $index => $programeId) {
+                            $checkPrograme = new InvoicePrograneCheck();
+                            $checkPrograme->invoice_id = $invoice->id;
+                            $checkPrograme->programe_id = $programeId;
+                            $checkPrograme->problem_name = $data['check_programe_name'][$index] ?? '';
+                            $checkPrograme->work = isset($data["programework_{$programeId}"]) ? reset($data["programework_{$programeId}"]) : 0;
+                            $checkPrograme->notes = $data['programe_notes'][$index] ?? null;
+                            $checkPrograme->after_check = $data['after_check_programe'][$index] ?? null;
+                            $checkPrograme->save();
+                        }
                     }
                 }
                 ########### Send Message To WhatsApp
@@ -263,7 +273,7 @@ class InvoiceController extends Controller
                     'date_delivery' => 'required',
                     'time_delivery' => 'required',
                     'status' => 'required',
-
+                    'checkout_type' => 'required',
                 ];
                 $messages = [
                     'name.required' => 'من فضلك ادخل اسم العميل ',
@@ -275,6 +285,7 @@ class InvoiceController extends Controller
                     'date_delivery.required' => 'من فضلك ادخل تاريخ الاستلام ',
                     'time_delivery.required' => 'من فضلك ادخل وقت الاستلام ',
                     'status.required' => 'من فضلك ادخل حالة الفاتورة ',
+                    'checkout_type.required' => 'من فضلك ادخل نوع الفحص ',
                 ];
                 $validator = Validator::make($data, $rules, $messages);
                 if ($validator->fails()) {
@@ -315,55 +326,60 @@ class InvoiceController extends Controller
                 $invoice_step->admin_id = Auth::id();
                 $invoice_step->step_details = ' تم تعديل الفاتورة  ';
                 $invoice_step->save();
-                // إضافة الفحوصات أو تعديلها
-                if (isset($data['problem_id']) && is_array($data['problem_id'])) {
-                    foreach ($data['problem_id'] as $index => $problem_id) {
-                        InvoiceCheck::updateOrCreate(
-                            [
-                                'invoice_id' => $invoice->id,
-                                'problem_id' => $problem_id,
-                            ],
-                            [
-                                'work' => $data['work_' . $problem_id] ?? null, // تأكد من أن القيمة موجودة
-                                'notes' => $data['notes'][$index] ?? '', // استخدام الترتيب الصحيح للمصفوفة
-                                'after_check' => $data['after_check'][$index] ?? '', // استخدام الترتيب الصحيح للمصفوفة
-                            ]
-                        );
+                if ($invoice->checkout_type == 'فحص كامل') {
+                    // إضافة الفحوصات أو تعديلها
+                    if (isset($data['problem_id']) && is_array($data['problem_id'])) {
+                        foreach ($data['problem_id'] as $index => $problem_id) {
+                            InvoiceCheck::updateOrCreate(
+                                [
+                                    'invoice_id' => $invoice->id,
+                                    'problem_id' => $problem_id,
+                                ],
+                                [
+                                    'work' => $data['work_' . $problem_id] ?? null, // تأكد من أن القيمة موجودة
+                                    'notes' => $data['notes'][$index] ?? '', // استخدام الترتيب الصحيح للمصفوفة
+                                    'after_check' => $data['after_check'][$index] ?? '', // استخدام الترتيب الصحيح للمصفوفة
+                                ]
+                            );
+                        }
                     }
                 }
-
-                // إضافة نتائج الفحص للجهاز السريع
-                if (isset($data['speed_id']) && is_array($data['speed_id'])) {
-                    foreach ($data['speed_id'] as $index => $speedId) {
-                        InvoiceSpeedCheck::updateOrCreate(
-                            [
-                                "invoice_id" => $invoice->id,
-                                "speed_id" => $speedId,
-                            ],
-                            [
-                                // "problem_name" => $data['check_speed_name'][$index] ?? '',
-                                "work" => $data['speedwork_' . $speedId] ?? null,
-                                "notes" => $data['speed_notes'][$index] ?? '',
-                                "after_check" => $data['after_check_speed'][$index] ?? '',
-                            ]
-                        );
+                if ($invoice->checkout_type == 'فحص جهاز سريع') {
+                    // إضافة نتائج الفحص للجهاز السريع
+                    if (isset($data['speed_id']) && is_array($data['speed_id'])) {
+                        foreach ($data['speed_id'] as $index => $speedId) {
+                            InvoiceSpeedCheck::updateOrCreate(
+                                [
+                                    "invoice_id" => $invoice->id,
+                                    "speed_id" => $speedId,
+                                ],
+                                [
+                                    // "problem_name" => $data['check_speed_name'][$index] ?? '',
+                                    "work" => $data['speedwork_' . $speedId] ?? null,
+                                    "notes" => $data['speed_notes'][$index] ?? '',
+                                    "after_check" => $data['after_check_speed'][$index] ?? '',
+                                ]
+                            );
+                        }
                     }
                 }
-                // إضافة نتائج الفحص للجهاز البرمجة
-                if (isset($data['programe_id']) && is_array($data['programe_id'])) {
-                    foreach ($data['programe_id'] as $index => $programeId) {
-                        $checkPrograme = InvoicePrograneCheck::updateOrCreate(
-                            [
-                                "invoice_id" => $invoice->id,
-                                "programe_id" => $programeId,
-                            ],
-                            [
-                                "problem_name" => $data['check_programe_name'][$index] ?? '',
-                                "work" => isset($data["programework_{$programeId}"]) ? reset($data["programework_{$programeId}"]) : 0,
-                                "notes" => $data['programe_notes'][$index] ?? null,
-                                "after_check" => $data['after_check_programe'][$index] ?? null,
-                            ]
-                        );
+                if ($invoice->checkout_type == 'فحص جهاز برمجة') {
+                    // إضافة نتائج الفحص للجهاز البرمجة
+                    if (isset($data['programe_id']) && is_array($data['programe_id'])) {
+                        foreach ($data['programe_id'] as $index => $programeId) {
+                            $checkPrograme = InvoicePrograneCheck::updateOrCreate(
+                                [
+                                    "invoice_id" => $invoice->id,
+                                    "programe_id" => $programeId,
+                                ],
+                                [
+                                    "problem_name" => $data['check_programe_name'][$index] ?? '',
+                                    "work" => isset($data["programework_{$programeId}"]) ? reset($data["programework_{$programeId}"]) : 0,
+                                    "notes" => $data['programe_notes'][$index] ?? null,
+                                    "after_check" => $data['after_check_programe'][$index] ?? null,
+                                ]
+                            );
+                        }
                     }
                 }
                 DB::commit();
