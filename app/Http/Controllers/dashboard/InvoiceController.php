@@ -26,6 +26,8 @@ use App\Models\dashboard\InvoiceSteps;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 use App\Models\dashboard\ProblemCategory;
 use App\Models\dashboard\ProgrameDevice;
+use App\Models\dashboard\ProgrameProblemCategory;
+use App\Models\dashboard\SpeedProblemCategory;
 // use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Validator;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -222,8 +224,8 @@ class InvoiceController extends Controller
 
                 // تعريف المتغير
                 $params = array(
-                    'instanceid' => '138484',
-                    'token' => '573f5335-db32-422f-8a7f-efc7a18654f9',
+                    'instanceid' => '138796',
+                    'token' => '3fc4ad69-3ea3-4307-923c-7080f7aa0d8e',
                     'phone' => $new_phone,
                     'body' => $message,
                 );
@@ -250,10 +252,12 @@ class InvoiceController extends Controller
         }
 
         $problems = ProblemCategory::all();
+        $programe_problems = ProgrameProblemCategory::all();
+        $speed_problems = SpeedProblemCategory::all();
         $checks = CheckText::all();
         $speed_devices = SpeedDevice::all();
         $programe_devices = ProgrameDevice::all();
-        return view('dashboard.invoices.create', compact('problems', 'checks', 'speed_devices', 'programe_devices'));
+        return view('dashboard.invoices.create', compact('problems', 'checks', 'speed_devices', 'programe_devices', 'programe_problems', 'speed_problems'));
     }
 
     public function update(Request $request, $id)
@@ -390,9 +394,11 @@ class InvoiceController extends Controller
         }
         $checks = CheckText::all();
         $problems = ProblemCategory::all();
+        $programe_problems = ProgrameProblemCategory::all();
+        $speed_problems = SpeedProblemCategory::all();
         $speed_devices = SpeedDevice::all();
         $programe_devices = ProgrameDevice::all();
-        return view('dashboard.invoices.update', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices'));
+        return view('dashboard.invoices.update', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'programe_problems', 'speed_problems'));
     }
     public function destroy($id)
     {

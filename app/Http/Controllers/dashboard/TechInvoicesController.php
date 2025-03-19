@@ -82,11 +82,10 @@ class TechInvoicesController extends Controller
                 $message_temp
             );
             // dd($message);
-
             // تعريف المتغير
             $params = array(
-                'instanceid' => '138484',
-                'token' => '573f5335-db32-422f-8a7f-efc7a18654f9',
+                'instanceid' => '138796',
+                'token' => '3fc4ad69-3ea3-4307-923c-7080f7aa0d8e',
                 'phone' => $new_phone,
                 'body' => $message,
             );
@@ -161,8 +160,8 @@ class TechInvoicesController extends Controller
 
                 // تعريف المتغير
                 $params = array(
-                    'instanceid' => '138484',
-                    'token' => '573f5335-db32-422f-8a7f-efc7a18654f9',
+                    'instanceid' => '138796',
+                    'token' => '3fc4ad69-3ea3-4307-923c-7080f7aa0d8e',
                     'phone' => $new_phone,
                     'body' => $message,
                 );
@@ -182,7 +181,7 @@ class TechInvoicesController extends Controller
                 curl_close($curl);
                 if ($request->status === "تم الاصلاح") {
                     // جدولة إرسال رسالة التقييم بعد 20 دقيقة
-                    SendReviewMessage::dispatch($invoice)->delay(now()->addMinutes(1));
+                    SendReviewMessage::dispatch($invoice)->delay(now()->addMinutes(20));
                 }
                 DB::commit();
                 return $this->success_message('تم تحديث حالة الجهاز بنجاح');

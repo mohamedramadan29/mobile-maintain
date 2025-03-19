@@ -23,12 +23,12 @@
                     <div class="form-group">
                         <label for="title"> الاعطال المتاحة للفني </label>
                         <div class="skin skin-square">
-                            <div class="col-md-12 col-sm-12 d-flex justify-content-around">
+                            <div class="col-md-12 col-sm-12 d-flex flex-column">
                                 @php
                                     // تأكد من أن $admin->problems يتم تحويله إلى مصفوفة صالحة أو اجعل القيمة فارغة افتراضيًا
                                     $admin_problems = json_decode($admin->problems, true) ?: [];
                                 @endphp
-
+                                <p> صلاحيات اعطال فحص شامل </p>
                                 @foreach ($problems as $problem)
                                     <fieldset>
                                         <input {{ in_array($problem->name, $admin_problems) ? 'checked' : '' }}
@@ -39,6 +39,32 @@
                                         </label>
                                     </fieldset>
                                 @endforeach
+                                <p> صلاحيات اعطال جهاز برمجة </p>
+                                @foreach ($programe_problems as $programe_problem)
+                                    <fieldset>
+                                        <input {{ in_array($programe_problem->name, $admin_problems) ? 'checked' : '' }}
+                                            type="checkbox" id="inputprograme-{{ $programe_problem->id }}"
+                                            name="problems[]" value="{{ $programe_problem->name }}">
+                                        <label for="inputprograme-{{ $programe_problem->id }}">
+                                            {{ $programe_problem->name }}
+                                        </label>
+                                    </fieldset>
+                                @endforeach
+
+                                <p> صلاحيات اعطال جهاز سريع </p>
+
+                                @foreach ($speed_problems as $speed_problem)
+                                    <fieldset>
+                                        <input {{ in_array($speed_problem->name, $admin_problems) ? 'checked' : '' }}
+                                            type="checkbox" id="inputspeed-{{ $speed_problem->id }}" name="problems[]"
+                                            value="{{ $speed_problem->name }}">
+                                        <label for="inputspeed-{{ $speed_problem->id }}">
+                                            {{ $speed_problem->name }}
+                                        </label>
+                                    </fieldset>
+                                @endforeach
+
+
                             </div>
 
                         </div>

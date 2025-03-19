@@ -71,6 +71,7 @@
     </nav>
     <!-- ////////////////////////////////////////////////////////////////////////////-->
     @yield('content')
+
     <!-- ////////////////////////////////////////////////////////////////////////////-->
     <footer class="footer fixed-bottom footer-dark navbar-border navbar-shadow">
         <p class="clearfix px-2 mb-0 blue-grey lighten-2 text-sm-center">

@@ -55,7 +55,7 @@ class AuthController extends Controller
                 return redirect()->intended(route('dashboard.welcome'));
             }
             // return redirect()->route('dashboard.login.show')->withErrors([]'error','لا يوجد حساب بهذة البيانات ');
-            return redirect()->back()->withErrors(['email' => 'لا يوجد حساب بهذة البيانات ']);
+            return redirect()->back()->withErrors(['لا يوجد حساب بهذة البيانات ']);
         }
     }
     public function logout()

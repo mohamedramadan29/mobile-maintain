@@ -1,6 +1,12 @@
 @extends('dashboard.layouts.app')
 @section('title', 'ا ضافة فاتورة جديدة ')
 @section('css')
+    <style>
+        .problem_check_box {
+            display: flex;
+            justify-content: space-around;
+        }
+    </style>
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/icheck.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/custom.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/css-rtl/plugins/forms/checkboxes-radios.css">
@@ -65,7 +71,6 @@
                                                                     {{ old('checkout_type') == 'فحص جهاز سريع' ? 'selected' : '' }}
                                                                     value="فحص جهاز سريع"> فحص جهاز سريع </option>
                                                             </select>
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -300,8 +305,9 @@
                                                             <label for="title"> حدد الاعطال <span
                                                                     class="required_span"> * </span> </label>
                                                             <div class="skin skin-square">
-                                                                <div
-                                                                    class="col-md-12 col-sm-12 d-flex justify-content-around">
+                                                                <!----------- ############## All Check ############## ------------>
+                                                                <div class="col-md-12 col-sm-12 problem_check_box"
+                                                                    style="display: none;" id="problem_all_check">
                                                                     @foreach ($problems as $problem)
                                                                         <fieldset>
                                                                             <input type="checkbox"
@@ -314,6 +320,42 @@
                                                                         </fieldset>
                                                                     @endforeach
                                                                 </div>
+
+                                                                <!-- ################ End All Check ################## -->
+
+                                                                <!-------############# Start Programe Check ##################-------------->
+                                                                <div class="col-md-12 col-sm-12 problem_check_box"
+                                                                    style="display: none;" id="problem_programe_check">
+                                                                    @foreach ($programe_problems as $programe_problem)
+                                                                        <fieldset>
+                                                                            <input type="checkbox"
+                                                                                id="inputprograme-{{ $programe_problem->id }}"
+                                                                                name="problems[]"
+                                                                                value="{{ $programe_problem->name }}">
+                                                                            <label
+                                                                                for="inputprograme-{{ $programe_problem->id }}">{{ $programe_problem->name }}
+                                                                            </label>
+                                                                        </fieldset>
+                                                                    @endforeach
+                                                                </div>
+                                                                <!-------############# End  Programe Check ##################-------------->
+
+                                                                <!-------############# Start Programe Check ##################-------------->
+                                                                <div class="col-md-12 col-sm-12 problem_check_box"
+                                                                    style="display: none;" id="problem_speed_check">
+                                                                    @foreach ($speed_problems as $speed_problem)
+                                                                        <fieldset>
+                                                                            <input type="checkbox"
+                                                                                id="inputspeed-{{ $speed_problem->id }}"
+                                                                                name="problems[]"
+                                                                                value="{{ $speed_problem->name }}">
+                                                                            <label
+                                                                                for="inputspeed-{{ $speed_problem->id }}">{{ $speed_problem->name }}
+                                                                            </label>
+                                                                        </fieldset>
+                                                                    @endforeach
+                                                                </div>
+                                                                <!-------############# End  Programe Check ##################-------------->
                                                             </div>
                                                         </div>
                                                     </div>
@@ -574,16 +616,25 @@
             $('#checkout_type').change(function() {
                 if ($(this).val() == 'فحص كامل') {
                     $('#full_check').show();
+                    $('#problem_all_check').show();
                     $('#programe_check').hide();
                     $('#speed_check').hide();
+                    $("#problem_programe_check").hide();
+                    $("#problem_speed_check").hide();
                 } else if ($(this).val() == 'فحص جهاز برمجة') {
                     $('#programe_check').show();
                     $('#full_check').hide();
                     $('#speed_check').hide();
+                    $("#problem_programe_check").show();
+                    $("#problem_speed_check").hide();
+                    $('#problem_all_check').hide();
                 } else if ($(this).val() == 'فحص جهاز سريع') {
                     $('#speed_check').show();
                     $('#full_check').hide();
                     $('#programe_check').hide();
+                    $("#problem_programe_check").hide();
+                    $("#problem_speed_check").show();
+                    $('#problem_all_check').hide();
                 }
             });
         });

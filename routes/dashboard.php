@@ -19,6 +19,8 @@ use App\Http\Controllers\dashboard\ProgrameDeviceController;
 use App\Http\Controllers\dashboard\ProblemCategoryController;
 use App\Http\Controllers\dashboard\auth\ResetPasswordController;
 use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
+use App\Http\Controllers\dashboard\ProgrameProblemCategoryController;
+use App\Http\Controllers\dashboard\SpeedProblemCategoryController;
 
 Route::group([
     'prefix' => '/dashboard',
@@ -106,6 +108,31 @@ Route::group([
             });
         });
         ##################### End Problem Category ###################
+
+
+        ###################### Start Problem Category Programe Device  #################
+        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'programe_problem_categories', 'as' => 'programe_problem_categories.'], function () {
+            Route::controller(ProgrameProblemCategoryController::class)->group(function () {
+                Route::get('index', 'index')->name('index');
+                Route::match(['get', 'post'], 'create', 'create')->name('create');
+                Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
+                Route::post('destroy/{id}', 'destroy')->name('destroy');
+            });
+        });
+        ###################### End  Problem Category Programe Device  #################
+
+        ###################### Start Problem Category Speed Device  #################
+        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'speed_problem_categories', 'as' => 'speed_problem_categories.'], function () {
+            Route::controller(SpeedProblemCategoryController::class)->group(function () {
+                Route::get('index', 'index')->name('index');
+                Route::match(['get', 'post'], 'create', 'create')->name('create');
+                Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
+                Route::post('destroy/{id}', 'destroy')->name('destroy');
+            });
+        });
+        ###################### End  Problem Category Speed Device  #################
+
+
         ###################### Start Check Text  #################
         Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'check_text', 'as' => 'check_text.'], function () {
             Route::controller(CheckTextController::class)->group(function () {
@@ -168,7 +195,7 @@ Route::group([
                 Route::post('checkout/{id}', 'checkout')->name('checkout');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
                 Route::post('addfile/{id}', 'AddFile')->name('addfile');
-                Route::post('client-connect/{id}','ClientConnect')->name('client-connect');
+                Route::post('client-connect/{id}', 'ClientConnect')->name('client-connect');
             });
         });
         ################# End Tech Invoices #####################

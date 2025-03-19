@@ -10,6 +10,8 @@ use App\Http\Traits\Message_Trait;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\Models\dashboard\ProblemCategory;
+use App\Models\dashboard\ProgrameProblemCategory;
+use App\Models\dashboard\SpeedProblemCategory;
 use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
@@ -134,7 +136,9 @@ class AdminController extends Controller
     {
         $admins = Admin::where('type', 'فني')->get();
         $problems = ProblemCategory::all();
-        return view('dashboard.admins.tech', compact('admins', 'problems'));
+        $programe_problems = ProgrameProblemCategory::all();
+        $speed_problems = SpeedProblemCategory::all();
+        return view('dashboard.admins.tech', compact('admins', 'problems','programe_problems','speed_problems'));
     }
 
     public function update_tech(Request $request, $id)

@@ -93,7 +93,19 @@
                       <ul class="menu-content">
                           <li class="{{ Route::is('dashboard.problem_categories.index') ? 'active' : '' }}">
                               <a class="menu-item" href="{{ route('dashboard.problem_categories.index') }}"
-                                  data-i18n="nav.users.user_profile"> اقسام الاعطال
+                                  data-i18n="nav.users.user_profile"> اقسام الاعطال فحص كامل
+                              </a>
+                          </li>
+
+                          <li class="{{ Route::is('dashboard.programe_problem_categories.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.programe_problem_categories.index') }}"
+                                  data-i18n="nav.users.user_profile"> اقسام الاعطال فحص جهاز برمجة
+                              </a>
+                          </li>
+
+                          <li class="{{ Route::is('dashboard.speed_problem_categories.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.speed_problem_categories.index') }}"
+                                  data-i18n="nav.users.user_profile"> اقسام الاعطال فحص جهاز سريع
                               </a>
                           </li>
 
@@ -198,7 +210,8 @@
 
               @can('admins')
                   <li class="nav-item {{ Route::is('dashboard.setting.*') ? 'active' : '' }}"><a href="#"><i
-                              class="la la-television"></i><span class="menu-title" data-i18n="nav.role.main"> ادارة الاعدادات
+                              class="la la-television"></i><span class="menu-title" data-i18n="nav.role.main"> ادارة
+                              الاعدادات
                           </span></a>
                       <ul class="menu-content">
                           <li class="{{ Route::is('dashboard.setting.index') ? 'active' : '' }}">

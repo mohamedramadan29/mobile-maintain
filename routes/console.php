@@ -12,5 +12,4 @@ Artisan::command('inspire', function () {
 
 //Schedule::job(new CheckInvoiceDeliveryJob)->everySecond();
 
-
-Schedule::command(CheckInvoiceDelivery::class)->everySecond();
+Schedule::command(CheckInvoiceDelivery::class)->dailyAt('11:00');
