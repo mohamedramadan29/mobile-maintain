@@ -31,8 +31,8 @@ class AdminController extends Controller
             $data = $request->all();
             $rules = [
                 'name' => 'required',
-                'email' => 'required|email',
-                'phone' => 'required',
+                'email' => 'required|email|unique:admins,email',
+                'phone' => 'required|unique:admins,phone',
                 'password' => 'required',
                 'password_confirmation' => 'required|same:password',
                 'role_id' => 'required',
@@ -42,7 +42,9 @@ class AdminController extends Controller
                 'name.required' => 'من فضلك ادخل اسم المستخدم ',
                 'email.required' => 'من فضلك ادخل البريد الالكتروني ',
                 'email.email' => 'من فضلك ادخل بريد الكتروني صحيح ',
+                'email.unique' => ' البريد الاكتروني مستخدم من قبل  ',
                 'phone.required' => 'من فضلك ادخل رقم الهاتف ',
+                'phone.unique' => ' رقم الهاتف متواجد من قبل  ',
                 'password.required' => 'من فضلك ادخل كلمة المرور ',
                 'password_confirmation.required' => 'من فضلك ادخل تاكيد كلمة المرور ',
                 'password_confirmation.same' => 'كلمة المرور غير متطابقة ',
@@ -75,16 +77,18 @@ class AdminController extends Controller
             $data = $request->all();
             $rules = [
                 'name' => 'required',
-                'email' => 'required|email',
-                'phone' => 'required',
+                'email' => 'required|email|unique:admins,email' . $admin->id,
+                'phone' => 'required|unique:admins,phone' . $admin->id,
                 'role_id' => 'required',
                 'type' => 'required',
             ];
             $messages = [
                 'name.required' => 'من فضلك ادخل اسم المستخدم ',
                 'email.required' => 'من فضلك ادخل البريد الالكتروني ',
+                'email.unique' => ' البريد الاكتروني مستخدم من قبل  ',
                 'email.email' => 'من فضلك ادخل بريد الكتروني صحيح ',
                 'phone.required' => 'من فضلك ادخل رقم الهاتف ',
+                'phone.unique' => ' رقم الهاتف مستخدم من قبل  ',
                 'role_id.required' => 'من فضلك ادخل صلاحيات المستخدم ',
                 'type.required' => 'من فضلك ادخل نوع المستخدم ',
             ];
@@ -138,7 +142,7 @@ class AdminController extends Controller
         $problems = ProblemCategory::all();
         $programe_problems = ProgrameProblemCategory::all();
         $speed_problems = SpeedProblemCategory::all();
-        return view('dashboard.admins.tech', compact('admins', 'problems','programe_problems','speed_problems'));
+        return view('dashboard.admins.tech', compact('admins', 'problems', 'programe_problems', 'speed_problems'));
     }
 
     public function update_tech(Request $request, $id)
