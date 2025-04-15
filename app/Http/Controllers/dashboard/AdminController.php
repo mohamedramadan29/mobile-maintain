@@ -77,8 +77,8 @@ class AdminController extends Controller
             $data = $request->all();
             $rules = [
                 'name' => 'required',
-                'email' => 'required|email|unique:admins,email' . $admin->id,
-                'phone' => 'required|unique:admins,phone' . $admin->id,
+                'email' => 'required|email|unique:admins,email,' . $admin->id,
+                'phone' => 'required|unique:admins,phone,' . $admin->id,
                 'role_id' => 'required',
                 'type' => 'required',
             ];

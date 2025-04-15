@@ -129,10 +129,10 @@
 
                             <!-------------- End Signute ---------->
 
-@php
+                            @php
 
-$settings = App\Models\dashboard\Setting::first();
-@endphp
+                                $settings = App\Models\dashboard\Setting::first();
+                            @endphp
                             <div class="row">
                                 <div class="text-center col-md-7 col-sm-12 text-md-left">
                                     <p class="lead"> للاستفسارات :</p>

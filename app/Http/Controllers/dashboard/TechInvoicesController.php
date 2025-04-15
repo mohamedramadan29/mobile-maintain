@@ -50,71 +50,77 @@ class TechInvoicesController extends Controller
         return view('dashboard.tech_invoices.show', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices'));
     }
 
-    public function checkout($id)
+    public function checkout(Request $request, $id)
     {
-        $message_temp = Message::where('message_type', 'تحت الصيانة')->value('template_text');
-        // dd($message_temp);
-        ############# Check If This User Have More Invoice Or Not ##############
-        try {
-            DB::beginTransaction();
-            $invoices = Invoice::where('admin_repair_id', Auth::guard('admin')->user()->id)->where('status', 'تحت الصيانة')->count();
-            $admin = Auth::guard('admin')->user();
-            $available_number = $admin->device_nums;
-            if ($invoices >= $available_number) {
-                return $this->Error_message('لقد تجاوزت العدد المسموح به للعمل في نفس الوقت ');
+        $invoice = Invoice::find($id);
+        if ($request->isMethod('post')) {
+            $message_temp = Message::where('message_type', 'تحت الصيانة')->value('template_text');
+            // dd($message_temp);
+            ############# Check If This User Have More Invoice Or Not ##############
+            try {
+                DB::beginTransaction();
+                $invoices = Invoice::where('admin_repair_id', Auth::guard('admin')->user()->id)->where('status', 'تحت الصيانة')->count();
+                $admin = Auth::guard('admin')->user();
+                $available_number = $admin->device_nums;
+                if ($invoices >= $available_number) {
+                    return $this->Error_message('لقد تجاوزت العدد المسموح به للعمل في نفس الوقت ');
+                }
+
+                $invoice->admin_repair_id = Auth::guard('admin')->user()->id;
+                $invoice->status = 'تحت الصيانة';
+                $invoice->checkout_time = now();
+                $invoice->save();
+
+                ########## Send Message To Client
+
+                $invoice_link = url('dashboard/invoice/view/' . $invoice->id);
+                $new_phone = preg_replace('/^0/', '', $invoice->phone);
+                // إضافة رمز البلد +966
+                $new_phone = '966' . $new_phone;
+
+                $message = str_replace(
+                    ['{name}', '{status}', '{invoice_link}'],
+                    [$invoice->name, $invoice->status, $invoice_link],
+                    $message_temp
+                );
+                // dd($message);
+                // تعريف المتغير
+                $params = array(
+                    'instanceid' => '138796',
+                    'token' => '3fc4ad69-3ea3-4307-923c-7080f7aa0d8e',
+                    'phone' => $new_phone,
+                    'body' => $message,
+                );
+                $queryString = http_build_query($params); // تحويل المصفوفة إلى سلسلة نصية
+                $curl = curl_init();
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => "https://api.4whats.net/sendMessage/?" . $queryString, // إضافة سلسلة الاستعلام إلى عنوان URL
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => "GET",
+                ));
+                $response = curl_exec($curl);
+                $err = curl_error($curl);
+                curl_close($curl);
+                ############# Add Invoice Step ###############
+                $invoice_step = new InvoiceSteps();
+                $invoice_step->invoice_id = $invoice->id;
+                $invoice_step->admin_id = Auth::id();
+                $invoice_step->step_details = ' تم بدء الصيانة علي الجهاز';
+                $invoice_step->save();
+
+                DB::commit();
+                // return $this->success_message('تم بدأ العمل علي الجهاز  بنجاح');
+                return Redirect::route('dashboard.tech_invoices.index')->with(['تم بدأ العمل علي الجهاز  بنجاح']);
+            } catch (Exception $e) {
+                return $this->exception_message($e);
             }
-            $invoice = Invoice::find($id);
-            $invoice->admin_repair_id = Auth::guard('admin')->user()->id;
-            $invoice->status = 'تحت الصيانة';
-            $invoice->checkout_time = now();
-            $invoice->save();
-
-            ########## Send Message To Client
-
-            $invoice_link = url('dashboard/invoice/view/' . $invoice->id);
-            $new_phone = preg_replace('/^0/', '', $invoice->phone);
-            // إضافة رمز البلد +966
-            $new_phone = '966' . $new_phone;
-
-            $message = str_replace(
-                ['{name}', '{status}', '{invoice_link}'],
-                [$invoice->name, $invoice->status, $invoice_link],
-                $message_temp
-            );
-            // dd($message);
-            // تعريف المتغير
-            $params = array(
-                'instanceid' => '138796',
-                'token' => '3fc4ad69-3ea3-4307-923c-7080f7aa0d8e',
-                'phone' => $new_phone,
-                'body' => $message,
-            );
-            $queryString = http_build_query($params); // تحويل المصفوفة إلى سلسلة نصية
-            $curl = curl_init();
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://api.4whats.net/sendMessage/?" . $queryString, // إضافة سلسلة الاستعلام إلى عنوان URL
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => "GET",
-            ));
-            $response = curl_exec($curl);
-            $err = curl_error($curl);
-            curl_close($curl);
-            ############# Add Invoice Step ###############
-            $invoice_step = new InvoiceSteps();
-            $invoice_step->invoice_id = $invoice->id;
-            $invoice_step->admin_id = Auth::id();
-            $invoice_step->step_details = ' تم بدء الصيانة علي الجهاز';
-            $invoice_step->save();
-
-            DB::commit();
-            return $this->success_message('تم بدأ العمل علي الجهاز  بنجاح');
-        } catch (Exception $e) {
-            return $this->exception_message($e);
         }
+        return view('dashboard.tech_invoices.checkout', compact('invoice'));
+
     }
 
     ################ Update After Repair ##################

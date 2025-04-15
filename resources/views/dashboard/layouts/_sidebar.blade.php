@@ -153,42 +153,45 @@
               @endcan
 
 
-              @can('tech_invoices')
-                  <li class="nav-item {{ Route::is('dashboard.tech_invoices.*') ? 'active' : '' }}"><a href="#"><i
-                              class="la la-file-text"></i><span class="menu-title" data-i18n="nav.users.main"> ادارة
-                              فواتيري
-                          </span></a>
-                      <ul class="menu-content">
-                          <li class="{{ Route::is('dashboard.tech_invoices.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.tech_invoices.index') }}"
-                                  data-i18n="nav.users.user_profile"> فواتيري
-                              </a>
-                          </li>
-                          <li class="{{ Route::is('dashboard.tech_invoices.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.tech_invoices.available') }}"
-                                  data-i18n="nav.users.user_profile"> الفواتير المتاحة
-                              </a>
-                          </li>
-                      </ul>
-                  </li>
-              @endcan
+              @if (Auth::guard('admin')->user()->type == 'فني')
+                  @can('tech_invoices')
+                      <li class="nav-item {{ Route::is('dashboard.tech_invoices.*') ? 'active' : '' }}"><a
+                              href="#"><i class="la la-file-text"></i><span class="menu-title"
+                                  data-i18n="nav.users.main"> ادارة
+                                  فواتيري
+                              </span></a>
+                          <ul class="menu-content">
+                              <li class="{{ Route::is('dashboard.tech_invoices.index') ? 'active' : '' }}">
+                                  <a class="menu-item" href="{{ route('dashboard.tech_invoices.index') }}"
+                                      data-i18n="nav.users.user_profile"> فواتيري
+                                  </a>
+                              </li>
+                              <li class="{{ Route::is('dashboard.tech_invoices.index') ? 'active' : '' }}">
+                                  <a class="menu-item" href="{{ route('dashboard.tech_invoices.available') }}"
+                                      data-i18n="nav.users.user_profile"> الفواتير المتاحة
+                                  </a>
+                              </li>
+                          </ul>
+                      </li>
+                  @endcan
 
-              @can('tech_invoices')
-                  <li class="nav-item {{ Route::is('dashboard.invoices.*') ? 'active' : '' }}"><a href="#"><i
-                              class="la la-file-text"></i><span class="menu-title" data-i18n="nav.users.main"> ادارة
-                              الفواتير
-                          </span></a>
-                      <ul class="menu-content">
+                  @can('tech_invoices')
+                      <li class="nav-item {{ Route::is('dashboard.invoices.*') ? 'active' : '' }}"><a href="#"><i
+                                  class="la la-file-text"></i><span class="menu-title" data-i18n="nav.users.main"> ادارة
+                                  الفواتير
+                              </span></a>
+                          <ul class="menu-content">
 
-                          <li class="{{ Route::is('dashboard.invoices.invoice-haif-time') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.invoices.invoice-haif-time') }}"
-                                  data-i18n="nav.users.user_profile"> فواتير مر عليها نصف الوقت او اكثر
-                              </a>
-                          </li>
+                              <li class="{{ Route::is('dashboard.invoices.invoice-haif-time') ? 'active' : '' }}">
+                                  <a class="menu-item" href="{{ route('dashboard.invoices.invoice-haif-time') }}"
+                                      data-i18n="nav.users.user_profile"> فواتير مر عليها نصف الوقت او اكثر
+                                  </a>
+                              </li>
 
-                      </ul>
-                  </li>
-              @endcan
+                          </ul>
+                      </li>
+                  @endcan
+              @endif
 
               <li class="nav-item {{ Route::is('dashboard.update_profile.*') ? 'active' : '' }}"><a href="#"><i
                           class="la la-user"></i><span class="menu-title" data-i18n="nav.users.main"> ادارة

@@ -117,3 +117,8 @@ code[class*='language-'], pre[class*='language-'] {
     }
 
 }
+
+
+.modal-backdrop {
+    display: none !important;
+}

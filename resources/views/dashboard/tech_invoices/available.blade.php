@@ -44,9 +44,9 @@
                                             </thead>
                                             <tbody>
                                                 @php
-                                                $technicianProblems =
-                                                    json_decode(Auth::user()->problems, true) ?? [];
-                                            @endphp
+                                                    $technicianProblems =
+                                                        json_decode(Auth::user()->problems, true) ?? [];
+                                                @endphp
                                                 @forelse ($invoices as $invoice)
                                                     @php
                                                         // تحويل مشاكل الفاتورة إلى مصفوفة
@@ -56,39 +56,44 @@
                                                             array_diff($invoiceProblems, $technicianProblems)
                                                         );
                                                     @endphp
-                                                     @if ($allMatch)
-                                                    <tr>
-                                                        <th scope="row">{{ $loop->iteration }}</th>
-                                                        <td> {{ $invoice->id }} </td>
-                                                        <td>
-                                                            {{ $invoice->title }}
-                                                        </td>
-                                                        <td>
-                                                            @foreach (json_decode($invoice->problems) as $problem)
-                                                                <span class="badge badge-danger"> {{ $problem }}
+                                                    @if ($allMatch)
+                                                        <tr>
+                                                            <th scope="row">{{ $loop->iteration }}</th>
+                                                            <td> {{ $invoice->id }} </td>
+                                                            <td>
+                                                                {{ $invoice->title }}
+                                                            </td>
+                                                            <td>
+                                                                @foreach (json_decode($invoice->problems) as $problem)
+                                                                    <span class="badge badge-danger"> {{ $problem }}
+                                                                    </span>
+                                                                @endforeach
+                                                            </td>
+                                                            <td>
+                                                                <span class="badge badge-info">
+                                                                    {{ $invoice->status }}
                                                                 </span>
-                                                            @endforeach
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge badge-info">
-                                                                {{ $invoice->status }}
-                                                            </span>
-                                                        </td>
-                                                        <td> {{ $invoice->date_delivery }} // {{ $invoice->time_delivery }}
-                                                        </td>
-                                                        <td>
-                                                            <a class="btn btn-info btn-sm"
-                                                                href="{{ route('dashboard.tech_invoices.show', $invoice->id) }}"><i
-                                                                    class="la la-eye"></i> تفاصيل الجهاز </a>
-                                                            <button type="button" class="btn btn-warning btn-sm"
-                                                                data-toggle="modal"
-                                                                data-target="#checkout_invoice_{{ $invoice->id }}">
-                                                                استلام الجهاز <i class="la la-check"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
+                                                            </td>
+                                                            <td> {{ $invoice->date_delivery }} //
+                                                                {{ $invoice->time_delivery }}
+                                                            </td>
+                                                            <td>
+                                                                <a class="btn btn-info btn-sm"
+                                                                    href="{{ route('dashboard.tech_invoices.show', $invoice->id) }}"><i
+                                                                        class="la la-eye"></i> تفاصيل الجهاز </a>
+
+                                                                <a class="btn btn-warning btn-sm"
+                                                                    href="{{ route('dashboard.tech_invoices.checkout', $invoice->id) }}"><i
+                                                                        class="la la-eye"></i> استلام الجهاز </a>
+                                                                {{-- <button type="button" class="btn btn-warning btn-sm"
+                                                                    data-toggle="modal"
+                                                                    data-target="#checkout_invoice_{{ $invoice->id }}">
+                                                                    استلام الجهاز <i class="la la-check"></i>
+                                                                </button> --}}
+                                                            </td>
+                                                        </tr>
                                                     @endif
-                                                    @include('dashboard.tech_invoices.checkout')
+                                                    {{-- @include('dashboard.tech_invoices.checkout') --}}
                                                 @empty
                                                     <td colspan="4"> لا يوجد بيانات </td>
                                                 @endforelse

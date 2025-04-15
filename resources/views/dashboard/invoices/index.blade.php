@@ -2,7 +2,10 @@
 @section('title', ' الفواتير ')
 @section('css')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/tables/datatable/datatables.min.css">
-@endsection
+<style>
+
+</style>
+    @endsection
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">

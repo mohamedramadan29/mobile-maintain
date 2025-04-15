@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\dashboard;
 
-use App\Models\dashboard\InvoicePrograneCheck;
-use App\Models\dashboard\InvoiceSpeedCheck;
 use Exception;
 use Mpdf\Mpdf;
 use Carbon\Carbon;
@@ -24,13 +22,16 @@ use App\Models\dashboard\InvoiceCheck;
 use App\Models\dashboard\InvoiceImage;
 use App\Models\dashboard\InvoiceSteps;
 use Picqer\Barcode\BarcodeGeneratorPNG;
-use App\Models\dashboard\ProblemCategory;
 use App\Models\dashboard\ProgrameDevice;
-use App\Models\dashboard\ProgrameProblemCategory;
-use App\Models\dashboard\SpeedProblemCategory;
-// use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Redirect;
+use App\Models\dashboard\ProblemCategory;
 use Illuminate\Support\Facades\Validator;
+use App\Models\dashboard\InvoiceSpeedCheck;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+// use Intervention\Image\Facades\Image;
+use App\Models\dashboard\InvoicePrograneCheck;
+use App\Models\dashboard\SpeedProblemCategory;
+use App\Models\dashboard\ProgrameProblemCategory;
 
 class InvoiceController extends Controller
 {
@@ -244,7 +245,11 @@ class InvoiceController extends Controller
                 $err = curl_error($curl);
                 curl_close($curl);
                 DB::commit();
-                return $this->success_message(' تم اضافة الفاتورة بنجاح');
+                /// Need Go to Print Code
+                return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
+
+
+                // return $this->success_message(' تم اضافة الفاتورة بنجاح');
             } catch (Exception $e) {
                 return Redirect()->back()->withInput()->withErrors($e->getMessage());
                 //return $this->exception_message($e);

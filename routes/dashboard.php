@@ -192,7 +192,8 @@ Route::group([
                 Route::get('index', 'index')->name('index');
                 Route::get('available', 'available')->name('available');
                 Route::get('show/{id}', 'show')->name('show');
-                Route::post('checkout/{id}', 'checkout')->name('checkout');
+                Route::match(['get', 'post'], 'checkout/{id}', 'checkout')->name('checkout');
+                // Route::post('checkout/{id}', 'checkout')->name('checkout');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
                 Route::post('addfile/{id}', 'AddFile')->name('addfile');
                 Route::post('client-connect/{id}', 'ClientConnect')->name('client-connect');
