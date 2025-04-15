@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\dashboard\MoreCheckController;
 use App\Models\dashboard\CheckText;
 use App\Models\dashboard\SpeedDevice;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,7 @@ use App\Http\Controllers\dashboard\ProgrameDeviceController;
 use App\Http\Controllers\dashboard\ProblemCategoryController;
 use App\Http\Controllers\dashboard\auth\ResetPasswordController;
 use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
+use App\Http\Controllers\dashboard\PieceResourceController;
 use App\Http\Controllers\dashboard\ProgrameProblemCategoryController;
 use App\Http\Controllers\dashboard\SpeedProblemCategoryController;
 
@@ -163,6 +165,26 @@ Route::group([
             });
         });
         ##################### End Programe Device  ###################
+        ###################### Start PieceResource Controller   #################
+        Route::group(['middleware' => 'can:admins', 'prefix' => 'piece_resource', 'as' => 'piece_resource.'], function () {
+            Route::controller(PieceResourceController::class)->group(function () {
+                Route::get('index', 'index')->name('index');
+                Route::match(['get', 'post'], 'create', 'create')->name('create');
+                Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
+                Route::post('destroy/{id}', 'destroy')->name('destroy');
+            });
+        });
+        ##################### End PieceResource Controller ###################
+        ###################### Start MoreCheck Controller   #################
+        Route::group(['middleware' => 'can:admins', 'prefix' => 'more_check', 'as' => 'more_check.'], function () {
+            Route::controller(MoreCheckController::class)->group(function () {
+                Route::get('index', 'index')->name('index');
+                Route::match(['get', 'post'], 'create', 'create')->name('create');
+                Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
+                Route::post('destroy/{id}', 'destroy')->name('destroy');
+            });
+        });
+        ##################### End MoreCheck Controller ###################
         ################### Start Invoices #######################
         Route::group(['middleware' => 'can:invoices', 'prefix' => 'invoices', 'as' => 'invoices.'], function () {
             Route::controller(InvoiceController::class)->group(function () {

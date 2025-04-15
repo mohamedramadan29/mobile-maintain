@@ -152,6 +152,35 @@
                   </li>
               @endcan
 
+              @can('admins')
+                  <li class="nav-item {{ Route::is('dashboard.piece_resource.*') ? 'active' : '' }}"><a href="#"><i
+                              class="la la-puzzle-piece"></i><span class="menu-title" data-i18n="nav.users.main"> ادارة
+                              مصدر القطع
+                          </span></a>
+                      <ul class="menu-content">
+                          <li class="{{ Route::is('dashboard.piece_resource.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.piece_resource.index') }}"
+                                  data-i18n="nav.users.user_profile"> مصدر القطع
+                              </a>
+                          </li>
+
+                      </ul>
+                  </li>
+                  <li class="nav-item {{ Route::is('dashboard.more_check.*') ? 'active' : '' }}"><a href="#"><i
+                              class="la la-puzzle-piece"></i><span class="menu-title" data-i18n="nav.users.main">
+                                خيارات اضافية للفحص
+                          </span></a>
+                      <ul class="menu-content">
+                          <li class="{{ Route::is('dashboard.more_check.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.more_check.index') }}"
+                                  data-i18n="nav.users.user_profile"> خيارات اضافية للفحص
+                              </a>
+                          </li>
+
+                      </ul>
+                  </li>
+              @endcan
+
 
               @if (Auth::guard('admin')->user()->type == 'فني')
                   @can('tech_invoices')

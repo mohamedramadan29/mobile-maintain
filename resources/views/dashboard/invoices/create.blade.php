@@ -238,6 +238,25 @@
                                                 </div>
                                                 <!--################### End Programe Device Check  #####################-->
 
+                                                <div class="row">
+                                                    @foreach ($invoice_more_checks as $invoice_more_check)
+                                                        <div class="col-2">
+                                                            <div class="skin skin-square">
+                                                                <fieldset>
+                                                                    <input type="checkbox"
+                                                                        id="inputmorecheck-{{ $invoice_more_check->id }}"
+                                                                        name="invoice_more_checks[]"
+                                                                        value="{{ $invoice_more_check->id }}"
+                                                                        @checked(in_array($invoice_more_check->id, old('invoice_more_checks', [])))>
+                                                                    <label
+                                                                        for="inputmorecheck-{{ $invoice_more_check->id }}">{{ $invoice_more_check->name }}
+                                                                    </label>
+                                                                </fieldset>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                                <br>
                                                 <!-- باقي الحقول -->
                                                 <div class="row">
                                                     <div class="col-md-6">
@@ -450,7 +469,25 @@
                                                                 <input type="number" min="1" max="12"
                                                                     name="pattern[]" value="{{ old('pattern.8') }}">
                                                             </div>
-
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group">
+                                                            <label for="price"> حدد مصدر القطعة <span
+                                                                    class="required_span"> *
+                                                                </span> </label>
+                                                            <select required name="piece_resource" id=""
+                                                                class="form-control">
+                                                                <option value="" selected disabled> -- حدد مصدر
+                                                                    القطعة -- </option>
+                                                                @foreach ($piece_resources as $resource)
+                                                                    <option @selected(old('piece_resource') == $resource->id)
+                                                                        value="{{ $resource->id }}">
+                                                                        {{ $resource->name }}</option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>

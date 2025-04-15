@@ -20,6 +20,7 @@ use App\Models\dashboard\SpeedDevice;
 use Intervention\Image\Facades\Image;
 use App\Models\dashboard\InvoiceCheck;
 use App\Models\dashboard\InvoiceImage;
+use App\Models\dashboard\InvoiceMoreCheck;
 use App\Models\dashboard\InvoiceSteps;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 use App\Models\dashboard\ProgrameDevice;
@@ -30,6 +31,7 @@ use App\Models\dashboard\InvoiceSpeedCheck;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 // use Intervention\Image\Facades\Image;
 use App\Models\dashboard\InvoicePrograneCheck;
+use App\Models\dashboard\PieceSource;
 use App\Models\dashboard\SpeedProblemCategory;
 use App\Models\dashboard\ProgrameProblemCategory;
 
@@ -53,11 +55,13 @@ class InvoiceController extends Controller
     }
     public function create(Request $request)
     {
+
         ///$message_temp = Message::where('message_type', 'اضافة فاتورة')->select('template_text')->first();
         $message_temp = Message::where('message_type', 'اضافة فاتورة')->value('template_text');
         // dd($message_temp);
         if ($request->isMethod('post')) {
             try {
+                // dd($request->all());
                 $data = $request->all();
 
                 ///  dd($data);
@@ -126,6 +130,8 @@ class InvoiceController extends Controller
                 $invoice->device_password_text = $data['device_text_password'];
                 $invoice->device_pattern = $patternJson;
                 $invoice->checkout_type = $data['checkout_type'];
+                $invoice->piece_resource = $data['piece_resource'];
+                $invoice->invoice_more_checks = json_encode($data['invoice_more_checks']);
                 $invoice->save();
                 ############ Start Insert Files ################
                 if ($request->hasFile('files_images')) {
@@ -262,12 +268,25 @@ class InvoiceController extends Controller
         $checks = CheckText::all();
         $speed_devices = SpeedDevice::all();
         $programe_devices = ProgrameDevice::all();
-        return view('dashboard.invoices.create', compact('problems', 'checks', 'speed_devices', 'programe_devices', 'programe_problems', 'speed_problems'));
+        $piece_resources = PieceSource::all();
+        $invoice_more_checks = InvoiceMoreCheck::all();
+        return view('dashboard.invoices.create', compact(
+            'problems',
+            'checks',
+            'speed_devices',
+            'programe_devices',
+            'programe_problems',
+            'speed_problems',
+            'piece_resources',
+            'invoice_more_checks'
+        ));
     }
 
     public function update(Request $request, $id)
     {
         $invoice = Invoice::find($id);
+        $piece_resources = PieceSource::all();
+        $invoice_more_checks = InvoiceMoreCheck::all();
         if ($request->isMethod('post')) {
             try {
                 $data = $request->all();
@@ -314,6 +333,8 @@ class InvoiceController extends Controller
                 $invoice->status = $data['status'];
                 $invoice->device_password_text = $data['device_text_password'];
                 $invoice->device_pattern = $patternJson;
+                $invoice->piece_resource = $data['piece_resource'];
+                $invoice->invoice_more_checks = json_encode($data['invoice_more_checks']);
                 $invoice->save();
                 ############ Start Insert Files ################
                 ############ Start Insert Files ################
@@ -403,7 +424,17 @@ class InvoiceController extends Controller
         $speed_problems = SpeedProblemCategory::all();
         $speed_devices = SpeedDevice::all();
         $programe_devices = ProgrameDevice::all();
-        return view('dashboard.invoices.update', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'programe_problems', 'speed_problems'));
+        return view('dashboard.invoices.update', compact(
+            'invoice',
+            'problems',
+            'checks',
+            'speed_devices',
+            'programe_devices',
+            'programe_problems',
+            'speed_problems',
+            'piece_resources',
+            'invoice_more_checks'
+        ));
     }
     public function destroy($id)
     {

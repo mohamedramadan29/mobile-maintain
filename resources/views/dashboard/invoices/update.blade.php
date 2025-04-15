@@ -256,6 +256,31 @@
                                                     </table>
                                                 </div>
                                                 <!--################### End Programe Device Check  #####################-->
+                                                @php
+                                                    $selectedChecks =
+                                                        json_decode($invoice->invoice_more_checks, true) ?? [];
+                                                @endphp
+                                                <div class="row">
+                                                    @foreach ($invoice_more_checks as $invoice_more_check)
+                                                        <div class="col-2">
+                                                            <div class="skin skin-square">
+                                                                <fieldset>
+                                                                    <input type="checkbox"
+                                                                        {{ in_array($invoice_more_check->id, $selectedChecks) ? 'checked' : '' }}
+                                                                        id="inputmorecheck-{{ $invoice_more_check->id }}"
+                                                                        name="invoice_more_checks[]"
+                                                                        value="{{ $invoice_more_check->id }}">
+                                                                    <label
+                                                                        for="inputmorecheck-{{ $invoice_more_check->id }}">
+                                                                        {{ $invoice_more_check->name }}
+                                                                    </label>
+                                                                </fieldset>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+
+                                                <br>
 
                                                 <div class="row">
                                                     <div class="col-md-6">
@@ -462,6 +487,26 @@
                                                         </div>
                                                     </div>
 
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group">
+                                                            <label for="price"> حدد مصدر القطعة <span
+                                                                    class="required_span"> *
+                                                                </span> </label>
+                                                            <select required name="piece_resource" id=""
+                                                                class="form-control">
+                                                                <option value="" selected disabled> -- حدد مصدر
+                                                                    القطعة -- </option>
+                                                                @foreach ($piece_resources as $resource)
+                                                                    <option @selected($invoice->piece_resource == $resource->id)
+                                                                        value="{{ $resource->id }}">
+                                                                        {{ $resource->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
                                                 </div>
 
                                                 <div class="row">
