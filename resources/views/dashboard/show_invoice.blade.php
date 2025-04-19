@@ -61,42 +61,119 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($checks as $check)
-                                        @php
-                                            $checkResult = $invoice->checkResults
-                                                ->where('problem_id', $check->id)
-                                                ->where('invoice_id', $invoice->id)
-                                                ->first();
-                                        @endphp
-                                        <tr>
-                                            <td> {{ $loop->iteration }}</td>
-                                            <td>
-                                                <p>
-                                                    {{ $check->name }}
-                                                </p>
-                                            </td>
-                                            <td>
-                                                <input readonly disabled type="radio" value="1" class="form-control"
-                                                    name="work_{{ $check->id }}[]"
-                                                    {{ isset($checkResult) && $checkResult->work == 1 ? 'checked' : '' }}>
-                                            </td>
-                                            <td>
-                                                <input readonly disabled type="radio" value="0" class="form-control"
-                                                    name="work_{{ $check->id }}[]"
-                                                    {{ isset($checkResult) && $checkResult->work == 0 ? 'checked' : '' }}>
-                                            </td>
-                                            <td>
-                                                <p>
-                                                    {{ $checkResult->notes ?? '' }}
-                                                </p>
-                                            </td>
-                                            <td>
-                                                <p>
-                                                    {{ $checkResult->after_check ?? '' }}
-                                                </p>
-                                            </td>
-                                        </tr>
-                                    @endforeach
+                                    @if ($invoice->checkout_type == 'فحص كامل')
+                                        @foreach ($checks as $check)
+                                            @php
+                                                $checkResult = $invoice->checkResults
+                                                    ->where('problem_id', $check->id)
+                                                    ->where('invoice_id', $invoice->id)
+                                                    ->first();
+                                            @endphp
+                                            <tr>
+                                                <td> {{ $loop->iteration }}</td>
+                                                <td>
+                                                    <p>
+                                                        {{ $check->name }}
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <input readonly disabled type="radio" value="1"
+                                                        class="form-control" name="work_{{ $check->id }}[]"
+                                                        {{ isset($checkResult) && $checkResult->work == 1 ? 'checked' : '' }}>
+                                                </td>
+                                                <td>
+                                                    <input readonly disabled type="radio" value="0"
+                                                        class="form-control" name="work_{{ $check->id }}[]"
+                                                        {{ isset($checkResult) && $checkResult->work == 0 ? 'checked' : '' }}>
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        {{ $checkResult->notes ?? '' }}
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        {{ $checkResult->after_check ?? '' }}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @elseif($invoice->checkout_type == 'فحص جهاز برمجة')
+                                        @foreach ($programe_problems as $pro_check)
+                                            @php
+                                                $checkResultprogram = $invoice->programeResults
+                                                    ->where('programe_id', $pro_check->id)
+                                                    ->where('invoice_id', $invoice->id)
+                                                    ->first();
+                                            @endphp
+                                            <tr>
+                                                <td> {{ $loop->iteration }}</td>
+                                                <td>
+                                                    <p>
+                                                        {{ $pro_check->name }}
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <input readonly disabled type="radio" value="1"
+                                                        class="form-control" name="work_{{ $pro_check->id }}[]"
+                                                        {{ isset($checkResultprogram) && $checkResultprogram->work == 1 ? 'checked' : '' }}>
+                                                </td>
+                                                <td>
+                                                    <input readonly disabled type="radio" value="0"
+                                                        class="form-control" name="work_{{ $pro_check->id }}[]"
+                                                        {{ isset($checkResultprogram) && $checkResultprogram->work == 0 ? 'checked' : '' }}>
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        {{ $checkResultprogram->notes ?? '' }}
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        {{ $checkResultprogram->after_check ?? '' }}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @elseif($invoice->checkout_type == 'فحص جهاز سريع')
+                                        @foreach ($speed_problems as $speed_check)
+                                            @php
+                                                $checkResultspeed = $invoice->speedResults
+                                                    ->where('speed_id', $speed_check->id)
+                                                    ->where('invoice_id', $invoice->id)
+                                                    ->first();
+                                            @endphp
+                                            <tr>
+                                                <td> {{ $loop->iteration }}</td>
+                                                <td>
+                                                    <p>
+                                                        {{ $speed_check->name }}
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <input readonly disabled type="radio" value="1"
+                                                        class="form-control" name="work_{{ $speed_check->id }}[]"
+                                                        {{ isset($checkResultspeed) && $checkResultspeed->work == 1 ? 'checked' : '' }}>
+                                                </td>
+                                                <td>
+                                                    <input readonly disabled type="radio" value="0"
+                                                        class="form-control" name="work_{{ $speed_check->id }}[]"
+                                                        {{ isset($checkResultspeed) && $checkResultspeed->work == 0 ? 'checked' : '' }}>
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        {{ $checkResultspeed->notes ?? '' }}
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        {{ $checkResultspeed->after_check ?? '' }}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
+
                                 </tbody>
                             </table>
                         </div>
@@ -122,10 +199,13 @@
                                             <td class="text-right">
                                                 <div class="flex-row d-flex justify-content-center">
                                                     @foreach ($invoice->files as $file)
-                                                        <img style="border: 1px solid #ccc;border-radius: 10px;padding: 2px;margin-left: 5px"
-                                                            width="100px" height="100px" class="img-border"
-                                                            src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
-                                                            alt="">
+                                                        <a
+                                                            href="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}">
+                                                            <img style="border: 1px solid #ccc;border-radius: 10px;padding: 2px;margin-left: 5px"
+                                                                width="100px" height="100px" class="img-border"
+                                                                src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
+                                                                alt="">
+                                                        </a>
                                                     @endforeach
                                                 </div>
                                             </td>
@@ -212,19 +292,20 @@
                                                     $sub_total = 0;
                                                 @endphp
                                                 @if ($invoice->files->count() > 0)
-                                                @foreach ($invoice->files as $file)
-                                                    @php
-                                                        $sub_total += $file->price;
-                                                    @endphp
-                                                    @if ($file->price != 0)
-                                                        <tr>
-                                                            <td>{{ $file->title }}</td>
-                                                            <td class="text-right">{{ number_format($file->price, 2) }}
-                                                                ريال</td>
-                                                        </tr>
-                                                    @endif
-                                                @endforeach
-                                            @endif
+                                                    @foreach ($invoice->files as $file)
+                                                        @php
+                                                            $sub_total += $file->price;
+                                                        @endphp
+                                                        @if ($file->price != 0)
+                                                            <tr>
+                                                                <td>{{ $file->title }}</td>
+                                                                <td class="text-right">
+                                                                    {{ number_format($file->price, 2) }}
+                                                                    ريال</td>
+                                                            </tr>
+                                                        @endif
+                                                    @endforeach
+                                                @endif
 
                                                 @php
                                                     $total_price = $invoice->price + $sub_total;
@@ -262,7 +343,8 @@
                                 <div class="col-md-7 col-sm-12">
                                     <h6> الشروط والاحكام </h6>
                                     <p> يجب إحضار الفاتورة عند استلام الجهاز. </p>
-                                    <p> <a target="_blank" href="{{ url('/dashboard/terms') }}"> قراءة الشروط والاحكام </a>
+                                    <p> <a target="_blank" href="{{ url('/dashboard/terms') }}"> قراءة الشروط والاحكام
+                                        </a>
                                     </p>
                                 </div>
                             </div>

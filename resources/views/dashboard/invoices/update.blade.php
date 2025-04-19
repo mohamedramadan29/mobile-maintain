@@ -637,9 +637,12 @@
                                                             method="POST">
                                                             @csrf
                                                             <div class="filess">
-                                                                <img class="file_image"
+                                                                <a target="_blank" href="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}">
+                                                                    <img class="file_image"
                                                                     src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
                                                                     alt="Card image cap">
+                                                                </a>
+
                                                                 <button onclick="return confirm('هل تريد حذف هذا المرفق؟')"
                                                                     type="submit" class="btn btn-danger btn-sm">
                                                                     <i class="la la-trash"></i> حذف </button>

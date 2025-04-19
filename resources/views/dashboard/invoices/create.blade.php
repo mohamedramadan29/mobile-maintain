@@ -82,8 +82,7 @@
                                                             <tr>
                                                                 <th> # </th>
                                                                 <th> اساسيات الفحص </th>
-                                                                <th> يعمل </th>
-                                                                <th> لا يعمل </th>
+                                                                <th> حالة العمل </th>
                                                                 <th> ملاحظات </th>
                                                                 <th> بعد الفحص </th>
                                                             </tr>
@@ -101,17 +100,30 @@
                                                                             name="check_problem_name[]">
                                                                     </td>
                                                                     <td>
+                                                                        <select name="work_{{ $check->id }}"
+                                                                            class="form-control">
+                                                                            <option value="">-- اختر الحالة --
+                                                                            </option>
+                                                                            <option value="1"
+                                                                                {{ old('work_' . $check->id) == '1' ? 'selected' : '' }}>
+                                                                                يعمل</option>
+                                                                            <option value="0"
+                                                                                {{ old('work_' . $check->id) == '0' ? 'selected' : '' }}>
+                                                                                لا يعمل</option>
+                                                                        </select>
+                                                                    </td>
+                                                                    {{-- <td>
                                                                         <input type="radio" value="1"
                                                                             class="form-control"
-                                                                            name="work_{{ $check->id }}[]"
+                                                                            name="work_[{{ $check->id }}]"
                                                                             {{ old('work_' . $check->id) == '1' ? 'checked' : '' }}>
                                                                     </td>
                                                                     <td>
                                                                         <input type="radio" value="0"
                                                                             class="form-control"
-                                                                            name="work_{{ $check->id }}[]"
+                                                                            name="work_[{{ $check->id }}]"
                                                                             {{ old('work_' . $check->id) == '0' ? 'checked' : '' }}>
-                                                                    </td>
+                                                                    </td> --}}
                                                                     <td>
                                                                         <input type="text"
                                                                             value="{{ old('notes.' . $loop->index) }}"
@@ -136,8 +148,7 @@
                                                             <tr>
                                                                 <th> # </th>
                                                                 <th> اساسيات الفحص </th>
-                                                                <th> يعمل </th>
-                                                                <th> لا يعمل </th>
+                                                                <th> حالة العمل </th>
                                                                 <th> ملاحظات </th>
                                                                 <th> بعد الفحص </th>
                                                             </tr>
@@ -154,6 +165,20 @@
                                                                             class="form-control" name="check_speed_name[]">
                                                                     </td>
                                                                     <td>
+                                                                        <select name="speedwork_{{ $speed->id }}"
+                                                                            class="form-control">
+                                                                            <option value="">-- اختر الحالة --
+                                                                            </option>
+                                                                            <option value="1"
+                                                                                {{ old('speedwork_' . $speed->id) == '1' ? 'selected' : '' }}>
+                                                                                يعمل</option>
+                                                                            <option value="0"
+                                                                                {{ old('speedwork_' . $speed->id) == '0' ? 'selected' : '' }}>
+                                                                                لا يعمل</option>
+                                                                        </select>
+                                                                    </td>
+
+                                                                    {{-- <td>
                                                                         <input type="radio" value="1"
                                                                             class="form-control"
                                                                             name="speedwork_{{ $speed->id }}[]"
@@ -164,7 +189,7 @@
                                                                             class="form-control"
                                                                             name="speedwork_{{ $speed->id }}[]"
                                                                             {{ old('speedwork_' . $speed->id) == '0' ? 'checked' : '' }}>
-                                                                    </td>
+                                                                    </td> --}}
                                                                     <td>
                                                                         <input type="text"
                                                                             value="{{ old('speed_notes.' . $loop->index) }}"
@@ -190,8 +215,7 @@
                                                             <tr>
                                                                 <th> # </th>
                                                                 <th> اساسيات الفحص </th>
-                                                                <th> يعمل </th>
-                                                                <th> لا يعمل </th>
+                                                                <th> حالة العمل </th>
                                                                 <th> ملاحظات </th>
                                                                 <th> بعد الفحص </th>
                                                             </tr>
@@ -209,6 +233,20 @@
                                                                             name="check_programe_name[]">
                                                                     </td>
                                                                     <td>
+                                                                        <select name="programework_{{ $programe->id }}"
+                                                                            class="form-control">
+                                                                            <option value="">-- اختر الحالة --
+                                                                            </option>
+                                                                            <option value="1"
+                                                                                {{ old('programework_' . $programe->id) == '1' ? 'selected' : '' }}>
+                                                                                يعمل</option>
+                                                                            <option value="0"
+                                                                                {{ old('programework_' . $programe->id) == '0' ? 'selected' : '' }}>
+                                                                                لا يعمل</option>
+                                                                        </select>
+                                                                    </td>
+
+                                                                    {{-- <td>
                                                                         <input type="radio" value="1"
                                                                             class="form-control"
                                                                             name="programework_{{ $programe->id }}[]"
@@ -219,7 +257,7 @@
                                                                             class="form-control"
                                                                             name="programework_{{ $programe->id }}[]"
                                                                             {{ old('programework_' . $programe->id) == '0' ? 'checked' : '' }}>
-                                                                    </td>
+                                                                    </td> --}}
                                                                     <td>
                                                                         <input type="text"
                                                                             value="{{ old('programe_notes.' . $loop->index) }}"
@@ -325,10 +363,10 @@
                                                                     class="required_span"> * </span> </label>
                                                             <div class="skin skin-square">
                                                                 <!----------- ############## All Check ############## ------------>
-                                                                <div class="col-md-12 col-sm-12 problem_check_box"
+                                                                <div class="flex-wrap col-md-12 col-sm-12 problem_check_box"
                                                                     style="display: none;" id="problem_all_check">
                                                                     @foreach ($problems as $problem)
-                                                                        <fieldset>
+                                                                        <fieldset style="min-width: 120px">
                                                                             <input type="checkbox"
                                                                                 id="input-{{ $problem->id }}"
                                                                                 name="problems[]"
@@ -343,10 +381,10 @@
                                                                 <!-- ################ End All Check ################## -->
 
                                                                 <!-------############# Start Programe Check ##################-------------->
-                                                                <div class="col-md-12 col-sm-12 problem_check_box"
+                                                                <div class="flex-wrap col-md-12 col-sm-12 problem_check_box"
                                                                     style="display: none;" id="problem_programe_check">
                                                                     @foreach ($programe_problems as $programe_problem)
-                                                                        <fieldset>
+                                                                        <fieldset  style="min-width: 120px">
                                                                             <input type="checkbox"
                                                                                 id="inputprograme-{{ $programe_problem->id }}"
                                                                                 name="problems[]"
@@ -360,10 +398,10 @@
                                                                 <!-------############# End  Programe Check ##################-------------->
 
                                                                 <!-------############# Start Programe Check ##################-------------->
-                                                                <div class="col-md-12 col-sm-12 problem_check_box"
+                                                                <div class="flex-wrap col-md-12 col-sm-12 problem_check_box"
                                                                     style="display: none;" id="problem_speed_check">
                                                                     @foreach ($speed_problems as $speed_problem)
-                                                                        <fieldset>
+                                                                        <fieldset  style="min-width: 120px">
                                                                             <input type="checkbox"
                                                                                 id="inputspeed-{{ $speed_problem->id }}"
                                                                                 name="problems[]"
@@ -493,6 +531,7 @@
                                                 </div>
 
                                                 <!-- اضافة المرفقات -->
+                                                <!-- اضافة المرفقات -->
                                                 <div class="row">
                                                     <div class="col-lg-12">
                                                         <div class="form-group">
@@ -508,47 +547,182 @@
                                                 <script>
                                                     let imageInput = document.getElementById('imageInput');
                                                     let imagePreview = document.getElementById('imagePreview');
-                                                    let dt = new DataTransfer(); // لتخزين الملفات المرفوعة
+                                                    let dt = new DataTransfer(); // لتخزين الملفات
 
                                                     imageInput.addEventListener('change', function(event) {
                                                         Array.from(event.target.files).forEach(file => {
+                                                            // فقط صور
+                                                            if (!file.type.startsWith('image/')) return;
+
                                                             let reader = new FileReader();
                                                             reader.onload = function(e) {
-                                                                let imgContainer = document.createElement("div");
-                                                                imgContainer.classList.add("position-relative", "m-2");
+                                                                let img = new Image();
+                                                                img.onload = function() {
+                                                                    const MAX_WIDTH = 800;
+                                                                    const MAX_HEIGHT = 800;
+                                                                    let width = img.width;
+                                                                    let height = img.height;
 
-                                                                let img = document.createElement("img");
-                                                                img.src = e.target.result;
-                                                                img.classList.add("rounded", "shadow", "border", "p-1");
-                                                                img.style.width = "120px";
-                                                                img.style.height = "120px";
-
-                                                                let removeBtn = document.createElement("span");
-                                                                removeBtn.innerHTML = "&times;";
-                                                                removeBtn.classList.add("position-absolute", "remove-button", "top-0", "end-0",
-                                                                    "bg-danger",
-                                                                    "text-white", "rounded-circle", "p-1");
-                                                                removeBtn.style.cursor = "pointer";
-
-                                                                removeBtn.onclick = function() {
-                                                                    let index = Array.from(dt.files).findIndex(f => f.name === file.name);
-                                                                    if (index > -1) {
-                                                                        dt.items.remove(index);
-                                                                        imageInput.files = dt.files;
+                                                                    if (width > height) {
+                                                                        if (width > MAX_WIDTH) {
+                                                                            height *= MAX_WIDTH / width;
+                                                                            width = MAX_WIDTH;
+                                                                        }
+                                                                    } else {
+                                                                        if (height > MAX_HEIGHT) {
+                                                                            width *= MAX_HEIGHT / height;
+                                                                            height = MAX_HEIGHT;
+                                                                        }
                                                                     }
-                                                                    imgContainer.remove();
+
+                                                                    let canvas = document.createElement("canvas");
+                                                                    canvas.width = width;
+                                                                    canvas.height = height;
+                                                                    let ctx = canvas.getContext("2d");
+                                                                    ctx.drawImage(img, 0, 0, width, height);
+
+                                                                    // تحويل canvas لصورة مضغوطة
+                                                                    let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+                                                                    // إنشاء حاوية الصورة
+                                                                    let imgContainer = document.createElement("div");
+                                                                    imgContainer.classList.add("position-relative", "m-2");
+
+                                                                    let imgElement = document.createElement("img");
+                                                                    imgElement.src = compressedDataUrl;
+                                                                    imgElement.classList.add("rounded", "shadow", "border", "p-1");
+                                                                    imgElement.style.width = "120px";
+                                                                    imgElement.style.height = "120px";
+
+                                                                    let removeBtn = document.createElement("span");
+                                                                    removeBtn.innerHTML = "&times;";
+                                                                    removeBtn.classList.add("position-absolute", "remove-button", "top-0",
+                                                                        "end-0", "bg-danger", "text-white", "rounded-circle", "p-1");
+                                                                    removeBtn.style.cursor = "pointer";
+
+                                                                    removeBtn.onclick = function() {
+                                                                        let index = Array.from(dt.files).findIndex(f => f.name === file
+                                                                            .name);
+                                                                        if (index > -1) {
+                                                                            dt.items.remove(index);
+                                                                            imageInput.files = dt.files;
+                                                                        }
+                                                                        imgContainer.remove();
+                                                                    };
+
+                                                                    imgContainer.appendChild(imgElement);
+                                                                    imgContainer.appendChild(removeBtn);
+                                                                    imagePreview.appendChild(imgContainer);
+
+                                                                    // إضافة الملف الأصلي إلى input
+                                                                    dt.items.add(file);
+                                                                    imageInput.files = dt.files;
                                                                 };
-
-                                                                imgContainer.appendChild(img);
-                                                                imgContainer.appendChild(removeBtn);
-                                                                imagePreview.appendChild(imgContainer);
-
-                                                                dt.items.add(file);
-                                                                imageInput.files = dt.files; // تحديث الملفات داخل input
+                                                                img.src = e.target.result;
                                                             };
                                                             reader.readAsDataURL(file);
                                                         });
                                                     });
+                                                </script>
+
+
+                                                {{-- New Updtae Images  --}}
+
+
+                                                <div class="form-group">
+                                                    <label>📸 التقاط الصور من الكاميرا</label><br>
+                                                    <button class="mb-2 btn btn-primary"
+                                                        onclick="startCamera(event)">تشغيل الكاميرا</button>
+                                                    <button class="mb-2 btn btn-success" onclick="takeSnapshot(event)">📷
+                                                        التقاط صورة</button>
+                                                    <div>
+                                                        <video id="video" width="320" height="240" autoplay
+                                                            style="border:1px solid #ccc;"></video>
+                                                        <canvas id="canvas" style="display: none;"></canvas>
+                                                    </div>
+                                                    <div id="snapshots" class="flex-wrap mt-3 d-flex" style="gap: 10px;">
+                                                    </div>
+                                                    <div id="imageHiddenInputs"></div>
+                                                </div>
+
+
+                                                <script>
+                                                    let video = document.getElementById('video');
+                                                    let canvas = document.getElementById('canvas');
+                                                    let snapshotsContainer = document.getElementById('snapshots');
+                                                    let imageHiddenInputs = document.getElementById('imageHiddenInputs');
+                                                    let stream = null;
+
+                                                    function startCamera(event) {
+                                                        event.preventDefault(); // منع أي إرسال غير مرغوب فيه
+                                                        navigator.mediaDevices.getUserMedia({
+                                                                video: true
+                                                            })
+                                                            .then(function(mediaStream) {
+                                                                stream = mediaStream;
+                                                                video.srcObject = mediaStream;
+                                                            })
+                                                            .catch(function(err) {
+                                                                alert("تعذر تشغيل الكاميرا: " + err);
+                                                            });
+                                                    }
+
+                                                    function takeSnapshot(event) {
+                                                        event.preventDefault(); // منع أي إرسال غير مرغوب فيه
+                                                        const context = canvas.getContext('2d');
+                                                        canvas.width = video.videoWidth;
+                                                        canvas.height = video.videoHeight;
+                                                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                                                        // ضغط الصورة
+                                                        let dataUrl = canvas.toDataURL('image/jpeg', 0.7); // ضغط 70%
+
+                                                        // عرض الصورة
+                                                        let img = document.createElement('img');
+                                                        img.src = dataUrl;
+                                                        img.style.width = '150px';
+                                                        img.style.border = '2px solid #ccc';
+                                                        img.style.borderRadius = '5px';
+
+                                                        // إضافة زر حذف
+                                                        let deleteButton = document.createElement('button');
+                                                        deleteButton.textContent = 'حذف';
+                                                        deleteButton.classList.add('btn', 'btn-danger', 'mt-2');
+                                                        deleteButton.onclick = function() {
+                                                            deleteImage(img, dataUrl);
+                                                        };
+
+                                                        // إنشاء حاوية للصورة وزر الحذف
+                                                        let imgContainer = document.createElement('div');
+                                                        imgContainer.style.position = 'relative';
+                                                        imgContainer.appendChild(img);
+                                                        imgContainer.appendChild(deleteButton);
+
+                                                        // إضافة الصورة والحاوية إلى الحاوية الرئيسية
+                                                        snapshotsContainer.appendChild(imgContainer);
+
+                                                        // إضافة input مخفي للإرسال
+                                                        let input = document.createElement('input');
+                                                        input.type = 'hidden';
+                                                        input.name = 'captured_images[]';
+                                                        input.value = dataUrl;
+                                                        imageHiddenInputs.appendChild(input);
+                                                    }
+
+                                                    // دالة حذف الصورة
+                                                    function deleteImage(imageElement, dataUrl) {
+                                                        // إزالة الصورة من العرض
+                                                        imageElement.parentNode.remove();
+
+                                                        // إزالة الـ input المخفي الذي يحتوي على البيانات
+                                                        let inputs = imageHiddenInputs.getElementsByTagName('input');
+                                                        for (let i = 0; i < inputs.length; i++) {
+                                                            if (inputs[i].value === dataUrl) {
+                                                                inputs[i].remove();
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
                                                 </script>
 
 
@@ -558,7 +732,7 @@
                                                         <label>توقيع العميل <span class="required_span"> * </span> </label>
                                                         <div id="signature-pad" class="signature-pad">
                                                             <div class="signature-pad-body">
-                                                                <canvas></canvas>
+                                                                <canvas id="signatureCanvas"></canvas>
                                                             </div>
                                                             <div class="signature-pad-footer">
                                                                 <button type="button" id="clear-signature"
@@ -592,6 +766,9 @@
                                                 <button type="button" class="mr-1 btn btn-warning">
                                                     <i class="ft-x"></i> رجوع
                                                 </button>
+                                                <p id="loadingMessage" class="mt-2 text-info" style="display: none;">⏳
+                                                    جاري رفع البيانات، الرجاء الانتظار...</p>
+
                                             </div>
                                         </form>
 
@@ -604,8 +781,8 @@
                                             integrity="sha512-Mtr2f9aMp/TVEdDWcRlcREy9NfgsvXvApdxrm3/gK8lAMWnXrFsYaoW01B5eJhrUpBT7hmIjLeaQe0hnL7Oh1w=="
                                             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
                                         <script>
-                                            var canvas = document.querySelector("canvas");
-                                            var signaturePad = new SignaturePad(canvas);
+                                            var signcanvas = document.getElementById("signatureCanvas");
+                                            var signaturePad = new SignaturePad(signcanvas);
                                             // مسح التوقيع عند الضغط على الزر
                                             document.getElementById("clear-signature").addEventListener("click", function() {
                                                 signaturePad.clear();
@@ -617,6 +794,15 @@
                                                     alert("الرجاء التوقيع");
                                                 } else {
                                                     signatureInput.value = signaturePad.toDataURL(); // تأكد من أن التوقيع يتم تخزينه هنا
+                                                    let submitBtn = this.querySelector('button[type="submit"]');
+                                                    let loadingMessage = document.getElementById('loadingMessage');
+
+                                                    // تعطيل الزر
+                                                    submitBtn.disabled = true;
+                                                    submitBtn.innerHTML = '<i class="la la-spinner la-spin"></i> جاري الحفظ...';
+
+                                                    // عرض الرسالة
+                                                    loadingMessage.style.display = 'block';
                                                 }
                                             });
                                         </script>
@@ -650,30 +836,45 @@
 
     <script>
         $(document).ready(function() {
-            $('#checkout_type').change(function() {
-                if ($(this).val() == 'فحص كامل') {
+            function toggleCheckoutSections(type) {
+                if (type == 'فحص كامل') {
                     $('#full_check').show();
                     $('#problem_all_check').show();
                     $('#programe_check').hide();
                     $('#speed_check').hide();
                     $("#problem_programe_check").hide();
                     $("#problem_speed_check").hide();
-                } else if ($(this).val() == 'فحص جهاز برمجة') {
+                } else if (type == 'فحص جهاز برمجة') {
                     $('#programe_check').show();
                     $('#full_check').hide();
                     $('#speed_check').hide();
                     $("#problem_programe_check").show();
                     $("#problem_speed_check").hide();
                     $('#problem_all_check').hide();
-                } else if ($(this).val() == 'فحص جهاز سريع') {
+                } else if (type == 'فحص جهاز سريع') {
                     $('#speed_check').show();
                     $('#full_check').hide();
                     $('#programe_check').hide();
                     $("#problem_programe_check").hide();
                     $("#problem_speed_check").show();
                     $('#problem_all_check').hide();
+                } else {
+                    // إخفاء الكل عند الاختيار الافتراضي أو لا شيء
+                    $('#full_check, #programe_check, #speed_check, #problem_all_check, #problem_programe_check, #problem_speed_check')
+                        .hide();
                 }
+            }
+
+            // عند التغيير
+            $('#checkout_type').change(function() {
+                toggleCheckoutSections($(this).val());
             });
+
+            // عند تحميل الصفحة إذا كان هناك old value
+            let oldValue = "{{ old('checkout_type') }}";
+            if (oldValue) {
+                toggleCheckoutSections(oldValue);
+            }
         });
     </script>
 @endsection

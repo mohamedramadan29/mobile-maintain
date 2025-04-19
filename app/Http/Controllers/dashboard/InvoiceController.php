@@ -61,7 +61,7 @@ class InvoiceController extends Controller
         // dd($message_temp);
         if ($request->isMethod('post')) {
             try {
-                // dd($request->all());
+                //dd($request->all());
                 $data = $request->all();
 
                 ///  dd($data);
@@ -77,6 +77,7 @@ class InvoiceController extends Controller
                     'status' => 'required',
                     'signature' => 'required', // إضافة التوقيع
                     'checkout_type' => 'required',
+                    'work.*' => 'required|in:0,1'
                 ];
                 $messages = [
                     'name.required' => 'من فضلك ادخل اسم العميل ',
@@ -145,6 +146,31 @@ class InvoiceController extends Controller
                         $invoice_image->save();
                     }
                 }
+                // حفظ الصور الملتقطة من الكاميرا
+                if (!empty($data['captured_images']) && is_array($data['captured_images'])) {
+                    foreach ($data['captured_images'] as $base64Image) {
+                        if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $type)) {
+                            $imageData = substr($base64Image, strpos($base64Image, ',') + 1);
+                            $imageData = base64_decode($imageData);
+                            $extension = strtolower($type[1]);
+
+                            // إنشاء اسم فريد للصورة
+                            $fileName = uniqid() . '.' . $extension;
+                            $path = public_path('assets/uploads/invoices_files/') . $fileName;
+
+                            // حفظ الصورة في المجلد
+                            file_put_contents($path, $imageData);
+
+                            // تخزينها في قاعدة البيانات
+                            $invoice_image = new InvoiceImage();
+                            $invoice_image->invoice_id = $invoice->id;
+                            $invoice_image->image = $fileName;
+                            $invoice_image->user_upload = Auth::id();
+                            $invoice_image->save();
+                        }
+                    }
+                }
+
                 ############# Add Invoice Step ###############
                 $invoice_step = new InvoiceSteps();
                 $invoice_step->invoice_id = $invoice->id;
@@ -161,7 +187,7 @@ class InvoiceController extends Controller
                             $check->invoice_id = $invoice->id;
                             $check->problem_id = $problemId;
                             $check->problem_name = $data['check_problem_name'][$index] ?? '';
-                            $check->work = isset($data["work_{$problemId}"]) ? reset($data["work_{$problemId}"]) : 0;
+                            $check->work = $data["work_{$problemId}"] ?? 0;
                             $check->notes = $data['notes'][$index] ?? null;
                             $check->after_check = $data['after_check'][$index] ?? null;
                             $check->save();
@@ -176,7 +202,8 @@ class InvoiceController extends Controller
                             $checkSpeed->invoice_id = $invoice->id;
                             $checkSpeed->speed_id = $speedId;
                             $checkSpeed->problem_name = $data['check_speed_name'][$index] ?? '';
-                            $checkSpeed->work = isset($data["speedwork_{$speedId}"]) ? reset($data["speedwork_{$speedId}"]) : 0;
+
+                            $checkSpeed->work = $data["speedwork_{$speedId}"] ?? 0;
                             $checkSpeed->notes = $data['speed_notes'][$index] ?? null;
                             $checkSpeed->after_check = $data['after_check_speed'][$index] ?? null;
                             $checkSpeed->save();
@@ -191,7 +218,7 @@ class InvoiceController extends Controller
                             $checkPrograme->invoice_id = $invoice->id;
                             $checkPrograme->programe_id = $programeId;
                             $checkPrograme->problem_name = $data['check_programe_name'][$index] ?? '';
-                            $checkPrograme->work = isset($data["programework_{$programeId}"]) ? reset($data["programework_{$programeId}"]) : 0;
+                            $checkPrograme->work = $data["programework_{$programeId}"] ?? 0;
                             $checkPrograme->notes = $data['programe_notes'][$index] ?? null;
                             $checkPrograme->after_check = $data['after_check_programe'][$index] ?? null;
                             $checkPrograme->save();
@@ -255,7 +282,7 @@ class InvoiceController extends Controller
                 return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
 
 
-                // return $this->success_message(' تم اضافة الفاتورة بنجاح');
+                //return $this->success_message(' تم اضافة الفاتورة بنجاح');
             } catch (Exception $e) {
                 return Redirect()->back()->withInput()->withErrors($e->getMessage());
                 //return $this->exception_message($e);

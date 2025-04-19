@@ -114,10 +114,13 @@
                                                 <td class="text-right">
                                                     <div class="flex-row d-flex justify-content-center">
                                                         @foreach ($invoice->files as $file)
+                                                        <a href="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}" target="_blank">
                                                             <img style="border: 1px solid #ccc;border-radius: 10px;padding: 2px;margin-left: 5px"
-                                                                width="100px" height="100px" class="img-border"
-                                                                src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
-                                                                alt="">
+                                                            width="100px" height="100px" class="img-border"
+                                                            src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
+                                                            alt="">
+                                                        </a>
+
                                                         @endforeach
                                                     </div>
                                                 </td>
