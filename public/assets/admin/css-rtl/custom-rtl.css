@@ -122,3 +122,9 @@ code[class*='language-'], pre[class*='language-'] {
 .modal-backdrop {
     display: none !important;
 }
+
+input[type='checkbox']{
+    cursor: pointer;
+    width: 20px;
+    height: 15px;
+}

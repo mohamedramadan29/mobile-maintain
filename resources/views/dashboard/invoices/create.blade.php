@@ -22,7 +22,7 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.invoices.index') }}"> الوافتير </a>
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard.invoices.index') }}"> الفواتير </a>
                                 </li>
                                 <li class="breadcrumb-item active"><a href="#"> اضافة فاتورة جديدة </a>
                                 </li>
@@ -112,18 +112,6 @@
                                                                                 لا يعمل</option>
                                                                         </select>
                                                                     </td>
-                                                                    {{-- <td>
-                                                                        <input type="radio" value="1"
-                                                                            class="form-control"
-                                                                            name="work_[{{ $check->id }}]"
-                                                                            {{ old('work_' . $check->id) == '1' ? 'checked' : '' }}>
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="radio" value="0"
-                                                                            class="form-control"
-                                                                            name="work_[{{ $check->id }}]"
-                                                                            {{ old('work_' . $check->id) == '0' ? 'checked' : '' }}>
-                                                                    </td> --}}
                                                                     <td>
                                                                         <input type="text"
                                                                             value="{{ old('notes.' . $loop->index) }}"
@@ -278,19 +266,19 @@
 
                                                 <div class="row">
                                                     @foreach ($invoice_more_checks as $invoice_more_check)
-                                                        <div class="col-2">
-                                                            <div class="skin skin-square">
-                                                                <fieldset>
-                                                                    <input type="checkbox"
-                                                                        id="inputmorecheck-{{ $invoice_more_check->id }}"
-                                                                        name="invoice_more_checks[]"
-                                                                        value="{{ $invoice_more_check->id }}"
-                                                                        @checked(in_array($invoice_more_check->id, old('invoice_more_checks', [])))>
-                                                                    <label
-                                                                        for="inputmorecheck-{{ $invoice_more_check->id }}">{{ $invoice_more_check->name }}
-                                                                    </label>
-                                                                </fieldset>
-                                                            </div>
+                                                        <div class="col-6">
+                                                            {{-- <div class="skin skin-square"> --}}
+                                                            <fieldset>
+                                                                <input type="checkbox"
+                                                                    id="inputmorecheck-{{ $invoice_more_check->id }}"
+                                                                    name="invoice_more_checks[]"
+                                                                    value="{{ $invoice_more_check->id }}"
+                                                                    @checked(in_array($invoice_more_check->id, old('invoice_more_checks', [])))>
+                                                                <label
+                                                                    for="inputmorecheck-{{ $invoice_more_check->id }}">{{ $invoice_more_check->name }}
+                                                                </label>
+                                                            </fieldset>
+                                                            {{-- </div> --}}
                                                         </div>
                                                     @endforeach
                                                 </div>
@@ -384,7 +372,7 @@
                                                                 <div class="flex-wrap col-md-12 col-sm-12 problem_check_box"
                                                                     style="display: none;" id="problem_programe_check">
                                                                     @foreach ($programe_problems as $programe_problem)
-                                                                        <fieldset  style="min-width: 120px">
+                                                                        <fieldset style="min-width: 120px">
                                                                             <input type="checkbox"
                                                                                 id="inputprograme-{{ $programe_problem->id }}"
                                                                                 name="problems[]"
@@ -401,7 +389,7 @@
                                                                 <div class="flex-wrap col-md-12 col-sm-12 problem_check_box"
                                                                     style="display: none;" id="problem_speed_check">
                                                                     @foreach ($speed_problems as $speed_problem)
-                                                                        <fieldset  style="min-width: 120px">
+                                                                        <fieldset style="min-width: 120px">
                                                                             <input type="checkbox"
                                                                                 id="inputspeed-{{ $speed_problem->id }}"
                                                                                 name="problems[]"
@@ -435,7 +423,7 @@
                                                         <label for="price"> تاريخ ووقت التسليم <span
                                                                 class="required_span"> * </span> </label>
                                                         <div class="justify-between d-flex">
-                                                            <div class="form-group">
+                                                            <div class="form-group" style="min-width: 50%">
                                                                 <div class="position-relative has-icon-left">
                                                                     <input required type="date" name="date_delivery"
                                                                         id="timesheetinput3" class="form-control"
@@ -445,7 +433,7 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="form-group">
+                                                            <div class="form-group" style="min-width: 50%">
                                                                 <div class="position-relative has-icon-left">
                                                                     <input required type="time" name="time_delivery"
                                                                         id="timesheetinput6" class="form-control"
@@ -780,32 +768,60 @@
                                         <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.3.4/signature_pad.min.js"
                                             integrity="sha512-Mtr2f9aMp/TVEdDWcRlcREy9NfgsvXvApdxrm3/gK8lAMWnXrFsYaoW01B5eJhrUpBT7hmIjLeaQe0hnL7Oh1w=="
                                             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
                                         <script>
                                             var signcanvas = document.getElementById("signatureCanvas");
                                             var signaturePad = new SignaturePad(signcanvas);
+
                                             // مسح التوقيع عند الضغط على الزر
                                             document.getElementById("clear-signature").addEventListener("click", function() {
                                                 signaturePad.clear();
                                             });
+
                                             document.getElementById("invoice-form").addEventListener("submit", function(e) {
                                                 var signatureInput = document.getElementById("signature");
+                                                let checkoutType = document.getElementById("checkout_type").value;
+
+                                                let problem_all_check = document.getElementById('problem_all_check');
+                                                let problem_programe_check = document.getElementById('problem_programe_check');
+                                                let problem_speed_check = document.getElementById('problem_speed_check');
+
+                                                // تحديد العنصر الذي يجب التحقق منه حسب نوع الفحص
+                                                let activeProblemContainer;
+                                                if (checkoutType === "فحص كامل") {
+                                                    activeProblemContainer = problem_all_check;
+                                                } else if (checkoutType === "فحص جهاز برمجة") {
+                                                    activeProblemContainer = problem_programe_check;
+                                                } else if (checkoutType === "فحص جهاز سريع") {
+                                                    activeProblemContainer = problem_speed_check;
+                                                }
+
+                                                if (activeProblemContainer) {
+                                                    let checkedCount = activeProblemContainer.querySelectorAll('input[type="checkbox"]:checked').length;
+                                                    if (checkedCount === 0) {
+                                                        e.preventDefault();
+                                                        alert("من فضلك حدد الاعطال المناسبة حسب نوع الفحص");
+                                                        return;
+                                                    }
+                                                }
+
                                                 if (signaturePad.isEmpty()) {
                                                     e.preventDefault();
                                                     alert("الرجاء التوقيع");
                                                 } else {
-                                                    signatureInput.value = signaturePad.toDataURL(); // تأكد من أن التوقيع يتم تخزينه هنا
+                                                    signatureInput.value = signaturePad.toDataURL();
+
                                                     let submitBtn = this.querySelector('button[type="submit"]');
                                                     let loadingMessage = document.getElementById('loadingMessage');
 
-                                                    // تعطيل الزر
                                                     submitBtn.disabled = true;
                                                     submitBtn.innerHTML = '<i class="la la-spinner la-spin"></i> جاري الحفظ...';
 
-                                                    // عرض الرسالة
                                                     loadingMessage.style.display = 'block';
                                                 }
                                             });
                                         </script>
+
 
                                     </div>
                                 </div>
@@ -877,4 +893,46 @@
             }
         });
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const disableCheckIds = [1, 3]; // IDs الخاصة بالخيار "خلل يعوق الفحص" أو أي خيار يمنع الفحص
+
+            // دالة تتحقق إن كان أحد الـ checkboxes المختارة مفعلة
+            function isAnyDisableChecked() {
+                return disableCheckIds.some(id => {
+                    const checkbox = document.getElementById("inputmorecheck-" + id);
+                    return checkbox && checkbox.checked;
+                });
+            }
+
+            // دالة لتعطيل كل الـ selectات وتعيينها على "لا يعمل"
+            function disableAllChecks() {
+                document.querySelectorAll(
+                    'select[name^="work_"], select[name^="speedwork_"], select[name^="programework_"]'
+                ).forEach(select => {
+                    select.value = "0";
+                    // select.setAttribute("disabled", "disabled");
+                });
+            }
+
+            // إضافة مستمع لكل الـ checkboxes المحددة
+            disableCheckIds.forEach(id => {
+                const checkbox = document.getElementById("inputmorecheck-" + id);
+                if (checkbox) {
+                    checkbox.addEventListener("change", function() {
+                        if (isAnyDisableChecked()) {
+                            disableAllChecks();
+                        }
+                    });
+
+                    // تحقق إذا كانت الصفحة أعادت تحميلها والـ checkbox مفعلة
+                    if (checkbox.checked) {
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                }
+            });
+        });
+    </script>
+
+
 @endsection

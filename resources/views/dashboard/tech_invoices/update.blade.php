@@ -232,10 +232,56 @@
                                                 </div>
                                                 <!--################### End Programe Device Check  #####################-->
 
+                                                @php
+                                                    $selectedChecks =
+                                                        json_decode($invoice->invoice_more_checks, true) ?? [];
+                                                @endphp
+                                                <div class="row">
+                                                    @foreach ($invoice_more_checks as $invoice_more_check)
+                                                        <div class="col-6">
+                                                            <div class="skin skin-square">
+                                                                <fieldset>
+                                                                    <input type="checkbox" disabled
+                                                                        {{ in_array($invoice_more_check->id, $selectedChecks) ? 'checked' : '' }}
+                                                                        id="inputmorecheck-{{ $invoice_more_check->id }}"
+                                                                        name="invoice_more_checks[]"
+                                                                        value="{{ $invoice_more_check->id }}">
+                                                                    <label
+                                                                        for="inputmorecheck-{{ $invoice_more_check->id }}">
+                                                                        {{ $invoice_more_check->name }}
+                                                                    </label>
+                                                                </fieldset>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="title"> اسم الجهاز </label>
+                                                            <label for="name"> اسم العميل <span class="required_span">
+                                                                    *
+                                                                </span> </label>
+                                                            <input disabled type="text" id="name"
+                                                                class="form-control" placeholder="" name="name"
+                                                                value="{{ $invoice->name }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="phone"> رقم الهاتف <span class="required_span">
+                                                                    *
+                                                                </span> </label>
+                                                            <input disabled type="text" id="phone"
+                                                                class="form-control" placeholder="" name="phone"
+                                                                value="{{ $invoice->phone }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="title"> اسم الجهاز <span class="required_span">
+                                                                    *
+                                                                </span> </label>
                                                             <input disabled type="text" id="title"
                                                                 class="form-control" placeholder="" name="title"
                                                                 value="{{ $invoice->title }}">
@@ -243,10 +289,14 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="title"> الاعطال </label>
+                                                            <label for="title"> الاعطال <span
+                                                                    class="required_span">
+                                                                    * </span> </label>
                                                             <div class="skin skin-square">
-                                                                <div
-                                                                    class="col-md-12 col-sm-12 d-flex justify-content-around">
+                                                                <!-- ########## Start All Check ####################### -->
+                                                                <div class="col-md-12 col-sm-12 problem_check_box"
+                                                                    style="{{ $invoice->checkout_type === 'فحص كامل' ? 'display: block' : 'display: none' }}"
+                                                                    id="problem_all_check">
                                                                     @foreach ($problems as $problem)
                                                                         <fieldset>
                                                                             <input disabled
@@ -260,9 +310,156 @@
                                                                         </fieldset>
                                                                     @endforeach
                                                                 </div>
+                                                                <!-- ############# End All Check ################# -->
+
+                                                                <!-------############# Start Programe Check ##################-------------->
+                                                                <div class="col-md-12 col-sm-12 problem_check_box"
+                                                                    style="{{ $invoice->checkout_type === 'فحص جهاز برمجة' ? 'display: block' : 'display: none' }}"
+                                                                    id="problem_programe_check">
+                                                                    @foreach ($programe_problems as $programe_problem)
+                                                                        <fieldset>
+                                                                            <input disabled
+                                                                                {{ in_array($programe_problem->name, json_decode($invoice->problems)) ? 'checked' : '' }}
+                                                                                type="checkbox"
+                                                                                id="inputprograme-{{ $programe_problem->id }}"
+                                                                                name="problems[]"
+                                                                                value="{{ $programe_problem->name }}">
+                                                                            <label
+                                                                                for="inputprograme-{{ $programe_problem->id }}">
+                                                                                {{ $programe_problem->name }} </label>
+                                                                        </fieldset>
+                                                                    @endforeach
+                                                                </div>
+                                                                <!-------############# End  Programe Check ##################-------------->
+
+                                                                <!-------############# Start Programe Check ##################-------------->
+                                                                <div class="col-md-12 col-sm-12 problem_check_box"
+                                                                    style="{{ $invoice->checkout_type === 'فحص جهاز سريع' ? 'display: block' : 'display: none' }}"
+                                                                    id="problem_speed_check">
+                                                                    @foreach ($speed_problems as $speed_problem)
+                                                                        <fieldset>
+                                                                            <input disabled
+                                                                                {{ in_array($speed_problem->name, json_decode($invoice->problems)) ? 'checked' : '' }}
+                                                                                type="checkbox"
+                                                                                id="inputspeed-{{ $speed_problem->id }}"
+                                                                                name="problems[]"
+                                                                                value="{{ $speed_problem->name }}">
+                                                                            <label
+                                                                                for="inputspeed-{{ $speed_problem->id }}">
+                                                                                {{ $speed_problem->name }} </label>
+                                                                        </fieldset>
+                                                                    @endforeach
+                                                                </div>
+                                                                <!-------############# End  Programe Check ##################-------------->
+
+
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label for="title"> ملاحظات </label>
+                                                            <textarea disabled name="description" id="" class="form-control">{{ $invoice->description }}</textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="price"> السعر الاولي <span
+                                                                    class="required_span"> * </span> </label>
+                                                            <input disabled type="number" step="0.01" id="price"
+                                                                class="form-control" placeholder="" name="price"
+                                                                value="{{ $invoice->price }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="price"> تاريخ ووقت التسليم <span
+                                                                class="required_span"> * </span> </label>
+                                                        <div class="justify-between d-flex">
+                                                            <div class="form-group">
+                                                                <div class="position-relative has-icon-left">
+                                                                    <input disabled type="date" name="date_delivery"
+                                                                        value="{{ $invoice->date_delivery }}"
+                                                                        id="timesheetinput3" class="form-control">
+                                                                    <div class="form-control-position">
+                                                                        <i class="ft-message-square"></i>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="position-relative has-icon-left">
+                                                                    <input disabled type="time" name="time_delivery"
+                                                                        value="{{ $invoice->time_delivery }}"
+                                                                        id="timesheetinput6" class="form-control">
+                                                                    <div class="form-control-position">
+                                                                        <i class="ft-clock"></i>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <img width="100" height="100"
+                                                        src="{{ asset('assets/uploads/invoices_files/' . $invoice->signature) }}"
+                                                        alt="">
+
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="name"> رمز الجهاز </label>
+                                                            <input disabled type="text" id="device_text_password"
+                                                                class="form-control" placeholder=""
+                                                                name="device_text_password"
+                                                                value="{{ $invoice->device_password_text ?? old('device_text_password') }}">
+                                                        </div>
+                                                    </div>
+                                                    @php
+                                                        $storedPattern = json_decode($invoice->device_pattern, true);
+                                                    @endphp
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <div class="d-flex">
+                                                                <input disabled type="number" min="1" max="12"
+                                                                    name="pattern[]"
+                                                                    value="{{ $storedPattern[0] ?? '' }}">
+                                                                <input disabled type="number" min="1" max="12"
+                                                                    name="pattern[]"
+                                                                    value="{{ $storedPattern[1] ?? '' }}">
+                                                                <input disabled type="number" min="1" max="12"
+                                                                    name="pattern[]"
+                                                                    value="{{ $storedPattern[2] ?? '' }}">
+                                                            </div>
+                                                            <div class="d-flex">
+                                                                <input disabled type="number" min="1" max="12"
+                                                                    name="pattern[]"
+                                                                    value="{{ $storedPattern[3] ?? '' }}">
+                                                                <input disabled type="number" min="1" max="12"
+                                                                    name="pattern[]"
+                                                                    value="{{ $storedPattern[4] ?? '' }}">
+                                                                <input disabled type="number" min="1" max="12"
+                                                                    name="pattern[]"
+                                                                    value="{{ $storedPattern[5] ?? '' }}">
+                                                            </div>
+                                                            <div class="d-flex">
+                                                                <input disabled type="number" min="1" max="12"
+                                                                    name="pattern[]"
+                                                                    value="{{ $storedPattern[6] ?? '' }}">
+                                                                <input disabled type="number" min="1" max="12"
+                                                                    name="pattern[]"
+                                                                    value="{{ $storedPattern[7] ?? '' }}">
+                                                                <input disabled type="number" min="1" max="12"
+                                                                    name="pattern[]"
+                                                                    value="{{ $storedPattern[8] ?? '' }}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+
+
+                                                <div class="row">
+
                                                     <div class="col-md-12">
                                                         <div class="form-group">
                                                             <label for="title"> ملاحظات فني الصيانة </label>

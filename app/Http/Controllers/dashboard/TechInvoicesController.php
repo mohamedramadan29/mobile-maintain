@@ -19,8 +19,11 @@ use App\Models\dashboard\InvoiceSteps;
 use App\Models\dashboard\ProgrameDevice;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\dashboard\ProblemCategory;
+use App\Models\dashboard\InvoiceMoreCheck;
 use App\Models\dashboard\InvoiceSpeedCheck;
 use App\Models\dashboard\InvoicePrograneCheck;
+use App\Models\dashboard\SpeedProblemCategory;
+use App\Models\dashboard\ProgrameProblemCategory;
 
 class TechInvoicesController extends Controller
 {
@@ -47,7 +50,12 @@ class TechInvoicesController extends Controller
         $checks = CheckText::all();
         $speed_devices = SpeedDevice::all();
         $programe_devices = ProgrameDevice::all();
-        return view('dashboard.tech_invoices.show', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices'));
+        $invoice_more_checks = InvoiceMoreCheck::all();
+        $programe_problems = ProgrameProblemCategory::all();
+        $speed_problems = SpeedProblemCategory::all();
+        return view('dashboard.tech_invoices.show', compact('invoice',
+        'invoice_more_checks', 'programe_problems', 'speed_problems',
+        'problems', 'checks', 'speed_devices', 'programe_devices'));
     }
 
     public function checkout(Request $request, $id)
@@ -199,7 +207,10 @@ class TechInvoicesController extends Controller
         $checks = CheckText::all();
         $speed_devices = SpeedDevice::all();
         $programe_devices = ProgrameDevice::all();
-        return view('dashboard.tech_invoices.update', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices'));
+        $invoice_more_checks = InvoiceMoreCheck::all();
+        $programe_problems = ProgrameProblemCategory::all();
+        $speed_problems = SpeedProblemCategory::all();
+        return view('dashboard.tech_invoices.update', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices','invoice_more_checks','programe_problems','speed_problems'));
     }
 
     public function addfile(Request $request, $id)

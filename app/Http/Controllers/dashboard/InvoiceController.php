@@ -70,7 +70,7 @@ class InvoiceController extends Controller
                     'phone' => 'required',
                     'title' => 'required',
                     'problems' => 'required',
-                    'description' => 'required',
+                    'description' => 'nullable',
                     'price' => 'required',
                     'date_delivery' => 'required',
                     'time_delivery' => 'required',
@@ -84,7 +84,7 @@ class InvoiceController extends Controller
                     'phone.required' => 'من فضلك ادخل رقم الهاتف ',
                     'title.required' => 'من فضلك ادخل عنوان الفاتورة ',
                     'problems.required' => 'من فضلك ادخل المشاكل ',
-                    'description.required' => 'من فضلك ادخل الوصف ',
+                   // 'description.required' => 'من فضلك ادخل الوصف ',
                     'price.required' => 'من فضلك ادخل السعر ',
                     'date_delivery.required' => 'من فضلك ادخل تاريخ الاستلام ',
                     'time_delivery.required' => 'من فضلك ادخل وقت الاستلام ',
@@ -279,7 +279,7 @@ class InvoiceController extends Controller
                 curl_close($curl);
                 DB::commit();
                 /// Need Go to Print Code
-                return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
+             //  return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
 
 
                 //return $this->success_message(' تم اضافة الفاتورة بنجاح');
@@ -323,7 +323,7 @@ class InvoiceController extends Controller
                     'phone' => 'required',
                     'title' => 'required',
                     'problems' => 'required',
-                    'description' => 'required',
+                   // 'description' => 'required',
                     'price' => 'required',
                     'date_delivery' => 'required',
                     'time_delivery' => 'required',
@@ -335,7 +335,7 @@ class InvoiceController extends Controller
                     'phone.required' => 'من فضلك ادخل رقم الهاتف ',
                     'title.required' => 'من فضلك ادخل عنوان الفاتورة ',
                     'problems.required' => 'من فضلك ادخل المشاكل ',
-                    'description.required' => 'من فضلك ادخل الوصف ',
+                   // 'description.required' => 'من فضلك ادخل الوصف ',
                     'price.required' => 'من فضلك ادخل السعر ',
                     'date_delivery.required' => 'من فضلك ادخل تاريخ الاستلام ',
                     'time_delivery.required' => 'من فضلك ادخل وقت الاستلام ',

@@ -262,7 +262,7 @@
                                                 @endphp
                                                 <div class="row">
                                                     @foreach ($invoice_more_checks as $invoice_more_check)
-                                                        <div class="col-2">
+                                                        <div class="col-6">
                                                             <div class="skin skin-square">
                                                                 <fieldset>
                                                                     <input type="checkbox"

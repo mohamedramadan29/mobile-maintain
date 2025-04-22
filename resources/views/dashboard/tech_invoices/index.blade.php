@@ -35,6 +35,8 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th> رقم الفاتورة </th>
+                                                    <th> اسم العميل </th>
+                                                    <th>  رقم الهاتف </th>
                                                     <th> العنوان </th>
                                                     <th> المشاكل </th>
                                                     <th> الحالة </th>
@@ -48,6 +50,8 @@
                                                     <tr>
                                                         <th scope="row">{{ $loop->iteration }}</th>
                                                         <td> {{ $invoice->id }} </td>
+                                                        <td> {{ $invoice->name }} </td>
+                                                        <td> {{ $invoice->phone }} </td>
 
                                                         <td>
                                                             {{ $invoice->title }}

@@ -178,6 +178,91 @@
                             </table>
                         </div>
 
+                        @php
+                            $selectedChecks = json_decode($invoice->invoice_more_checks, true) ?? [];
+                        @endphp
+                        <div class="row">
+                            @foreach ($invoice_more_checks as $invoice_more_check)
+                                <div class="col-6">
+                                    <div class="skin skin-square">
+                                        <fieldset>
+                                            <input type="checkbox" disabled
+                                                {{ in_array($invoice_more_check->id, $selectedChecks) ? 'checked' : '' }}
+                                                id="inputmorecheck-{{ $invoice_more_check->id }}"
+                                                name="invoice_more_checks[]" value="{{ $invoice_more_check->id }}">
+                                            <label for="inputmorecheck-{{ $invoice_more_check->id }}">
+                                                {{ $invoice_more_check->name }}
+                                            </label>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="title"> الاعطال  </label>
+                                <div class="skin skin-square">
+                                    <!-- ########## Start All Check ####################### -->
+                                    <div class="col-md-12 col-sm-12 problem_check_box"
+                                        style="{{ $invoice->checkout_type === 'فحص كامل' ? 'display: block' : 'display: none' }}"
+                                        id="problem_all_check">
+                                        @foreach ($problems as $problem)
+                                            <fieldset>
+                                                <input disabled
+                                                    {{ in_array($problem->name, json_decode($invoice->problems)) ? 'checked' : '' }}
+                                                    type="checkbox" id="input-{{ $problem->id }}" name="problems[]"
+                                                    value="{{ $problem->name }}">
+                                                <label for="input-{{ $problem->id }}">
+                                                    {{ $problem->name }} </label>
+                                            </fieldset>
+                                        @endforeach
+                                    </div>
+                                    <!-- ############# End All Check ################# -->
+
+                                    <!-------############# Start Programe Check ##################-------------->
+                                    <div class="col-md-12 col-sm-12 problem_check_box"
+                                        style="{{ $invoice->checkout_type === 'فحص جهاز برمجة' ? 'display: block' : 'display: none' }}"
+                                        id="problem_programe_check">
+                                        @foreach ($programe_problems as $programe_problem)
+                                            <fieldset>
+                                                <input disabled
+                                                    {{ in_array($programe_problem->name, json_decode($invoice->problems)) ? 'checked' : '' }}
+                                                    type="checkbox" id="inputprograme-{{ $programe_problem->id }}"
+                                                    name="problems[]" value="{{ $programe_problem->name }}">
+                                                <label for="inputprograme-{{ $programe_problem->id }}">
+                                                    {{ $programe_problem->name }} </label>
+                                            </fieldset>
+                                        @endforeach
+                                    </div>
+                                    <!-------############# End  Programe Check ##################-------------->
+
+                                    <!-------############# Start Programe Check ##################-------------->
+                                    <div class="col-md-12 col-sm-12 problem_check_box"
+                                        style="{{ $invoice->checkout_type === 'فحص جهاز سريع' ? 'display: block' : 'display: none' }}"
+                                        id="problem_speed_check">
+                                        @foreach ($speed_problems as $speed_problem)
+                                            <fieldset>
+                                                <input disabled
+                                                    {{ in_array($speed_problem->name, json_decode($invoice->problems)) ? 'checked' : '' }}
+                                                    type="checkbox" id="inputspeed-{{ $speed_problem->id }}"
+                                                    name="problems[]" value="{{ $speed_problem->name }}">
+                                                <label for="inputspeed-{{ $speed_problem->id }}">
+                                                    {{ $speed_problem->name }} </label>
+                                            </fieldset>
+                                        @endforeach
+                                    </div>
+                                    <!-------############# End  Programe Check ##################-------------->
+
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <br>
+
                         <!-------------- Signutre And Images Files -------------->
                         <div class="row">
                             <div class="table-responsive col-sm-12">
