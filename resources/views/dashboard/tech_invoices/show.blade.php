@@ -289,8 +289,7 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="title"> الاعطال <span
-                                                                    class="required_span">
+                                                            <label for="title"> الاعطال <span class="required_span">
                                                                     * </span> </label>
                                                             <div class="skin skin-square">
                                                                 <!-- ########## Start All Check ####################### -->
@@ -369,6 +368,35 @@
                                                             <input disabled type="number" step="0.01" id="price"
                                                                 class="form-control" placeholder="" name="price"
                                                                 value="{{ $invoice->price }}">
+                                                            @if ($invoice->priceDetails->count() > 0))
+                                                                <div id="price-details-wrapper">
+                                                                    <label for="price-details"> التفاصيل </label>
+                                                                    @php $detailIndex = 0; @endphp
+                                                                    @foreach ($invoice->priceDetails as $detail)
+                                                                        <div class="mb-2 form-row">
+                                                                            <input type="hidden"
+                                                                                name="price_details[{{ $detailIndex }}][id]"
+                                                                                value="{{ $detail->id }}">
+                                                                            <div class="col-6">
+                                                                                <input type="text" readonly
+                                                                                    name="price_details[{{ $detailIndex }}][title]"
+                                                                                    class="form-control"
+                                                                                    placeholder="عنوان التفصيلة"
+                                                                                    value="{{ $detail->title }}">
+                                                                            </div>
+                                                                            <div class="col-5">
+                                                                                <input type="number" step="0.01"
+                                                                                    readonly
+                                                                                    name="price_details[{{ $detailIndex }}][amount]"
+                                                                                    class="form-control"
+                                                                                    placeholder="السعر"
+                                                                                    value="{{ $detail->amount }}">
+                                                                            </div>
+                                                                        </div>
+                                                                        @php $detailIndex++; @endphp
+                                                                    @endforeach
+                                                                </div>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
@@ -419,36 +447,36 @@
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <div class="d-flex">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[0] ?? '' }}">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[1] ?? '' }}">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[2] ?? '' }}">
                                                             </div>
                                                             <div class="d-flex">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[3] ?? '' }}">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[4] ?? '' }}">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[5] ?? '' }}">
                                                             </div>
                                                             <div class="d-flex">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[6] ?? '' }}">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[7] ?? '' }}">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[8] ?? '' }}">
                                                             </div>
                                                         </div>
@@ -508,7 +536,7 @@
                                                         <td>
                                                             {{ $file->description }}
                                                         </td>
-                                                        
+
                                                     </tr>
                                                 @empty
                                                     لا يوجد مرفقات

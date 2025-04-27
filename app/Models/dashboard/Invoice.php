@@ -56,4 +56,8 @@ class Invoice extends Model
         return $this->hasMany(InvoicePrograneCheck::class, 'invoice_id');
     }
 
+    public function priceDetails(){
+        return $this->hasMany(PriceDetail::class, 'invoice_id');
+    }
+
 }

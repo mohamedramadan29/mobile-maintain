@@ -5,7 +5,21 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/icheck.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/custom.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/css-rtl/plugins/forms/checkboxes-radios.css">
-@endsection
+    <style>
+        .table th, .table td{
+            padding: 0;
+        }
+        .table td input{
+            min-width: 150px;
+        }
+        .table td select{
+            min-width: 120px;
+        }
+        .table td input[type='radio']{
+            min-width:50px;
+        }
+    </style>
+    @endsection
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
@@ -70,6 +84,7 @@
                                                 <div class="row" id="full_check"
                                                     style="{{ $invoice->checkout_type === 'فحص كامل' ? 'display: block' : 'display: none' }}">
                                                     <h5> فحص الجهاز <span class="required_span"> * </span> </h5>
+                                                    <div class="table-responsive">
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
@@ -127,12 +142,14 @@
                                                             @endforeach
                                                         </tbody>
                                                     </table>
+                                                    </div>
                                                 </div>
                                                 <!--################### End Add ChecksResults #####################-->
                                                 <!--################### Start Speed Device Check  ###################-->
                                                 <div class="row" id="speed_check"
                                                     style="{{ $invoice->checkout_type === 'فحص جهاز سريع' ? 'display: block' : 'display: none' }}">
                                                     <h5> جهاز سريع <span class="required_span"> * </span> </h5>
+                                                    <div class="table-responsive">
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
@@ -190,6 +207,7 @@
                                                             @endforeach
                                                         </tbody>
                                                     </table>
+                                                    </div>
                                                 </div>
                                                 <!--################### End Speed Device Check  #####################-->
 
@@ -197,6 +215,7 @@
                                                 <div class="row" id="programe_check"
                                                     style="{{ $invoice->checkout_type === 'فحص جهاز برمجة' ? 'display: block' : 'display: none' }}">
                                                     <h5> جهاز برمجة <span class="required_span"> * </span> </h5>
+                                                    <div class="table-responsive">
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
@@ -254,6 +273,7 @@
                                                             @endforeach
                                                         </tbody>
                                                     </table>
+                                                    </div>
                                                 </div>
                                                 <!--################### End Programe Device Check  #####################-->
                                                 @php
@@ -390,13 +410,62 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="price"> السعر الاولي <span
-                                                                    class="required_span"> * </span> </label>
-                                                            <input required type="number" step="0.01" id="price"
-                                                                class="form-control" placeholder="" name="price"
-                                                                value="{{ $invoice->price }}">
+                                                            <label for="price"> السعر الاولي <span class="required_span"> * </span></label>
+                                                            <input required type="number" step="0.01" id="price" class="form-control" name="price"
+                                                                   value="{{ $invoice->price }}">
+                                                        </div>
+
+                                                        <!-- زر إضافة تفاصيل السعر -->
+                                                        <div class="mt-2 form-group">
+                                                            <button type="button" class="btn btn-sm btn-primary" onclick="addPriceDetail()">إضافة تفاصيل السعر</button>
+                                                        </div>
+
+                                                        <!-- تفاصيل السعر القديمة -->
+                                                        <div id="price-details-wrapper">
+                                                            @php $detailIndex = 0; @endphp
+                                                            @foreach($invoice->priceDetails as $detail)
+                                                                <div class="mb-2 form-row">
+                                                                    <input type="hidden" name="price_details[{{ $detailIndex }}][id]" value="{{ $detail->id }}">
+                                                                    <div class="col-6">
+                                                                        <input type="text" name="price_details[{{ $detailIndex }}][title]" class="form-control"
+                                                                               placeholder="عنوان التفصيلة" value="{{ $detail->title }}">
+                                                                    </div>
+                                                                    <div class="col-5">
+                                                                        <input type="number" step="0.01" name="price_details[{{ $detailIndex }}][amount]" class="form-control"
+                                                                               placeholder="السعر" value="{{ $detail->amount }}">
+                                                                    </div>
+                                                                    <div class="col-1">
+                                                                        <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.parentElement.remove()">-</button>
+                                                                    </div>
+                                                                </div>
+                                                                @php $detailIndex++; @endphp
+                                                            @endforeach
                                                         </div>
                                                     </div>
+
+                                                    <script>
+                                                        let detailIndex = {{ $detailIndex ?? 0 }};
+
+                                                        function addPriceDetail() {
+                                                            const wrapper = document.getElementById('price-details-wrapper');
+
+                                                            const detailDiv = document.createElement('div');
+                                                            detailDiv.classList.add('form-row', 'mb-2');
+                                                            detailDiv.innerHTML = `
+                                                                <div class="col-6">
+                                                                    <input type="text" name="price_details[${detailIndex}][title]" class="form-control" placeholder="عنوان التفصيلة">
+                                                                </div>
+                                                                <div class="col-5">
+                                                                    <input type="number" step="0.01" name="price_details[${detailIndex}][amount]" class="form-control" placeholder="السعر">
+                                                                </div>
+                                                                <div class="col-1">
+                                                                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.parentElement.remove()">-</button>
+                                                                </div>
+                                                            `;
+                                                            wrapper.appendChild(detailDiv);
+                                                            detailIndex++;
+                                                        }
+                                                    </script>
                                                     <div class="col-md-6">
                                                         <label for="price"> تاريخ ووقت التسليم <span
                                                                 class="required_span"> * </span> </label>

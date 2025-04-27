@@ -6,6 +6,19 @@
             display: flex;
             justify-content: space-around;
         }
+
+        .table th,
+        .table td {
+            padding: 0;
+        }
+
+        .table td input {
+            min-width: 150px;
+        }
+
+        .table td select {
+            min-width: 120px;
+        }
     </style>
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/icheck.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/custom.css">
@@ -77,96 +90,100 @@
                                                 <!--################### Start Add ChecksResults ###################-->
                                                 <div class="row" id="full_check" style="display: none;">
                                                     <h5> فحص الجهاز <span class="required_span"> * </span> </h5>
-                                                    <table class="table">
-                                                        <thead>
-                                                            <tr>
-                                                                <th> # </th>
-                                                                <th> اساسيات الفحص </th>
-                                                                <th> حالة العمل </th>
-                                                                <th> ملاحظات </th>
-                                                                <th> بعد الفحص </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach ($checks as $check)
+                                                    <div class="table-responsive">
+                                                        <table class="table">
+                                                            <thead>
                                                                 <tr>
-                                                                    <td> {{ $loop->iteration }}</td>
-                                                                    <td>
-                                                                        <input type="hidden" name="problem_id[]"
-                                                                            value="{{ $check->id }}">
-                                                                        <input readonly type="text"
-                                                                            value="{{ $check->name }}"
-                                                                            class="form-control"
-                                                                            name="check_problem_name[]">
-                                                                    </td>
-                                                                    <td>
-                                                                        <select name="work_{{ $check->id }}"
-                                                                            class="form-control">
-                                                                            <option value="">-- اختر الحالة --
-                                                                            </option>
-                                                                            <option value="1"
-                                                                                {{ old('work_' . $check->id) == '1' ? 'selected' : '' }}>
-                                                                                يعمل</option>
-                                                                            <option value="0"
-                                                                                {{ old('work_' . $check->id) == '0' ? 'selected' : '' }}>
-                                                                                لا يعمل</option>
-                                                                        </select>
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="text"
-                                                                            value="{{ old('notes.' . $loop->index) }}"
-                                                                            class="form-control" name="notes[]">
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="text"
-                                                                            value="{{ old('after_check.' . $loop->index) }}"
-                                                                            class="form-control" name="after_check[]">
-                                                                    </td>
+                                                                    <th> # </th>
+                                                                    <th> اساسيات الفحص </th>
+                                                                    <th> حالة العمل </th>
+                                                                    <th> ملاحظات </th>
+                                                                    <th> بعد الفحص </th>
                                                                 </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($checks as $check)
+                                                                    <tr>
+                                                                        <td> {{ $loop->iteration }}</td>
+                                                                        <td>
+                                                                            <input type="hidden" name="problem_id[]"
+                                                                                value="{{ $check->id }}">
+                                                                            <input readonly type="text"
+                                                                                value="{{ $check->name }}"
+                                                                                class="form-control w-100"
+                                                                                name="check_problem_name[]">
+                                                                        </td>
+                                                                        <td>
+                                                                            <select name="work_{{ $check->id }}"
+                                                                                class="form-control">
+                                                                                <option value="">-- اختر الحالة --
+                                                                                </option>
+                                                                                <option value="1"
+                                                                                    {{ old('work_' . $check->id) == '1' ? 'selected' : '' }}>
+                                                                                    يعمل</option>
+                                                                                <option value="0"
+                                                                                    {{ old('work_' . $check->id) == '0' ? 'selected' : '' }}>
+                                                                                    لا يعمل</option>
+                                                                            </select>
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="text"
+                                                                                value="{{ old('notes.' . $loop->index) }}"
+                                                                                class="form-control" name="notes[]">
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="text"
+                                                                                value="{{ old('after_check.' . $loop->index) }}"
+                                                                                class="form-control" name="after_check[]">
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </div>
                                                 <!--################### End Add ChecksResults #####################-->
                                                 <!--################### Start Speed Device Check  ###################-->
                                                 <div class="row" id="speed_check" style="display: none;">
                                                     <h5> جهاز سريع <span class="required_span"> * </span> </h5>
-                                                    <table class="table">
-                                                        <thead>
-                                                            <tr>
-                                                                <th> # </th>
-                                                                <th> اساسيات الفحص </th>
-                                                                <th> حالة العمل </th>
-                                                                <th> ملاحظات </th>
-                                                                <th> بعد الفحص </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach ($speed_devices as $speed)
+                                                    <div class="table-responsive">
+                                                        <table class="table">
+                                                            <thead>
                                                                 <tr>
-                                                                    <td> {{ $loop->iteration }}</td>
-                                                                    <td>
-                                                                        <input type="hidden" name="speed_id[]"
-                                                                            value="{{ $speed->id }}">
-                                                                        <input readonly type="text"
-                                                                            value="{{ $speed->name }}"
-                                                                            class="form-control" name="check_speed_name[]">
-                                                                    </td>
-                                                                    <td>
-                                                                        <select name="speedwork_{{ $speed->id }}"
-                                                                            class="form-control">
-                                                                            <option value="">-- اختر الحالة --
-                                                                            </option>
-                                                                            <option value="1"
-                                                                                {{ old('speedwork_' . $speed->id) == '1' ? 'selected' : '' }}>
-                                                                                يعمل</option>
-                                                                            <option value="0"
-                                                                                {{ old('speedwork_' . $speed->id) == '0' ? 'selected' : '' }}>
-                                                                                لا يعمل</option>
-                                                                        </select>
-                                                                    </td>
+                                                                    <th> # </th>
+                                                                    <th> اساسيات الفحص </th>
+                                                                    <th> حالة العمل </th>
+                                                                    <th> ملاحظات </th>
+                                                                    <th> بعد الفحص </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($speed_devices as $speed)
+                                                                    <tr>
+                                                                        <td> {{ $loop->iteration }}</td>
+                                                                        <td>
+                                                                            <input type="hidden" name="speed_id[]"
+                                                                                value="{{ $speed->id }}">
+                                                                            <input readonly type="text"
+                                                                                value="{{ $speed->name }}"
+                                                                                class="form-control"
+                                                                                name="check_speed_name[]">
+                                                                        </td>
+                                                                        <td>
+                                                                            <select name="speedwork_{{ $speed->id }}"
+                                                                                class="form-control">
+                                                                                <option value="">-- اختر الحالة --
+                                                                                </option>
+                                                                                <option value="1"
+                                                                                    {{ old('speedwork_' . $speed->id) == '1' ? 'selected' : '' }}>
+                                                                                    يعمل</option>
+                                                                                <option value="0"
+                                                                                    {{ old('speedwork_' . $speed->id) == '0' ? 'selected' : '' }}>
+                                                                                    لا يعمل</option>
+                                                                            </select>
+                                                                        </td>
 
-                                                                    {{-- <td>
+                                                                        {{-- <td>
                                                                         <input type="radio" value="1"
                                                                             class="form-control"
                                                                             name="speedwork_{{ $speed->id }}[]"
@@ -178,63 +195,66 @@
                                                                             name="speedwork_{{ $speed->id }}[]"
                                                                             {{ old('speedwork_' . $speed->id) == '0' ? 'checked' : '' }}>
                                                                     </td> --}}
-                                                                    <td>
-                                                                        <input type="text"
-                                                                            value="{{ old('speed_notes.' . $loop->index) }}"
-                                                                            class="form-control" name="speed_notes[]">
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="text"
-                                                                            value="{{ old('after_check_speed.' . $loop->index) }}"
-                                                                            class="form-control"
-                                                                            name="after_check_speed[]">
-                                                                    </td>
-                                                                </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
+                                                                        <td>
+                                                                            <input type="text"
+                                                                                value="{{ old('speed_notes.' . $loop->index) }}"
+                                                                                class="form-control" name="speed_notes[]">
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="text"
+                                                                                value="{{ old('after_check_speed.' . $loop->index) }}"
+                                                                                class="form-control"
+                                                                                name="after_check_speed[]">
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </div>
                                                 <!--################### End Speed Device Check  #####################-->
                                                 <!--################### Start Programe Device Check  ###################-->
                                                 <div class="row" id="programe_check" style="display: none;">
                                                     <h5> جهاز برمجة <span class="required_span"> * </span> </h5>
-                                                    <table class="table">
-                                                        <thead>
-                                                            <tr>
-                                                                <th> # </th>
-                                                                <th> اساسيات الفحص </th>
-                                                                <th> حالة العمل </th>
-                                                                <th> ملاحظات </th>
-                                                                <th> بعد الفحص </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach ($programe_devices as $programe)
+                                                    <div class="table-responsive">
+                                                        <table class="table">
+                                                            <thead>
                                                                 <tr>
-                                                                    <td> {{ $loop->iteration }}</td>
-                                                                    <td>
-                                                                        <input type="hidden" name="programe_id[]"
-                                                                            value="{{ $programe->id }}">
-                                                                        <input readonly type="text"
-                                                                            value="{{ $programe->name }}"
-                                                                            class="form-control"
-                                                                            name="check_programe_name[]">
-                                                                    </td>
-                                                                    <td>
-                                                                        <select name="programework_{{ $programe->id }}"
-                                                                            class="form-control">
-                                                                            <option value="">-- اختر الحالة --
-                                                                            </option>
-                                                                            <option value="1"
-                                                                                {{ old('programework_' . $programe->id) == '1' ? 'selected' : '' }}>
-                                                                                يعمل</option>
-                                                                            <option value="0"
-                                                                                {{ old('programework_' . $programe->id) == '0' ? 'selected' : '' }}>
-                                                                                لا يعمل</option>
-                                                                        </select>
-                                                                    </td>
+                                                                    <th> # </th>
+                                                                    <th> اساسيات الفحص </th>
+                                                                    <th> حالة العمل </th>
+                                                                    <th> ملاحظات </th>
+                                                                    <th> بعد الفحص </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($programe_devices as $programe)
+                                                                    <tr>
+                                                                        <td> {{ $loop->iteration }}</td>
+                                                                        <td>
+                                                                            <input type="hidden" name="programe_id[]"
+                                                                                value="{{ $programe->id }}">
+                                                                            <input readonly type="text"
+                                                                                value="{{ $programe->name }}"
+                                                                                class="form-control"
+                                                                                name="check_programe_name[]">
+                                                                        </td>
+                                                                        <td>
+                                                                            <select
+                                                                                name="programework_{{ $programe->id }}"
+                                                                                class="form-control">
+                                                                                <option value="">-- اختر الحالة --
+                                                                                </option>
+                                                                                <option value="1"
+                                                                                    {{ old('programework_' . $programe->id) == '1' ? 'selected' : '' }}>
+                                                                                    يعمل</option>
+                                                                                <option value="0"
+                                                                                    {{ old('programework_' . $programe->id) == '0' ? 'selected' : '' }}>
+                                                                                    لا يعمل</option>
+                                                                            </select>
+                                                                        </td>
 
-                                                                    {{-- <td>
+                                                                        {{-- <td>
                                                                         <input type="radio" value="1"
                                                                             class="form-control"
                                                                             name="programework_{{ $programe->id }}[]"
@@ -246,21 +266,23 @@
                                                                             name="programework_{{ $programe->id }}[]"
                                                                             {{ old('programework_' . $programe->id) == '0' ? 'checked' : '' }}>
                                                                     </td> --}}
-                                                                    <td>
-                                                                        <input type="text"
-                                                                            value="{{ old('programe_notes.' . $loop->index) }}"
-                                                                            class="form-control" name="programe_notes[]">
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="text"
-                                                                            value="{{ old('after_check_programe.' . $loop->index) }}"
-                                                                            class="form-control"
-                                                                            name="after_check_programe[]">
-                                                                    </td>
-                                                                </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
+                                                                        <td>
+                                                                            <input type="text"
+                                                                                value="{{ old('programe_notes.' . $loop->index) }}"
+                                                                                class="form-control"
+                                                                                name="programe_notes[]">
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="text"
+                                                                                value="{{ old('after_check_programe.' . $loop->index) }}"
+                                                                                class="form-control"
+                                                                                name="after_check_programe[]">
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </div>
                                                 <!--################### End Programe Device Check  #####################-->
 
@@ -418,6 +440,40 @@
                                                                 class="form-control" placeholder="" name="price"
                                                                 value="{{ old('price') }}">
                                                         </div>
+                                                        <!-- زر إضافة تفاصيل السعر -->
+                                                        <div class="form-group">
+                                                            <button type="button" class="btn btn-sm btn-primary"
+                                                                onclick="addPriceDetail()"> <i class="la la-plus"></i> إضافة تفاصيل السعر</button>
+                                                        </div>
+
+                                                        <!-- حاوية تفاصيل السعر -->
+                                                        <div id="price-details-wrapper">
+                                                            <!-- سيتم إضافة تفاصيل السعر هنا -->
+                                                        </div>
+
+                                                        <script>
+                                                            let detailIndex = 0;
+
+                                                            function addPriceDetail() {
+                                                                const wrapper = document.getElementById('price-details-wrapper');
+
+                                                                const detailDiv = document.createElement('div');
+                                                                detailDiv.classList.add('form-row', 'mb-2');
+                                                                detailDiv.innerHTML = `
+                                                                        <div class="col-6">
+                                                                            <input type="text" name="price_details[${detailIndex}][title]" class="form-control" placeholder="عنوان التفصيلة ">
+                                                                        </div>
+                                                                        <div class="col-5">
+                                                                            <input type="number" step="0.01" name="price_details[${detailIndex}][amount]" class="form-control" placeholder="السعر" required>
+                                                                        </div>
+                                                                        <div class="col-1">
+                                                                            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.parentElement.remove()">-</button>
+                                                                        </div>
+                                                                    `;
+                                                                wrapper.appendChild(detailDiv);
+                                                                detailIndex++;
+                                                            }
+                                                        </script>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label for="price"> تاريخ ووقت التسليم <span
@@ -818,6 +874,7 @@
                                                     submitBtn.innerHTML = '<i class="la la-spinner la-spin"></i> جاري الحفظ...';
 
                                                     loadingMessage.style.display = 'block';
+
                                                 }
                                             });
                                         </script>

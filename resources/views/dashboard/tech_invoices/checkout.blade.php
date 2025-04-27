@@ -41,7 +41,8 @@
                                 <div class="card-content collapse show">
                                     <div class="card-body">
 
-                                        <form action="{{ route('dashboard.tech_invoices.checkout', $invoice->id) }}"
+                                        <form id='invoice-form'
+                                            action="{{ route('dashboard.tech_invoices.checkout', $invoice->id) }}"
                                             method="POST">
                                             @csrf
 
@@ -60,8 +61,26 @@
                                                     data-dismiss="modal">رجوع
                                                 </button>
                                                 <button type="submit" class="btn btn-info"> بدء العمل </button>
+                                                <br>
+                                                <p id="loadingMessage" class="mt-2 text-info" style="display: none;">⏳
+                                                    جاري رفع البيانات، الرجاء الانتظار...</p>
                                             </div>
                                         </form>
+                                        <script>
+                                            document.getElementById("invoice-form").addEventListener("submit", function(e) {
+                                                e.preventDefault();
+
+                                                let submitBtn = this.querySelector('button[type="submit"]');
+                                                let loadingMessage = document.getElementById('loadingMessage');
+
+                                                submitBtn.disabled = true;
+                                                submitBtn.innerHTML = '<i class="la la-spinner la-spin"></i> جاري الحفظ...';
+
+                                                loadingMessage.style.display = 'block';
+                                                this.submit();
+
+                                            });
+                                        </script>
                                     </div>
                                 </div>
                             </div>

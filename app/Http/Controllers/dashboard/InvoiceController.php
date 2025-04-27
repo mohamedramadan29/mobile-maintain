@@ -16,22 +16,23 @@ use App\Models\dashboard\CheckText;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use App\Models\dashboard\PieceSource;
+use App\Models\dashboard\PriceDetail;
 use App\Models\dashboard\SpeedDevice;
 use Intervention\Image\Facades\Image;
 use App\Models\dashboard\InvoiceCheck;
 use App\Models\dashboard\InvoiceImage;
-use App\Models\dashboard\InvoiceMoreCheck;
 use App\Models\dashboard\InvoiceSteps;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 use App\Models\dashboard\ProgrameDevice;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\dashboard\ProblemCategory;
 use Illuminate\Support\Facades\Validator;
+use App\Models\dashboard\InvoiceMoreCheck;
+// use Intervention\Image\Facades\Image;
 use App\Models\dashboard\InvoiceSpeedCheck;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
-// use Intervention\Image\Facades\Image;
 use App\Models\dashboard\InvoicePrograneCheck;
-use App\Models\dashboard\PieceSource;
 use App\Models\dashboard\SpeedProblemCategory;
 use App\Models\dashboard\ProgrameProblemCategory;
 
@@ -47,7 +48,6 @@ class InvoiceController extends Controller
         if ($request->has('invoice_status') && !empty($request->invoice_status)) {
             $query->where('status', $request->invoice_status);
         }
-
         $invoices = $query->orderBy('id', 'desc')->paginate(10);
         $techs = Admin::where('type', 'فني')->get();
 
@@ -84,7 +84,7 @@ class InvoiceController extends Controller
                     'phone.required' => 'من فضلك ادخل رقم الهاتف ',
                     'title.required' => 'من فضلك ادخل عنوان الفاتورة ',
                     'problems.required' => 'من فضلك ادخل المشاكل ',
-                   // 'description.required' => 'من فضلك ادخل الوصف ',
+                    // 'description.required' => 'من فضلك ادخل الوصف ',
                     'price.required' => 'من فضلك ادخل السعر ',
                     'date_delivery.required' => 'من فضلك ادخل تاريخ الاستلام ',
                     'time_delivery.required' => 'من فضلك ادخل وقت الاستلام ',
@@ -170,14 +170,12 @@ class InvoiceController extends Controller
                         }
                     }
                 }
-
                 ############# Add Invoice Step ###############
                 $invoice_step = new InvoiceSteps();
                 $invoice_step->invoice_id = $invoice->id;
                 $invoice_step->admin_id = Auth::id();
                 $invoice_step->step_details = ' تم اضافة الفاتورة  ';
                 $invoice_step->save();
-
 
                 if ($invoice->checkout_type == 'فحص كامل') {
                     // إضافة نتائج الفحص
@@ -222,6 +220,19 @@ class InvoiceController extends Controller
                             $checkPrograme->notes = $data['programe_notes'][$index] ?? null;
                             $checkPrograme->after_check = $data['after_check_programe'][$index] ?? null;
                             $checkPrograme->save();
+                        }
+                    }
+                }
+                ########## ADD Price Details ##################
+                // حفظ تفاصيل السعر إن وجدت
+                if (!empty($data['price_details']) && is_array($data['price_details'])) {
+                    foreach ($data['price_details'] as $detail) {
+                        if (!empty($detail['amount'])) {
+                            PriceDetail::create([
+                                'invoice_id' => $invoice->id,
+                                'title' => $detail['title'] ?? '', // قيمة فاضية إذا ما أرسل عنوان
+                                'amount' => $detail['amount'],
+                            ]);
                         }
                     }
                 }
@@ -279,7 +290,7 @@ class InvoiceController extends Controller
                 curl_close($curl);
                 DB::commit();
                 /// Need Go to Print Code
-             //  return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
+                //  return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
 
 
                 //return $this->success_message(' تم اضافة الفاتورة بنجاح');
@@ -323,7 +334,7 @@ class InvoiceController extends Controller
                     'phone' => 'required',
                     'title' => 'required',
                     'problems' => 'required',
-                   // 'description' => 'required',
+                    // 'description' => 'required',
                     'price' => 'required',
                     'date_delivery' => 'required',
                     'time_delivery' => 'required',
@@ -335,7 +346,7 @@ class InvoiceController extends Controller
                     'phone.required' => 'من فضلك ادخل رقم الهاتف ',
                     'title.required' => 'من فضلك ادخل عنوان الفاتورة ',
                     'problems.required' => 'من فضلك ادخل المشاكل ',
-                   // 'description.required' => 'من فضلك ادخل الوصف ',
+                    // 'description.required' => 'من فضلك ادخل الوصف ',
                     'price.required' => 'من فضلك ادخل السعر ',
                     'date_delivery.required' => 'من فضلك ادخل تاريخ الاستلام ',
                     'time_delivery.required' => 'من فضلك ادخل وقت الاستلام ',
@@ -363,7 +374,25 @@ class InvoiceController extends Controller
                 $invoice->piece_resource = $data['piece_resource'];
                 $invoice->invoice_more_checks = json_encode($data['invoice_more_checks']);
                 $invoice->save();
-                ############ Start Insert Files ################
+                ############ Start Price Details ################
+                // حذف، تحديث، إضافة حسب البيانات
+                // حذف كل تفاصيل السعر القديمة المرتبطة بالفاتورة
+                $invoice->priceDetails()->delete();
+
+                // ثم إضافة كل التفاصيل الجديدة
+                if (!empty($data['price_details']) && is_array($data['price_details'])) {
+                    foreach ($data['price_details'] as $detail) {
+                        if (!empty($detail['amount'])) {
+                            PriceDetail::create([
+                                'invoice_id' => $invoice->id,
+                                'title' => $detail['title'] ?? '',
+                                'amount' => $detail['amount'],
+                            ]);
+                        }
+                    }
+                }
+
+                ############ End Price Details ################
                 ############ Start Insert Files ################
                 if ($request->hasFile('files_images')) {
                     // $files = $request->file('files');
@@ -558,7 +587,6 @@ class InvoiceController extends Controller
 
             // عرض الـ PDF مباشرة أو تحميله
             return $mpdf->Output("Invoice_{$invoice->id}.pdf", 'I');
-
         } catch (Exception $e) {
             return back()->withErrors('حدث خطأ أثناء الطباعة: ' . $e->getMessage());
         }

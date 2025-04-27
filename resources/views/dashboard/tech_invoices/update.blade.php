@@ -40,7 +40,7 @@
                                 </div>
                                 <div class="card-content collapse show">
                                     <div class="card-body">
-                                        <form class="form" method="POST"
+                                        <form class="form" method="POST" id='invoice-form'
                                             action="{{ route('dashboard.tech_invoices.update', $invoice->id) }}') }}"
                                             enctype="multipart/form-data">
                                             @csrf
@@ -289,16 +289,15 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="title"> الاعطال <span
-                                                                    class="required_span">
+                                                            <label for="title"> الاعطال <span class="required_span">
                                                                     * </span> </label>
                                                             <div class="skin skin-square">
                                                                 <!-- ########## Start All Check ####################### -->
                                                                 <div class="col-md-12 col-sm-12 problem_check_box"
-                                                                    style="{{ $invoice->checkout_type === 'فحص كامل' ? 'display: block' : 'display: none' }}"
+                                                                    style="{{ $invoice->checkout_type === 'فحص كامل' ? 'display: flex; flex-wrap: wrap; word-wrap: break-word;' : 'display: none' }}"
                                                                     id="problem_all_check">
                                                                     @foreach ($problems as $problem)
-                                                                        <fieldset>
+                                                                        <fieldset  style="min-width: 120px">
                                                                             <input disabled
                                                                                 {{ in_array($problem->name, json_decode($invoice->problems)) ? 'checked' : '' }}
                                                                                 type="checkbox"
@@ -314,10 +313,10 @@
 
                                                                 <!-------############# Start Programe Check ##################-------------->
                                                                 <div class="col-md-12 col-sm-12 problem_check_box"
-                                                                    style="{{ $invoice->checkout_type === 'فحص جهاز برمجة' ? 'display: block' : 'display: none' }}"
+                                                                    style="{{ $invoice->checkout_type === 'فحص جهاز برمجة' ? 'display: flex; flex-wrap: wrap; word-wrap: break-word;' : 'display: none' }}"
                                                                     id="problem_programe_check">
                                                                     @foreach ($programe_problems as $programe_problem)
-                                                                        <fieldset>
+                                                                        <fieldset style="min-width: 120px">
                                                                             <input disabled
                                                                                 {{ in_array($programe_problem->name, json_decode($invoice->problems)) ? 'checked' : '' }}
                                                                                 type="checkbox"
@@ -334,10 +333,10 @@
 
                                                                 <!-------############# Start Programe Check ##################-------------->
                                                                 <div class="col-md-12 col-sm-12 problem_check_box"
-                                                                    style="{{ $invoice->checkout_type === 'فحص جهاز سريع' ? 'display: block' : 'display: none' }}"
+                                                                    style="{{ $invoice->checkout_type === 'فحص جهاز سريع' ? 'display: flex; flex-wrap: wrap; word-wrap: break-word;' : 'display: none' }}"
                                                                     id="problem_speed_check">
                                                                     @foreach ($speed_problems as $speed_problem)
-                                                                        <fieldset>
+                                                                        <fieldset  style="min-width: 120px">
                                                                             <input disabled
                                                                                 {{ in_array($speed_problem->name, json_decode($invoice->problems)) ? 'checked' : '' }}
                                                                                 type="checkbox"
@@ -370,6 +369,34 @@
                                                                 class="form-control" placeholder="" name="price"
                                                                 value="{{ $invoice->price }}">
                                                         </div>
+                                                        @if ($invoice->priceDetails->count() > 0)
+                                                            <div id="price-details-wrapper">
+
+                                                                <label for="price-details"> التفاصيل </label>
+                                                                @php $detailIndex = 0; @endphp
+                                                                @foreach ($invoice->priceDetails as $detail)
+                                                                    <div class="mb-2 form-row">
+                                                                        <input type="hidden"
+                                                                            name="price_details[{{ $detailIndex }}][id]"
+                                                                            value="{{ $detail->id }}">
+                                                                        <div class="col-6">
+                                                                            <input type="text" readonly
+                                                                                name="price_details[{{ $detailIndex }}][title]"
+                                                                                class="form-control"
+                                                                                placeholder="عنوان التفصيلة"
+                                                                                value="{{ $detail->title }}">
+                                                                        </div>
+                                                                        <div class="col-5">
+                                                                            <input type="number" step="0.01" readonly
+                                                                                name="price_details[{{ $detailIndex }}][amount]"
+                                                                                class="form-control" placeholder="السعر"
+                                                                                value="{{ $detail->amount }}">
+                                                                        </div>
+                                                                    </div>
+                                                                    @php $detailIndex++; @endphp
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label for="price"> تاريخ ووقت التسليم <span
@@ -419,36 +446,36 @@
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <div class="d-flex">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[0] ?? '' }}">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[1] ?? '' }}">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[2] ?? '' }}">
                                                             </div>
                                                             <div class="d-flex">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[3] ?? '' }}">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[4] ?? '' }}">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[5] ?? '' }}">
                                                             </div>
                                                             <div class="d-flex">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[6] ?? '' }}">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[7] ?? '' }}">
-                                                                <input disabled type="number" min="1" max="12"
-                                                                    name="pattern[]"
+                                                                <input disabled type="number" min="1"
+                                                                    max="12" name="pattern[]"
                                                                     value="{{ $storedPattern[8] ?? '' }}">
                                                             </div>
                                                         </div>
@@ -491,8 +518,25 @@
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="la la-check-square-o"></i> حفظ
                                                 </button>
+                                                <p id="loadingMessage" class="mt-2 text-info" style="display: none;">⏳
+                                                    جاري رفع البيانات، الرجاء الانتظار...</p>
                                             </div>
                                         </form>
+                                        <script>
+                                            document.getElementById("invoice-form").addEventListener("submit", function(e) {
+                                                e.preventDefault();
+
+                                                let submitBtn = this.querySelector('button[type="submit"]');
+                                                let loadingMessage = document.getElementById('loadingMessage');
+
+                                                submitBtn.disabled = true;
+                                                submitBtn.innerHTML = '<i class="la la-spinner la-spin"></i> جاري الحفظ...';
+
+                                                loadingMessage.style.display = 'block';
+                                                this.submit();
+
+                                            });
+                                        </script>
                                     </div>
                                 </div>
                             </div>
@@ -500,7 +544,7 @@
                                 <div class="card-header">
                                     <h4 class="card-title"> حالة التواصل مع العميل </h4>
                                     <br>
-                                    <form action="{{ route('dashboard.tech_invoices.client-connect', $invoice->id) }}"
+                                    <form id="clientConnectForm" action="{{ route('dashboard.tech_invoices.client-connect', $invoice->id) }}"
                                         method="post">
                                         @csrf
                                         <div class="col-md-12">
@@ -524,8 +568,26 @@
                                             <button type="submit" class="btn btn-primary">
                                                 <i class="la la-check-square-o"></i> حفظ
                                             </button>
+                                            <br>
+                                            <p id="loadingMessage" class="mt-2 text-info" style="display: none;">⏳
+                                                جاري رفع البيانات، الرجاء الانتظار...</p>
                                         </div>
                                     </form>
+                                    <script>
+                                        document.getElementById("clientConnectForm").addEventListener("submit", function(e) {
+                                            e.preventDefault();
+
+                                            let submitBtn = this.querySelector('button[type="submit"]');
+                                            let loadingMessage = document.getElementById('loadingMessage');
+
+                                            submitBtn.disabled = true;
+                                            submitBtn.innerHTML = '<i class="la la-spinner la-spin"></i> جاري الحفظ...';
+
+                                            loadingMessage.style.display = 'block';
+                                            this.submit();
+
+                                        });
+                                    </script>
                                 </div>
                             </div>
                             <div class="card">
