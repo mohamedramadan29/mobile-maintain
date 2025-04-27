@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\dashboard\CheckText;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\dashboard\PieceSource;
 use App\Models\dashboard\SpeedDevice;
 use App\Models\dashboard\InvoiceImage;
 use App\Models\dashboard\InvoiceSteps;
@@ -210,7 +211,8 @@ class TechInvoicesController extends Controller
         $invoice_more_checks = InvoiceMoreCheck::all();
         $programe_problems = ProgrameProblemCategory::all();
         $speed_problems = SpeedProblemCategory::all();
-        return view('dashboard.tech_invoices.update', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices','invoice_more_checks','programe_problems','speed_problems'));
+        $piece_resources = PieceSource::all();
+        return view('dashboard.tech_invoices.update', compact('piece_resources','invoice', 'problems', 'checks', 'speed_devices', 'programe_devices','invoice_more_checks','programe_problems','speed_problems'));
     }
 
     public function addfile(Request $request, $id)

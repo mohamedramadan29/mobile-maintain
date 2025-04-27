@@ -297,7 +297,7 @@
                                                                     style="{{ $invoice->checkout_type === 'فحص كامل' ? 'display: flex; flex-wrap: wrap; word-wrap: break-word;' : 'display: none' }}"
                                                                     id="problem_all_check">
                                                                     @foreach ($problems as $problem)
-                                                                        <fieldset  style="min-width: 120px">
+                                                                        <fieldset style="min-width: 120px">
                                                                             <input disabled
                                                                                 {{ in_array($problem->name, json_decode($invoice->problems)) ? 'checked' : '' }}
                                                                                 type="checkbox"
@@ -336,7 +336,7 @@
                                                                     style="{{ $invoice->checkout_type === 'فحص جهاز سريع' ? 'display: flex; flex-wrap: wrap; word-wrap: break-word;' : 'display: none' }}"
                                                                     id="problem_speed_check">
                                                                     @foreach ($speed_problems as $speed_problem)
-                                                                        <fieldset  style="min-width: 120px">
+                                                                        <fieldset style="min-width: 120px">
                                                                             <input disabled
                                                                                 {{ in_array($speed_problem->name, json_decode($invoice->problems)) ? 'checked' : '' }}
                                                                                 type="checkbox"
@@ -483,6 +483,26 @@
 
                                                 </div>
 
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group">
+                                                            <label for="price"> مصدر القطعة <span
+                                                                    class="required_span"> *
+                                                                </span> </label>
+                                                            <select disabled name="piece_resource" id=""
+                                                                class="form-control">
+                                                                <option value="" selected disabled> -- حدد مصدر
+                                                                    القطعة -- </option>
+                                                                @foreach ($piece_resources as $resource)
+                                                                    <option @selected($invoice->piece_resource == $resource->id)
+                                                                        value="{{ $resource->id }}">
+                                                                        {{ $resource->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
 
 
                                                 <div class="row">
@@ -544,7 +564,8 @@
                                 <div class="card-header">
                                     <h4 class="card-title"> حالة التواصل مع العميل </h4>
                                     <br>
-                                    <form id="clientConnectForm" action="{{ route('dashboard.tech_invoices.client-connect', $invoice->id) }}"
+                                    <form id="clientConnectForm"
+                                        action="{{ route('dashboard.tech_invoices.client-connect', $invoice->id) }}"
                                         method="post">
                                         @csrf
                                         <div class="col-md-12">
@@ -597,7 +618,7 @@
                                 <div class="card-content">
                                     <div class="card-body">
                                         <h5> اضافة مرفق </h5>
-                                        <form action="{{ route('dashboard.tech_invoices.addfile', $invoice->id) }}"
+                                        <form id="addattachmentForm" action="{{ route('dashboard.tech_invoices.addfile', $invoice->id) }}"
                                             method="POST" enctype="multipart/form-data">
                                             @csrf
 
@@ -642,8 +663,25 @@
                                                 <button type="submit" class="btn btn-primary btn-sm">
                                                     اضافة المرفق <i class="la la-plus"></i>
                                                 </button>
+                                                <p id="loadingMessage" class="mt-2 text-info" style="display: none;">⏳
+                                                    جاري رفع البيانات، الرجاء الانتظار...</p>
                                             </div>
                                         </form>
+                                        <script>
+                                            document.getElementById("addattachmentForm").addEventListener("submit", function(e) {
+                                                e.preventDefault();
+
+                                                let submitBtn = this.querySelector('button[type="submit"]');
+                                                let loadingMessage = document.getElementById('loadingMessage');
+
+                                                submitBtn.disabled = true;
+                                                submitBtn.innerHTML = '<i class="la la-spinner la-spin"></i> جاري الحفظ...';
+
+                                                loadingMessage.style.display = 'block';
+                                                this.submit();
+
+                                            });
+                                        </script>
                                         <div class="row">
                                             <table class="table table-bordered">
                                                 <tr>

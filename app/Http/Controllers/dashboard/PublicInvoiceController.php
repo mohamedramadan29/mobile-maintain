@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\dashboard\Invoice;
 use App\Models\dashboard\CheckText;
 use App\Http\Controllers\Controller;
+use App\Models\dashboard\PieceSource;
 use App\Models\dashboard\SpeedDevice;
 use App\Models\dashboard\ProgrameDevice;
 use App\Models\dashboard\ProblemCategory;
@@ -27,10 +28,12 @@ class PublicInvoiceController extends Controller
         $speed_problems = SpeedProblemCategory::all();
         $speed_devices = SpeedDevice::all();
         $programe_devices = ProgrameDevice::all();
+        $piece_resources = PieceSource::all();
         return view('dashboard.show_invoice', compact('invoice',
         'problems',
         'speed_devices',
         'programe_devices',
-        'checks','programe_problems','speed_problems','invoice_more_checks'));
+        'checks','programe_problems','speed_problems','invoice_more_checks',
+    'piece_resources'));
     }
 }
