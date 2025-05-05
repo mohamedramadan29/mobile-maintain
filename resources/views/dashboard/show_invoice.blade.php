@@ -100,21 +100,21 @@
                                                         class="form-control" name="check_problem_name[]">
                                                 </td>
                                                 <td>
-                                                    <input type="radio" value="1" class="form-control"
+                                                    <input disabled readonly type="radio" value="1" class="form-control"
                                                         name="work_{{ $check->id }}"
                                                         {{ isset($checkResult) && $checkResult->work == 1 ? 'checked' : '' }}>
                                                 </td>
                                                 <td>
-                                                    <input type="radio" value="0" class="form-control"
+                                                    <input disabled readonly type="radio" value="0" class="form-control"
                                                         name="work_{{ $check->id }}"
                                                         {{ isset($checkResult) && $checkResult->work == 0 ? 'checked' : '' }}>
                                                 </td>
                                                 <td>
-                                                    <input type="text" value="{{ $checkResult->notes ?? '' }}"
+                                                    <input disabled readonly type="text" value="{{ $checkResult->notes ?? '' }}"
                                                         class="form-control" name="notes[]">
                                                 </td>
                                                 <td>
-                                                    <input type="text" value="{{ $checkResult->after_check ?? '' }}"
+                                                    <input disabled readonly type="text" value="{{ $checkResult->after_check ?? '' }}"
                                                         class="form-control" name="after_check[]">
                                                 </td>
                                             </tr>
@@ -158,21 +158,21 @@
                                                 </td>
 
                                                 <td>
-                                                    <input type="radio" value="1" class="form-control"
+                                                    <input disabled readonly type="radio" value="1" class="form-control"
                                                         name="speedwork_{{ $speed->id }}"
                                                         {{ isset($speedResult) && $speedResult->work == 1 ? 'checked' : '' }}
                                                         </td>
                                                 <td>
-                                                    <input type="radio" value="0" class="form-control"
+                                                    <input disabled readonly type="radio" value="0" class="form-control"
                                                         name="speedwork_{{ $speed->id }}"
                                                         {{ isset($speedResult) && $speedResult->work == 0 ? 'checked' : '' }}>
                                                 </td>
                                                 <td>
-                                                    <input type="text" value="{{ $speedResult->notes ?? '' }}"
+                                                    <input disabled readonly type="text" value="{{ $speedResult->notes ?? '' }}"
                                                         class="form-control" name="speed_notes[]">
                                                 </td>
                                                 <td>
-                                                    <input type="text" value="{{ $speedResult->after_check ?? '' }}"
+                                                    <input disabled readonly type="text" value="{{ $speedResult->after_check ?? '' }}"
                                                         class="form-control" name="after_check_speed[]">
                                                 </td>
                                             </tr>
@@ -217,21 +217,21 @@
                                                         class="form-control" name="check_programe_name[]">
                                                 </td>
                                                 <td>
-                                                    <input type="radio" value="1" class="form-control"
+                                                    <input disabled readonly type="radio" value="1" class="form-control"
                                                         name="programework_{{ $programe->id }}[]"
                                                         {{ isset($programeResult) && $programeResult->work == 1 ? 'checked' : '' }}>
                                                 </td>
                                                 <td>
-                                                    <input type="radio" value="0" class="form-control"
+                                                    <input disabled readonly type="radio" value="0" class="form-control"
                                                         name="programework_{{ $programe->id }}[]"
                                                         {{ isset($programeResult) && $programeResult->work == 0 ? 'checked' : '' }}>
                                                 </td>
                                                 <td>
-                                                    <input type="text" value="{{ $programeResult->notes ?? '' }}"
+                                                    <input disabled readonly type="text" value="{{ $programeResult->notes ?? '' }}"
                                                         class="form-control" name="programe_notes[]">
                                                 </td>
                                                 <td>
-                                                    <input type="text"
+                                                    <input disabled readonly type="text"
                                                         value="{{ $programeResult->after_check ?? '' }}"
                                                         class="form-control" name="after_check_programe[]">
                                                 </td>
@@ -418,7 +418,7 @@
                                                     @if ($invoice->tech_notes)
                                                         <b> ملاحظات فنية الصيانة </b>
                                                         {{ $invoice->tech_notes }}
-                                                        @else
+                                                    @else
                                                         <b> ملاحظات فنية الصيانة </b>
                                                         لا يوجد
                                                     @endif

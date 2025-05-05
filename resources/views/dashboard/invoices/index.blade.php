@@ -2,10 +2,10 @@
 @section('title', ' الفواتير ')
 @section('css')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/tables/datatable/datatables.min.css">
-<style>
+    <style>
 
-</style>
-    @endsection
+    </style>
+@endsection
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
@@ -33,7 +33,7 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <div class="card-header d-flex align-items-center justify-content-between">
+                            <div class="card-header d-flex align-items-center justify-content-between flex-column">
                                 <a href="{{ route('dashboard.invoices.create') }}" class="btn btn-primary"> اضافة فاتورة
                                 </a>
                                 <form action="{{ route('dashboard.invoices.index') }}" method="get">
@@ -84,6 +84,8 @@
                                                     <th> الحالة </th>
                                                     <th> الاستقبال </th>
                                                     <th> الفني </th>
+                                                    <th> تاريخ الاستلام  </th>
+                                                    <th> تاريخ ووقت التسليم  </th>
                                                     <th> العمليات </th>
                                                 </tr>
                                             </thead>
@@ -138,6 +140,12 @@
                                                             @else
                                                                 {{ $invoice->Technical->name }}
                                                             @endif
+                                                        </td>
+                                                        <td>
+                                                            {{ date('Y-m-d h:i A', strtotime($invoice->created_at)) }}
+                                                        </td>
+                                                        <td>
+                                                            {{ $invoice->date_delivery }} {{ date('h:i A', strtotime($invoice->time_delivery)) }}
                                                         </td>
                                                         <td>
                                                             <div class="mb-1 mr-1 btn-group">

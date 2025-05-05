@@ -54,9 +54,16 @@ class TechInvoicesController extends Controller
         $invoice_more_checks = InvoiceMoreCheck::all();
         $programe_problems = ProgrameProblemCategory::all();
         $speed_problems = SpeedProblemCategory::all();
-        return view('dashboard.tech_invoices.show', compact('invoice',
-        'invoice_more_checks', 'programe_problems', 'speed_problems',
-        'problems', 'checks', 'speed_devices', 'programe_devices'));
+        return view('dashboard.tech_invoices.show', compact(
+            'invoice',
+            'invoice_more_checks',
+            'programe_problems',
+            'speed_problems',
+            'problems',
+            'checks',
+            'speed_devices',
+            'programe_devices'
+        ));
     }
 
     public function checkout(Request $request, $id)
@@ -138,69 +145,92 @@ class TechInvoicesController extends Controller
         $message_temp = Message::where('message_type', 'استلام الجهاز')->value('template_text');
         //dd($message_temp);
         $invoice = Invoice::find($id);
+        $old_invoice = Invoice::find($id);
         if ($request->isMethod('post')) {
             //dd($request->all());
             try {
                 DB::beginTransaction();
+                $status_changed = $request->status != $old_invoice->status;
+
+
                 $invoice->status = $request->status;
                 $invoice->tech_notes = $request->tech_notes;
                 $invoice->checkout_end_time = now();
                 $invoice->save();
                 ############# Add Invoice Step ###############
-                $invoice_step = new InvoiceSteps();
-                $invoice_step->invoice_id = $invoice->id;
-                $invoice_step->admin_id = Auth::id();
-                $invoice_step->step_details = '  تم تحديث حالة الجهاز الي   . $request->status;';
-                $invoice_step->save();
-                ############### Send Message To Client If Device Correct Or Not Or Device Status  ####################
+                if ($status_changed) {
+                    $invoice_step = new InvoiceSteps();
+                    $invoice_step->invoice_id = $invoice->id;
+                    $invoice_step->admin_id = Auth::id();
+                    $invoice_step->step_details = '  تم تحديث حالة الجهاز الي   . $request->status;';
+                    $invoice_step->save();
+                    ############### Send Message To Client If Device Correct Or Not Or Device Status  ####################
 
-                ########### Send Message To WhatsApp
-                // إنشاء رابط عام للفاتورة
+                    ########### Send Message To WhatsApp
+                    // إنشاء رابط عام للفاتورة
 
-                ########## Send Message To Client
+                    ########## Send Message To Client
 
-                $invoice_link = url('dashboard/invoice/view/' . $invoice->id);
-                $new_phone = preg_replace('/^0/', '', $invoice->phone);
-                // إضافة رمز البلد +966
-                $new_phone = '966' . $new_phone;
+                    $invoice_link = url('dashboard/invoice/view/' . $invoice->id);
+                    $new_phone = preg_replace('/^0/', '', $invoice->phone);
+                    // إضافة رمز البلد +966
+                    $new_phone = '966' . $new_phone;
 
-                // $new_phone = '201011642731';
+                    // $new_phone = '201011642731';
 
-                $message = str_replace(
-                    ['{name}', '{status}', '{invoice_link}'],
-                    [$invoice->name, $invoice->status, $invoice_link],
-                    $message_temp
-                );
-                // dd($message);
+                    $message = str_replace(
+                        ['{name}', '{status}', '{invoice_link}'],
+                        [$invoice->name, $invoice->status, $invoice_link],
+                        $message_temp
+                    );
+                    // dd($message);
 
-                // تعريف المتغير
-                $params = array(
-                    'instanceid' => '138796',
-                    'token' => '3fc4ad69-3ea3-4307-923c-7080f7aa0d8e',
-                    'phone' => $new_phone,
-                    'body' => $message,
-                );
-                $queryString = http_build_query($params); // تحويل المصفوفة إلى سلسلة نصية
-                $curl = curl_init();
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => "https://api.4whats.net/sendMessage/?" . $queryString, // إضافة سلسلة الاستعلام إلى عنوان URL
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => "",
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 30,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => "GET",
-                ));
-                $response = curl_exec($curl);
-                $err = curl_error($curl);
-                curl_close($curl);
-                if ($request->status === "تم الاصلاح") {
-                    // جدولة إرسال رسالة التقييم بعد 20 دقيقة
-                    SendReviewMessage::dispatch($invoice)->delay(now()->addMinutes(20));
+                    // تعريف المتغير
+                    $params = array(
+                        'instanceid' => '138796',
+                        'token' => '3fc4ad69-3ea3-4307-923c-7080f7aa0d8e',
+                        'phone' => $new_phone,
+                        'body' => $message,
+                    );
+                    $queryString = http_build_query($params); // تحويل المصفوفة إلى سلسلة نصية
+                    $curl = curl_init();
+                    curl_setopt_array($curl, array(
+                        CURLOPT_URL => "https://api.4whats.net/sendMessage/?" . $queryString, // إضافة سلسلة الاستعلام إلى عنوان URL
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => "",
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 30,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => "GET",
+                    ));
+                    $response = curl_exec($curl);
+                    $err = curl_error($curl);
+                    curl_close($curl);
+                    if ($request->status === "تم الاصلاح") {
+                        // جدولة إرسال رسالة التقييم بعد 20 دقيقة
+                        SendReviewMessage::dispatch($invoice)->delay(now()->addMinutes(20));
+                    }
                 }
+
+                ############### Add Files ####################
+
+                if ($request->hasFile('file')) {
+                    // dd($request->all());
+                    $filename = $this->saveImage($request->file('file'), public_path('assets/uploads/invoices_files'));
+                    $file = new InvoiceImage();
+                    $file->invoice_id = $invoice->id;
+                    $file->image = $filename;
+                    $file->user_upload = Auth::id();
+                    $file->title = $request->file_title;
+                    $file->description = $request->file_description;
+                    $file->price = $request->file_price;
+                    $file->save();
+                }
+                // return $this->success_message(' تم اضافة المرفق بنجاح  ');
                 DB::commit();
                 return $this->success_message('تم تحديث حالة الجهاز بنجاح');
             } catch (Exception $e) {
+                dd($e);
                 return $this->exception_message($e);
             }
         }
@@ -212,7 +242,7 @@ class TechInvoicesController extends Controller
         $programe_problems = ProgrameProblemCategory::all();
         $speed_problems = SpeedProblemCategory::all();
         $piece_resources = PieceSource::all();
-        return view('dashboard.tech_invoices.update', compact('piece_resources','invoice', 'problems', 'checks', 'speed_devices', 'programe_devices','invoice_more_checks','programe_problems','speed_problems'));
+        return view('dashboard.tech_invoices.update', compact('piece_resources', 'invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'invoice_more_checks', 'programe_problems', 'speed_problems'));
     }
 
     public function addfile(Request $request, $id)

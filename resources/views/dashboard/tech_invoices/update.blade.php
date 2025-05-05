@@ -502,18 +502,13 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
-
-
                                                 <div class="row">
-
                                                     <div class="col-md-12">
                                                         <div class="form-group">
                                                             <label for="title"> ملاحظات فني الصيانة </label>
                                                             <textarea name="tech_notes" id="" class="form-control">{{ $invoice->tech_notes }}</textarea>
                                                         </div>
                                                     </div>
-
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="price"> حالة الجهاز </label>
@@ -531,6 +526,39 @@
                                                                     value="معلق">معلق</option>
                                                             </select>
                                                         </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h5> اضافة مرفق </h5>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="address"> صورة المرفق </label>
+                                                        <input type="file" name="file" class="form-control">
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="address"> اضف عنوان للمرفق </label>
+                                                        <input type="text" id="title" class="form-control"
+                                                            placeholder="" name="file_title"
+                                                            value="{{ old('file_title') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="price"> سعر المرفق </label>
+                                                        <input type="number" step="0.01" id="price"
+                                                            class="form-control" placeholder="" name="file_price"
+                                                            value="{{ old('file_price') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="address"> تفاصيل اضافية عن المرفق * </span> </label>
+                                                        <textarea name="file_description" id="" class="form-control">{{ old('file_description') }}</textarea>
                                                     </div>
                                                 </div>
                                             </div>
@@ -560,7 +588,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card">
+                            {{-- <div class="card">
                                 <div class="card-header">
                                     <h4 class="card-title"> حالة التواصل مع العميل </h4>
                                     <br>
@@ -610,18 +638,18 @@
                                         });
                                     </script>
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="card">
                                 <div class="card-header">
                                     <h4 class="card-title" id="basic-layout-form"> المرفقات </h4>
                                 </div>
                                 <div class="card-content">
                                     <div class="card-body">
-                                        <h5> اضافة مرفق </h5>
-                                        <form id="addattachmentForm" action="{{ route('dashboard.tech_invoices.addfile', $invoice->id) }}"
+                                        {{-- <h5> اضافة مرفق </h5>
+                                        <form id="addattachmentForm"
+                                            action="{{ route('dashboard.tech_invoices.addfile', $invoice->id) }}"
                                             method="POST" enctype="multipart/form-data">
                                             @csrf
-
                                             <div class="row">
 
                                                 <div class="col-6">
@@ -666,8 +694,8 @@
                                                 <p id="loadingMessage" class="mt-2 text-info" style="display: none;">⏳
                                                     جاري رفع البيانات، الرجاء الانتظار...</p>
                                             </div>
-                                        </form>
-                                        <script>
+                                        </form> --}}
+                                        {{-- <script>
                                             document.getElementById("addattachmentForm").addEventListener("submit", function(e) {
                                                 e.preventDefault();
 
@@ -681,7 +709,7 @@
                                                 this.submit();
 
                                             });
-                                        </script>
+                                        </script> --}}
                                         <div class="row">
                                             <table class="table table-bordered">
                                                 <tr>
