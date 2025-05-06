@@ -11,8 +11,18 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item active"> ادارة فواتيري
-                                </li>
+
+                                @if (request('invoice_status'))
+                                    <li class="breadcrumb-item"> <a href="{{ route('dashboard.tech_invoices.index') }}">
+                                            ادارة فواتيري
+                                        </a>
+                                    </li>
+                                    <li class="breadcrumb-item active"> بحث
+                                    </li>
+                                @else
+                                    <li class="breadcrumb-item active"> ادارة فواتيري
+                                    </li>
+                                @endif
                             </ol>
                         </div>
                     </div>
@@ -22,7 +32,36 @@
                 </div>
             </div>
             <div class="content-body">
+                <form action="{{ route('dashboard.tech_invoices.search') }}" method="get">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <div class="form-group" style="margin-left: 20px">
+                            <label> حالة الفاتورة </label>
+                            <select name="invoice_status" class="form-control">
+                                <option value="" selected disabled> -- حدد حالة الفاتورة -- </option>
+                                <option value="رف الاستلام"
+                                    {{ request('invoice_status') == 'رف الاستلام' ? 'selected' : '' }}>رف
+                                    الاستلام</option>
+                                <option value="تحت الصيانة"
+                                    {{ request('invoice_status') == 'تحت الصيانة' ? 'selected' : '' }}> تحت
+                                    الصيانة </option>
+                                <option value="تم الاصلاح"
+                                    {{ request('invoice_status') == 'تم الاصلاح' ? 'selected' : '' }}>تم
+                                    الاصلاح</option>
+                                <option value="لم يتم الاصلاح"
+                                    {{ request('invoice_status') == 'لم يتم الاصلاح' ? 'selected' : '' }}>لم
+                                    يتم الاصلاح</option>
+                                <option value="معلق" {{ request('invoice_status') == 'معلق' ? 'selected' : '' }}>معلق
+                                </option>
+                            </select>
+                        </div>
 
+                        <div class="form-group">
+                            <button type="submit" style="margin-top: 25px" class="btn btn-primary btn-sm">بحث <i
+                                    class="la la-search"></i></button>
+                        </div>
+                    </div>
+
+                </form>
                 <!-- Bordered striped start -->
                 <div class="row">
                     <div class="col-12">
@@ -36,7 +75,7 @@
                                                     <th>#</th>
                                                     <th> رقم الفاتورة </th>
                                                     <th> اسم العميل </th>
-                                                    <th>  رقم الهاتف </th>
+                                                    <th> رقم الهاتف </th>
                                                     <th> العنوان </th>
                                                     <th> المشاكل </th>
                                                     <th> الحالة </th>
@@ -68,7 +107,8 @@
                                                             </span>
                                                         </td>
                                                         <td> {{ $invoice->checkout_time }} </td>
-                                                        <td> {{ $invoice->date_delivery }} // {{ $invoice->time_delivery }}
+                                                        <td> {{ $invoice->date_delivery }} //
+                                                            {{ $invoice->time_delivery }}
                                                         </td>
                                                         <td>
                                                             <a class="btn btn-warning btn-sm"

@@ -17,9 +17,9 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.tech_invoices.index') }}"> فواتيري
-                                    </a>
-                                </li>
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard.tech_invoices.available') }}"> الفواتير المتاحة
+                                </a>
+                            </li>
                                 <li class="breadcrumb-item active"><a href="#"> استلام الجهاز </a>
                                 </li>
                             </ol>

@@ -82,10 +82,11 @@
                                                     <th> العنوان </th>
                                                     <th> المشاكل </th>
                                                     <th> الحالة </th>
+                                                    <th> استلام الجهاز </th>
                                                     <th> الاستقبال </th>
                                                     <th> الفني </th>
-                                                    <th> تاريخ الاستلام  </th>
-                                                    <th> تاريخ ووقت التسليم  </th>
+                                                    <th> تاريخ الاستلام </th>
+                                                    <th> تاريخ ووقت التسليم </th>
                                                     <th> العمليات </th>
                                                 </tr>
                                             </thead>
@@ -128,6 +129,22 @@
 
                                                         </td>
                                                         <td>
+                                                            @if ($invoice->delivery_status == 1)
+                                                                <span class="badge badge-success">
+                                                                    تم التسليم
+                                                                </span>
+                                                            @else
+                                                                <span class="mb-1 badge badge-danger">
+                                                                    لم يتم التسليم
+                                                                </span>
+                                                                <button class="btn btn-warning btn-sm" type="button"
+                                                                    data-toggle="modal"
+                                                                    data-target="#delivery_invoice_{{ $invoice->id }}">
+                                                                    <i style="font-size:12px" class="la la-check"></i> تسليم
+                                                                    الجهاز </button>
+                                                            @endif
+                                                        </td>
+                                                        <td>
                                                             {{ $invoice->Recieved->name }}
                                                         </td>
                                                         <td>
@@ -145,10 +162,11 @@
                                                             {{ date('Y-m-d h:i A', strtotime($invoice->created_at)) }}
                                                         </td>
                                                         <td>
-                                                            {{ $invoice->date_delivery }} {{ date('h:i A', strtotime($invoice->time_delivery)) }}
+                                                            {{ $invoice->date_delivery }}
+                                                            {{ date('h:i A', strtotime($invoice->time_delivery)) }}
                                                         </td>
                                                         <td>
-                                                            <div class="mb-1 mr-1 btn-group">
+                                                            <div class="mr-1 mb-1 btn-group">
                                                                 <button type="button"
                                                                     class="btn btn-primary btn-block dropdown-toggle btn-sm"
                                                                     data-toggle="dropdown" aria-haspopup="true"
@@ -181,6 +199,7 @@
                                                     </div>
                                                     @include('dashboard.invoices.delete')
                                                     @include('dashboard.invoices.add_tech_invoice')
+                                                    @include('dashboard.invoices.delivery_status')
                                                 @empty
                                                     <td colspan="4"> لا يوجد بيانات </td>
                                                 @endforelse

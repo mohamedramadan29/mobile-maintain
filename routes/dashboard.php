@@ -198,6 +198,7 @@ Route::group([
                 Route::get('print_barcode/{id}', 'print_barcode')->name('print_barcode');
                 Route::get('steps/{id}', 'steps')->name('steps');
                 Route::post('add_tech/{id}', 'add_tech')->name('add_tech');
+                Route::post('delivery/{id}', 'delivery')->name('delivery');
             });
         });
 
@@ -212,6 +213,7 @@ Route::group([
         Route::group(['middleware' => 'can:tech_invoices', 'prefix' => 'tech_invoices', 'as' => 'tech_invoices.'], function () {
             Route::controller(TechInvoicesController::class)->group(function () {
                 Route::get('index', 'index')->name('index');
+                Route::get('search', 'search')->name('search');
                 Route::get('available', 'available')->name('available');
                 Route::get('show/{id}', 'show')->name('show');
                 Route::match(['get', 'post'], 'checkout/{id}', 'checkout')->name('checkout');

@@ -34,7 +34,19 @@ class TechInvoicesController extends Controller
 
     public function index()
     {
-        $invoices = Invoice::where('admin_repair_id', Auth::guard('admin')->user()->id)->orderBy('id', 'desc')->paginate(10);
+        $invoices = Invoice::where('admin_repair_id', Auth::guard('admin')->user()->id)->where('status', 'تحت الصيانة')->orderBy('id', 'desc')->paginate(10);
+        return view('dashboard.tech_invoices.index', compact('invoices'));
+    }
+
+    public function search(Request $request){
+        $query = Invoice::where('admin_repair_id', Auth::guard('admin')->user()->id);
+
+        // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
+        if ($request->has('invoice_status') && !empty($request->invoice_status)) {
+            $query->where('status', $request->invoice_status);
+        }
+        $invoices = $query->orderBy('id', 'desc')->paginate(10);
+
         return view('dashboard.tech_invoices.index', compact('invoices'));
     }
 
@@ -81,7 +93,6 @@ class TechInvoicesController extends Controller
                 if ($invoices >= $available_number) {
                     return $this->Error_message('لقد تجاوزت العدد المسموح به للعمل في نفس الوقت ');
                 }
-
                 $invoice->admin_repair_id = Auth::guard('admin')->user()->id;
                 $invoice->status = 'تحت الصيانة';
                 $invoice->checkout_time = now();

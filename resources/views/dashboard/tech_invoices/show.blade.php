@@ -1,6 +1,6 @@
 @extends('dashboard.layouts.app')
 
-@section('title', ' صيانة الجهاز ')
+@section('title', ' تفاصيل فاتورة الصيانة ')
 @section('css')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/icheck.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/custom.css">
@@ -17,7 +17,7 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.tech_invoices.index') }}"> فواتيري
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard.tech_invoices.available') }}"> الفواتير المتاحة
                                     </a>
                                 </li>
                                 <li class="breadcrumb-item active"><a href="#"> صيانة الجهاز </a>

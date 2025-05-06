@@ -27,6 +27,125 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-xl-3 col-lg-6 col-12">
+                        <div class="card pull-up">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <div class="media d-flex">
+                                        <div class="text-left media-body">
+                                            <h3 class="info"> {{ $delivery_count }} </h3>
+                                            <h6> تم تسليم الجهاز </h6>
+                                        </div>
+                                        <div>
+                                            <i class="float-right icon-basket-loaded info font-large-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-6 col-12">
+                        <div class="card pull-up">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <div class="media d-flex">
+                                        <div class="text-left media-body">
+                                            <h3 class="info"> {{ $undelivery_count }} </h3>
+                                            <h6> لم يتم تسليم الجهاز </h6>
+                                        </div>
+                                        <div>
+                                            <i class="float-right icon-basket-loaded info font-large-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-6 col-12">
+                        <div class="card pull-up">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <div class="media d-flex">
+                                        <div class="text-left media-body">
+                                            <h3 class="info"> {{ $under_maintain_count }} </h3>
+                                            <h6> تحت الصيانة </h6>
+                                        </div>
+                                        <div>
+                                            <i class="float-right icon-basket-loaded info font-large-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-6 col-12">
+                        <div class="card pull-up">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <div class="media d-flex">
+                                        <div class="text-left media-body">
+                                            <h3 class="info"> {{ $fixed_count }} </h3>
+                                            <h6> تم الاصلاح </h6>
+                                        </div>
+                                        <div>
+                                            <i class="float-right icon-basket-loaded info font-large-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-6 col-12">
+                        <div class="card pull-up">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <div class="media d-flex">
+                                        <div class="text-left media-body">
+                                            <h3 class="info"> {{ $not_fixed_count }} </h3>
+                                            <h6> لم يتم الاصلاح </h6>
+                                        </div>
+                                        <div>
+                                            <i class="float-right icon-basket-loaded info font-large-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-6 col-12">
+                        <div class="card pull-up">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <div class="media d-flex">
+                                        <div class="text-left media-body">
+                                            <h3 class="info"> {{ $roof_count }} </h3>
+                                            <h6> رف الاستلام </h6>
+                                        </div>
+                                        <div>
+                                            <i class="float-right icon-basket-loaded info font-large-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-6 col-12">
+                        <div class="card pull-up">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <div class="media d-flex">
+                                        <div class="text-left media-body">
+                                            <h3 class="info"> {{ $pending }} </h3>
+                                            <h6> معلق </h6>
+                                        </div>
+                                        <div>
+                                            <i class="float-right icon-basket-loaded info font-large-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     @can('admins')
                         <div class="col-xl-3 col-lg-6 col-12">
                             <div class="card pull-up">
@@ -109,10 +228,11 @@
                                                     <th> العنوان </th>
                                                     <th> المشاكل </th>
                                                     <th> الحالة </th>
+                                                    <th> استلام الجهاز </th>
                                                     <th> الاستقبال </th>
                                                     <th> الفني </th>
-                                                    <th> تاريخ الاستلام  </th>
-                                                    <th> تاريخ التسليم   </th>
+                                                    <th> تاريخ الاستلام </th>
+                                                    <th> تاريخ التسليم </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -153,6 +273,22 @@
 
                                                         </td>
                                                         <td>
+                                                            @if ($invoice->delivery_status == 1)
+                                                                <span class="badge badge-success">
+                                                                    تم التسليم
+                                                                </span>
+                                                            @else
+                                                                <span class="mb-1 badge badge-danger">
+                                                                    لم يتم التسليم
+                                                                </span>
+                                                                <button class="btn btn-warning btn-sm" type="button"
+                                                                    data-toggle="modal"
+                                                                    data-target="#delivery_invoice_{{ $invoice->id }}">
+                                                                    <i style="font-size:12px" class="la la-check"></i> تسليم
+                                                                    الجهاز </button>
+                                                            @endif
+                                                        </td>
+                                                        <td>
                                                             {{ $invoice->Recieved->name }}
                                                         </td>
                                                         <td>
@@ -162,7 +298,8 @@
                                                             {{ date('Y-m-d h:i A', strtotime($invoice->created_at)) }}
                                                         </td>
                                                         <td>
-                                                            {{ $invoice->date_delivery }} {{ date('h:i A', strtotime($invoice->time_delivery)) }}
+                                                            {{ $invoice->date_delivery }}
+                                                            {{ date('h:i A', strtotime($invoice->time_delivery)) }}
                                                         </td>
                                                     </tr>
 
@@ -205,8 +342,11 @@
                                                         <th> العنوان </th>
                                                         <th> المشاكل </th>
                                                         <th> الحالة </th>
+                                                        <th> استلام الجهاز </th>
                                                         <th> الاستقبال </th>
                                                         <th> الفني </th>
+                                                        <th> تاريخ الاستلام </th>
+                                                        <th> تاريخ التسليم </th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -261,10 +401,34 @@
 
                                                                 </td>
                                                                 <td>
+                                                                    @if ($invoice->delivery_status == 1)
+                                                                        <span class="badge badge-success">
+                                                                            تم التسليم
+                                                                        </span>
+                                                                    @else
+                                                                        <span class="mb-1 badge badge-danger">
+                                                                            لم يتم التسليم
+                                                                        </span>
+                                                                        <button class="btn btn-warning btn-sm" type="button"
+                                                                            data-toggle="modal"
+                                                                            data-target="#delivery_invoice_{{ $invoice->id }}">
+                                                                            <i style="font-size:12px" class="la la-check"></i>
+                                                                            تسليم
+                                                                            الجهاز </button>
+                                                                    @endif
+                                                                </td>
+                                                                <td>
                                                                     {{ $invoice->Recieved->name }}
                                                                 </td>
                                                                 <td>
                                                                     {{ $invoice->Technical->name ?? ' لا يوجد ' }}
+                                                                </td>
+                                                                <td>
+                                                                    {{ date('Y-m-d h:i A', strtotime($invoice->created_at)) }}
+                                                                </td>
+                                                                <td>
+                                                                    {{ $invoice->date_delivery }}
+                                                                    {{ date('h:i A', strtotime($invoice->time_delivery)) }}
                                                                 </td>
                                                             </tr>
                                                         @endif
