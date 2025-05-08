@@ -52,6 +52,14 @@
                                     يتم الاصلاح</option>
                                 <option value="معلق" {{ request('invoice_status') == 'معلق' ? 'selected' : '' }}>معلق
                                 </option>
+                                <option value="تم تسليم الجهاز"
+                                    {{ request('invoice_status') == 'تم تسليم الجهاز' ? 'selected' : '' }}>
+                                    تم تسليم الجهاز
+                                </option>
+                                <option value="لم يتم التسليم"
+                                    {{ request('invoice_status') == 'لم يتم التسليم' ? 'selected' : '' }}>
+                                    لم يتم تسليم الجهاز
+                                </option>
                             </select>
                         </div>
 
@@ -79,6 +87,7 @@
                                                     <th> العنوان </th>
                                                     <th> المشاكل </th>
                                                     <th> الحالة </th>
+                                                    <th> استلام الجهاز </th>
                                                     <th> تاريخ ووقت البدء </th>
                                                     <th> تاريخ ووقت التسليم </th>
                                                     <th> العمليات </th>
@@ -105,6 +114,17 @@
                                                             <span class="badge badge-info">
                                                                 {{ $invoice->status }}
                                                             </span>
+                                                        </td>
+                                                        <td>
+                                                            @if ($invoice->delivery_status == 1)
+                                                                <span class="badge badge-success">
+                                                                    تم التسليم
+                                                                </span>
+                                                            @else
+                                                                <span class="mb-1 badge badge-danger">
+                                                                    لم يتم التسليم
+                                                                </span>
+                                                            @endif
                                                         </td>
                                                         <td> {{ $invoice->checkout_time }} </td>
                                                         <td> {{ $invoice->date_delivery }} //

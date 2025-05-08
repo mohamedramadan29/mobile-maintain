@@ -41,11 +41,22 @@ class TechInvoicesController extends Controller
     public function search(Request $request){
         $query = Invoice::where('admin_repair_id', Auth::guard('admin')->user()->id);
 
-        // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
-        if ($request->has('invoice_status') && !empty($request->invoice_status)) {
-            $query->where('status', $request->invoice_status);
-        }
-        $invoices = $query->orderBy('id', 'desc')->paginate(10);
+       // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
+       if ($request->has('invoice_status') && !empty($request->invoice_status)) {
+
+        //  dd($request->invoice_status);
+          // تحقق من القيم النصية "0" و "1"
+          if ($request->invoice_status == 'تم تسليم الجهاز') {
+              $query->where('delivery_status', 1);
+          } elseif ($request->invoice_status == 'لم يتم التسليم') {
+              $query->where('delivery_status', 0);
+          }
+           else {
+              // في حالة وجود حالة غير الأرقام (مثل "رف الاستلام" أو "تحت الصيانة")
+              $query->where('status', $request->invoice_status);
+          }
+      }
+        $invoices = $query->orderBy('id', 'desc')->paginate(10)->appends($request->all());
 
         return view('dashboard.tech_invoices.index', compact('invoices'));
     }

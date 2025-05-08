@@ -199,6 +199,8 @@ Route::group([
                 Route::get('steps/{id}', 'steps')->name('steps');
                 Route::post('add_tech/{id}', 'add_tech')->name('add_tech');
                 Route::post('delivery/{id}', 'delivery')->name('delivery');
+                Route::post('undelivery/{id}', 'undelivery')->name('undelivery');
+                Route::post('bulk_delete', 'bulkDelete')->name('bulk_delete');
             });
         });
 

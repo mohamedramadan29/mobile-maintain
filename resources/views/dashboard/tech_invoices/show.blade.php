@@ -402,33 +402,29 @@
                                                     <div class="col-md-6">
                                                         <label for="price"> تاريخ ووقت التسليم <span
                                                                 class="required_span"> * </span> </label>
-                                                        <div class="justify-between d-flex">
-                                                            <div class="form-group">
-                                                                <div class="position-relative has-icon-left">
-                                                                    <input disabled type="date" name="date_delivery"
-                                                                        value="{{ $invoice->date_delivery }}"
-                                                                        id="timesheetinput3" class="form-control">
-                                                                    <div class="form-control-position">
-                                                                        <i class="ft-message-square"></i>
-                                                                    </div>
-                                                                </div>
+                                                        <div class="justify-between d-flex flex-column">
+                                                            <div class="form-group" style="min-width: 100%">
+
+                                                                <input disabled type="date" name="date_delivery"
+                                                                    class="form-control"
+                                                                    value="{{ $invoice->date_delivery }}"
+                                                                    class="form-control">
                                                             </div>
-                                                            <div class="form-group">
-                                                                <div class="position-relative has-icon-left">
-                                                                    <input disabled type="time" name="time_delivery"
-                                                                        value="{{ $invoice->time_delivery }}"
-                                                                        id="timesheetinput6" class="form-control">
-                                                                    <div class="form-control-position">
-                                                                        <i class="ft-clock"></i>
-                                                                    </div>
-                                                                </div>
+                                                            <div class="form-group" style="min-width: 100%">
+                                                                <input disabled type="time" name="time_delivery"
+                                                                    value="{{ $invoice->time_delivery }}"
+                                                                    class="form-control">
                                                             </div>
                                                         </div>
                                                     </div>
-
-                                                    <img width="100" height="100"
-                                                        src="{{ asset('assets/uploads/invoices_files/' . $invoice->signature) }}"
-                                                        alt="">
+                                                    <div class="col-md-6">
+                                                        <label for="price"> التوقيع </label>
+                                                        <div class="form-group">
+                                                            <img width="100" height="100"
+                                                                src="{{ asset('assets/uploads/invoices_files/' . $invoice->signature) }}"
+                                                                alt="">
+                                                        </div>
+                                                    </div>
 
                                                 </div>
                                                 <div class="row">

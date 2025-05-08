@@ -281,11 +281,6 @@
                                                                 <span class="mb-1 badge badge-danger">
                                                                     لم يتم التسليم
                                                                 </span>
-                                                                <button class="btn btn-warning btn-sm" type="button"
-                                                                    data-toggle="modal"
-                                                                    data-target="#delivery_invoice_{{ $invoice->id }}">
-                                                                    <i style="font-size:12px" class="la la-check"></i> تسليم
-                                                                    الجهاز </button>
                                                             @endif
                                                         </td>
                                                         <td>
@@ -409,12 +404,6 @@
                                                                         <span class="mb-1 badge badge-danger">
                                                                             لم يتم التسليم
                                                                         </span>
-                                                                        <button class="btn btn-warning btn-sm" type="button"
-                                                                            data-toggle="modal"
-                                                                            data-target="#delivery_invoice_{{ $invoice->id }}">
-                                                                            <i style="font-size:12px" class="la la-check"></i>
-                                                                            تسليم
-                                                                            الجهاز </button>
                                                                     @endif
                                                                 </td>
                                                                 <td>

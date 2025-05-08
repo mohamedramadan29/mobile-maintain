@@ -46,12 +46,36 @@ class InvoiceController extends Controller
 
         // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
         if ($request->has('invoice_status') && !empty($request->invoice_status)) {
-            $query->where('status', $request->invoice_status);
+
+            //  dd($request->invoice_status);
+            // تحقق من القيم النصية "0" و "1"
+            if ($request->invoice_status == 'تم تسليم الجهاز') {
+                $query->where('delivery_status', 1);
+            } elseif ($request->invoice_status == 'لم يتم التسليم') {
+                $query->where('delivery_status', 0);
+            } else {
+                // في حالة وجود حالة غير الأرقام (مثل "رف الاستلام" أو "تحت الصيانة")
+                $query->where('status', $request->invoice_status);
+            }
         }
-        $invoices = $query->orderBy('id', 'desc')->paginate(10);
+
+        $invoices = $query->orderBy('id', 'desc')->paginate(10)->appends($request->all());
         $techs = Admin::where('type', 'فني')->get();
+
         return view('dashboard.invoices.index', compact('invoices', 'techs'));
     }
+    public function bulkDelete(Request $request)
+    {
+        $ids = explode(',', $request->invoice_ids);
+
+        if (!empty($ids)) {
+            Invoice::whereIn('id', $ids)->delete();
+            return $this->success_message('تم حذف الفواتير المحددة بنجاح');
+        }
+
+        return $this->error_message('لم يتم تحديد أي فواتير');
+    }
+
     public function delivery(Request $reques, $id)
     {
         $invoice = Invoice::findOrFail($id);
@@ -92,6 +116,13 @@ class InvoiceController extends Controller
         $err = curl_error($curl);
         curl_close($curl);
         return $this->success_message('تم تسليم الجهاز بنجاح');
+    }
+    public function undelivery(Request $request, $id)
+    {
+        $invoice = Invoice::findOrFail($id);
+        $invoice->delivery_status  = 0;
+        $invoice->save();
+        return $this->success_message('تم عودة الجهاز بنجاح');
     }
     public function create(Request $request)
     {

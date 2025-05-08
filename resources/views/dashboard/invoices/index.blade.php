@@ -3,7 +3,9 @@
 @section('css')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/tables/datatable/datatables.min.css">
     <style>
-
+        div.dataTables_wrapper div.dataTables_paginate {
+            display: none;
+        }
     </style>
 @endsection
 @section('content')
@@ -41,7 +43,10 @@
                                         <div class="form-group" style="margin-left: 20px">
                                             <label> حالة الفاتورة </label>
                                             <select name="invoice_status" class="form-control">
-                                                <option value="" selected disabled> -- حدد حالة الفاتورة -- </option>
+
+                                                <option value=""
+                                                    {{ request('invoice_status') === null ? 'selected' : '' }}> -- كل
+                                                    الفواتير -- </option>
                                                 <option value="رف الاستلام"
                                                     {{ request('invoice_status') == 'رف الاستلام' ? 'selected' : '' }}>رف
                                                     الاستلام</option>
@@ -57,6 +62,14 @@
                                                 <option value="معلق"
                                                     {{ request('invoice_status') == 'معلق' ? 'selected' : '' }}>معلق
                                                 </option>
+                                                <option value="تم تسليم الجهاز"
+                                                    {{ request('invoice_status') == 'تم تسليم الجهاز' ? 'selected' : '' }}>
+                                                    تم تسليم الجهاز
+                                                </option>
+                                                <option value="لم يتم التسليم"
+                                                    {{ request('invoice_status') == 'لم يتم التسليم' ? 'selected' : '' }}>
+                                                    لم يتم تسليم الجهاز
+                                                </option>
                                             </select>
                                         </div>
 
@@ -71,10 +84,15 @@
                             <div class="card-content collapse show">
                                 <div class="card-body">
                                     <div class="table-responsive">
+                                        <form id="bulkDeleteForm" action="{{ route('dashboard.invoices.bulk_delete') }}" method="POST" style="display: none;">
+                                            @csrf
+                                            <input type="hidden" name="invoice_ids" id="invoice_ids">
+                                        </form>
                                         <table class="table table-striped table-bordered zero-configuration dataTable"
                                             id="DataTables_Table_0">
                                             <thead>
                                                 <tr>
+                                                    <th style="width: 10px;"><input type="checkbox" id="select_all"></th>
                                                     <th>#</th>
                                                     <th> رقم الفاتورة </th>
                                                     <th> الاسم </th>
@@ -93,7 +111,11 @@
                                             <tbody>
                                                 @forelse ($invoices as $invoice)
                                                     <tr>
-                                                        <th scope="row">{{ $loop->iteration }}</th>
+                                                        <td style="width: 10px; padding: 10px">
+                                                            <input type="checkbox" class="select_item"
+                                                                value="{{ $invoice->id }}">
+                                                        </td>
+                                                        <td scope="row">{{ $loop->iteration }}</td>
                                                         <td> {{ $invoice->id }} </td>
                                                         <td> {{ $invoice->name }} </td>
                                                         <td>
@@ -137,11 +159,6 @@
                                                                 <span class="mb-1 badge badge-danger">
                                                                     لم يتم التسليم
                                                                 </span>
-                                                                <button class="btn btn-warning btn-sm" type="button"
-                                                                    data-toggle="modal"
-                                                                    data-target="#delivery_invoice_{{ $invoice->id }}">
-                                                                    <i style="font-size:12px" class="la la-check"></i> تسليم
-                                                                    الجهاز </button>
                                                             @endif
                                                         </td>
                                                         <td>
@@ -192,6 +209,34 @@
                                                                         حذف </button>
 
                                                                 </div>
+
+                                                                @if ($invoice->delivery_status == 0)
+                                                                    <form
+                                                                        action="{{ route('dashboard.invoices.delivery', $invoice->id) }}"
+                                                                        method="POST">
+                                                                        @csrf
+                                                                        <button
+                                                                            onclick="return confirm('هل تريد تسليم هذا الجهاز؟')"
+                                                                            type="submit" class="btn btn-success btn-sm">
+                                                                            <i style="font-size:12px"
+                                                                                class="la la-check"></i>
+                                                                            تسليم الجهاز
+                                                                        </button>
+                                                                    </form>
+                                                                @elseif ($invoice->delivery_status == 1)
+                                                                    <form
+                                                                        action="{{ route('dashboard.invoices.undelivery', $invoice->id) }}"
+                                                                        method="POST">
+                                                                        @csrf
+                                                                        <button
+                                                                            onclick="return confirm('هل تريد عودة هذا الجهاز؟')"
+                                                                            type="submit" class="btn btn-danger btn-sm">
+                                                                            <i style="font-size:12px"
+                                                                                class="la la-undo"></i>
+                                                                            عودة الجهاز
+                                                                        </button>
+                                                                    </form>
+                                                                @endif
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -204,7 +249,15 @@
                                                     <td colspan="4"> لا يوجد بيانات </td>
                                                 @endforelse
                                             </tbody>
+                                            <tfoot>
+
+                                            </tfoot>
                                         </table>
+                                        <button type="button" class="btn btn-danger btn-sm"
+                                            onclick="submitBulkDelete()">
+                                            حذف المحدد
+                                        </button>
+
                                         {{ $invoices->links() }}
                                     </div>
                                 </div>
@@ -232,11 +285,39 @@
         $(document).ready(function() {
             if (!$.fn.DataTable.isDataTable('#DataTables_Table_0')) {
                 $('#DataTables_Table_0').DataTable({
+
+
                     language: lang === 'ar' ? {
                         url: '//cdn.datatables.net/plug-ins/2.2.2/i18n/ar.json',
                     } : {},
                 });
             }
+        });
+    </script>
+    <script>
+        function submitBulkDelete() {
+            let selected = [];
+            document.querySelectorAll('.select_item:checked').forEach(cb => {
+                selected.push(cb.value);
+            });
+
+            if (selected.length === 0) {
+                alert("من فضلك اختر فواتير لحذفها.");
+                return;
+            }
+
+            if (!confirm("هل أنت متأكد من حذف الفواتير المحددة؟")) {
+                return;
+            }
+
+            document.getElementById('invoice_ids').value = selected.join(',');
+            document.getElementById('bulkDeleteForm').submit();
+        }
+
+        // اختيار الكل
+        document.getElementById('select_all').addEventListener('click', function() {
+            let checkboxes = document.querySelectorAll('.select_item');
+            checkboxes.forEach(cb => cb.checked = this.checked);
         });
     </script>
 @endsection
