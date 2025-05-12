@@ -18,30 +18,56 @@ class CheckTextController extends Controller
 
     public function create(Request $request)
     {
-        $request->validate([
-            'name' => 'required|unique:check_texts,name',
-        ]);
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'name' => 'required|unique:check_texts,name',
+            ]);
 
-        CheckText::create(
-            ['name' => $request->name]
-        );
-        return $this->success_message(' تم اضافة   بنجاح');
+            CheckText::create([
+                'name' => $request->name
+            ]);
+            return redirect()->route('dashboard.checktexts.index')
+                ->with('Success_message', 'تم اضافة نص الفحص بنجاح');
+        }
+        return view('dashboard.checktext.create_page');
     }
 
-    public function update(Request $request, $id){
-        $data = $request->all();
-        $problem = CheckText::find($id);
-        $problem->name = $data['name'];
-        $problem->save();
-        return $this->success_message(' تم تعديل   بنجاح');
-    }
-
-    public function destroy($id)
+    public function update(Request $request, $id)
     {
         $problem = CheckText::find($id);
+        if (!$problem) {
+            return redirect()->route('dashboard.checktexts.index')
+                ->with('Error_message', 'نص الفحص غير موجود');
+        }
 
-        $problem->delete();
-        return $this->success_message(' تم حذف   بنجاح');
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'name' => 'required|unique:check_texts,name,' . $problem->id,
+            ]);
+            $problem->name = $request->name;
+            $problem->save();
+            return redirect()->route('dashboard.checktexts.index')
+                ->with('Success_message', 'تم تعديل نص الفحص بنجاح');
+        }
+
+        return view('dashboard.checktext.update_page', compact('problem'));
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $problem = CheckText::find($id);
+        if (!$problem) {
+            return redirect()->route('dashboard.checktexts.index')
+                ->with('Error_message', 'نص الفحص غير موجود');
+        }
+
+        if ($request->isMethod('post')) {
+            $problem->delete();
+            return redirect()->route('dashboard.checktexts.index')
+                ->with('Success_message', 'تم حذف نص الفحص بنجاح');
+        }
+
+        return view('dashboard.checktext.delete_page', compact('problem'));
     }
 
 }

@@ -28,11 +28,9 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
-                                    data-target="#add_problem">
+                                <a href="{{ route('dashboard.speed_devices.create') }}" class="btn btn-primary btn-sm">
                                     اضافة جديد <i class="la la-plus"></i>
-                                </button>
-                                @include('dashboard.speed_device.create')
+                                </a>
                             </div>
                             <div class="card-content collapse show">
                                 <div class="card-body">
@@ -51,20 +49,15 @@
                                                         <th scope="row">{{ $loop->iteration }}</th>
                                                         <td> {{ $problem->name }} </td>
                                                         <td>
-                                                            <button type="button" class="btn btn-info btn-sm"
-                                                                data-toggle="modal"
-                                                                data-target="#update_problem_{{ $problem->id }}">
+                                                            <a href="{{ route('dashboard.speed_devices.update', $problem->id) }}" class="btn btn-info btn-sm">
                                                                 تعديل <i class="la la-edit"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-danger btn-sm"
-                                                                data-toggle="modal"
-                                                                data-target="#delete_problem_{{ $problem->id }}">
+                                                            </a>
+                                                            <a href="{{ route('dashboard.speed_devices.destroy', $problem->id) }}" class="btn btn-danger btn-sm">
                                                                 حذف <i class="la la-trash"></i>
-                                                            </button>
+                                                            </a>
                                                         </td>
                                                     </tr>
-                                                    @include('dashboard.speed_device.update')
-                                                    @include('dashboard.speed_device.delete')
+
                                                 @empty
                                                     <td colspan="4"> لا يوجد بيانات </td>
                                                 @endforelse

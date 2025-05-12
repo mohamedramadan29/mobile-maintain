@@ -56,7 +56,6 @@ Route::group([
     Route::controller(ResetPasswordController::class)->group(function () {
         Route::get('password/reset/{email}', 'ShowResetForm')->name('password.reset');
         Route::post('password/reset', 'resetpassword')->name('password.reset.post');
-
     });
 
     ############################### Start Admin Auth Route  ###############
@@ -80,7 +79,7 @@ Route::group([
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
                 // Route::post('store', 'store')->name('store')->middleware('can:roles');
                 Route::match(['get', 'post'], 'update/{id}', 'update')->name('update');
-                Route::post('destroy/{id}', 'destroy')->name('destroy');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
             });
         });
 
@@ -91,10 +90,10 @@ Route::group([
             Route::controller(AdminController::class)->group(function () {
                 Route::get('index', 'index')->name('index');
                 Route::get('tech', 'tech')->name('tech');
-                Route::post('update_tech/{id}', 'update_tech')->name('update_tech');
+                Route::match(['post', 'get'], 'update_tech/{id}', 'update_tech')->name('update_tech');
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
-                Route::post('destroy/{id}', 'destroy')->name('destroy');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
                 ######################### Show Tech Invoices  Admins ############################
                 Route::match(['post', 'get'], 'tech_invoices/{id}', 'tech_invoices')->name('tech_invoices');
             });
@@ -106,7 +105,7 @@ Route::group([
                 Route::get('index', 'index')->name('index');
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
-                Route::post('destroy/{id}', 'destroy')->name('destroy');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
             });
         });
         ##################### End Problem Category ###################
@@ -118,7 +117,7 @@ Route::group([
                 Route::get('index', 'index')->name('index');
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
-                Route::post('destroy/{id}', 'destroy')->name('destroy');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
             });
         });
         ###################### End  Problem Category Programe Device  #################
@@ -129,59 +128,59 @@ Route::group([
                 Route::get('index', 'index')->name('index');
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
-                Route::post('destroy/{id}', 'destroy')->name('destroy');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
             });
         });
         ###################### End  Problem Category Speed Device  #################
 
 
         ###################### Start Check Text  #################
-        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'check_text', 'as' => 'check_text.'], function () {
+        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'check_text', 'as' => 'checktexts.'], function () {
             Route::controller(CheckTextController::class)->group(function () {
                 Route::get('index', 'index')->name('index');
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
-                Route::post('destroy/{id}', 'destroy')->name('destroy');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
             });
         });
         ##################### End Check Text  ###################
         ###################### Start Speed Device   #################
-        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'speed_device', 'as' => 'speed_device.'], function () {
+        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'speed_device', 'as' => 'speed_devices.'], function () {
             Route::controller(SpeedDeviceController::class)->group(function () {
                 Route::get('index', 'index')->name('index');
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
-                Route::post('destroy/{id}', 'destroy')->name('destroy');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
             });
         });
         ##################### End Speed Device   ###################
         ###################### Start Programe Device   #################
-        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'programe_device', 'as' => 'programe_device.'], function () {
+        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'programe_device', 'as' => 'programe_devices.'], function () {
             Route::controller(ProgrameDeviceController::class)->group(function () {
                 Route::get('index', 'index')->name('index');
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
-                Route::post('destroy/{id}', 'destroy')->name('destroy');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
             });
         });
         ##################### End Programe Device  ###################
         ###################### Start PieceResource Controller   #################
-        Route::group(['middleware' => 'can:admins', 'prefix' => 'piece_resource', 'as' => 'piece_resource.'], function () {
+        Route::group(['middleware' => 'can:admins', 'prefix' => 'piece_resource', 'as' => 'piece_resources.'], function () {
             Route::controller(PieceResourceController::class)->group(function () {
                 Route::get('index', 'index')->name('index');
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
-                Route::post('destroy/{id}', 'destroy')->name('destroy');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
             });
         });
         ##################### End PieceResource Controller ###################
         ###################### Start MoreCheck Controller   #################
-        Route::group(['middleware' => 'can:admins', 'prefix' => 'more_check', 'as' => 'more_check.'], function () {
+        Route::group(['middleware' => 'can:admins', 'prefix' => 'more_check', 'as' => 'more_checks.'], function () {
             Route::controller(MoreCheckController::class)->group(function () {
                 Route::get('index', 'index')->name('index');
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
-                Route::post('destroy/{id}', 'destroy')->name('destroy');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
             });
         });
         ##################### End MoreCheck Controller ###################
@@ -191,16 +190,18 @@ Route::group([
                 Route::get('index', 'index')->name('index');
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
-                Route::post('destroy/{id}', 'destroy')->name('destroy');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
                 Route::get('invoice-haif-time', 'InvoicesHaifTime')->name('invoice-haif-time')->middleware('can:tech_invoices');
                 Route::post('delete_file/{id}', 'delete_file')->name('delete_file');
                 Route::get('print/{id}', 'print')->name('print');
                 Route::get('print_barcode/{id}', 'print_barcode')->name('print_barcode');
                 Route::get('steps/{id}', 'steps')->name('steps');
-                Route::post('add_tech/{id}', 'add_tech')->name('add_tech');
-                Route::post('delivery/{id}', 'delivery')->name('delivery');
-                Route::post('undelivery/{id}', 'undelivery')->name('undelivery');
-                Route::post('bulk_delete', 'bulkDelete')->name('bulk_delete');
+                Route::match(['post', 'get'], 'add_tech/{id}', 'add_tech')->name('add_tech');
+                //Route::post('add_tech/{id}', 'add_tech')->name('add_tech');
+                Route::match(['post', 'get'], 'delivery/{id}', 'delivery')->name('delivery');
+                Route::match(['post', 'get'], 'undelivery/{id}', 'undelivery')->name('undelivery');
+                Route::match(['post', 'get'], 'bulk_delete', 'bulkDelete')->name('bulk_delete');
+                Route::get('/invoices/bulk-delete-confirm', 'bulkDeleteConfirm')->name('bulk_delete_confirm');
             });
         });
 
@@ -246,6 +247,4 @@ Route::group([
         });
         ################# End Setting Controller ###############
     });
-
-
 });

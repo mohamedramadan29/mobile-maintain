@@ -111,39 +111,39 @@
 
                       </ul>
                   </li>
-                  <li class="nav-item {{ Route::is('dashboard.check_text.*') ? 'active' : '' }}"><a href="#"><i
+                  <li class="nav-item {{ Route::is('dashboard.checktexts.*') ? 'active' : '' }}"><a href="#"><i
                               class="la la-puzzle-piece"></i><span class="menu-title" data-i18n="nav.users.main"> ادارة
                               اساسيات الفحص
                           </span></a>
                       <ul class="menu-content">
-                          <li class="{{ Route::is('dashboard.check_text.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.check_text.index') }}"
+                          <li class="{{ Route::is('dashboard.checktexts.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.checktexts.index') }}"
                                   data-i18n="nav.users.user_profile"> اساسيات الفحص
                               </a>
                           </li>
 
                       </ul>
                   </li>
-                  <li class="nav-item {{ Route::is('dashboard.speed_device.*') ? 'active' : '' }}"><a href="#"><i
+                  <li class="nav-item {{ Route::is('dashboard.speed_devices.*') ? 'active' : '' }}"><a href="#"><i
                               class="la la-puzzle-piece"></i><span class="menu-title" data-i18n="nav.users.main"> ادارة
                               جهاز سريع
                           </span></a>
                       <ul class="menu-content">
-                          <li class="{{ Route::is('dashboard.speed_device.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.speed_device.index') }}"
+                          <li class="{{ Route::is('dashboard.speed_devices.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.speed_devices.index') }}"
                                   data-i18n="nav.users.user_profile"> جهاز سريع
                               </a>
                           </li>
                       </ul>
                   </li>
-                  <li class="nav-item {{ Route::is('dashboard.programe_device.*') ? 'active' : '' }}"><a
+                  <li class="nav-item {{ Route::is('dashboard.programe_devices.*') ? 'active' : '' }}"><a
                           href="#"><i class="la la-puzzle-piece"></i><span class="menu-title"
                               data-i18n="nav.users.main"> ادارة
                               جهاز برمجة
                           </span></a>
                       <ul class="menu-content">
-                          <li class="{{ Route::is('dashboard.programe_device.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.programe_device.index') }}"
+                          <li class="{{ Route::is('dashboard.programe_devices.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.programe_devices.index') }}"
                                   data-i18n="nav.users.user_profile"> جهاز برمجة
                               </a>
                           </li>
@@ -153,26 +153,26 @@
               @endcan
 
               @can('admins')
-                  <li class="nav-item {{ Route::is('dashboard.piece_resource.*') ? 'active' : '' }}"><a href="#"><i
+                  <li class="nav-item {{ Route::is('dashboard.piece_resources.*') ? 'active' : '' }}"><a href="#"><i
                               class="la la-puzzle-piece"></i><span class="menu-title" data-i18n="nav.users.main"> ادارة
                               مصدر القطع
                           </span></a>
                       <ul class="menu-content">
-                          <li class="{{ Route::is('dashboard.piece_resource.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.piece_resource.index') }}"
+                          <li class="{{ Route::is('dashboard.piece_resources.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.piece_resources.index') }}"
                                   data-i18n="nav.users.user_profile"> مصدر القطع
                               </a>
                           </li>
 
                       </ul>
                   </li>
-                  <li class="nav-item {{ Route::is('dashboard.more_check.*') ? 'active' : '' }}"><a href="#"><i
+                  <li class="nav-item {{ Route::is('dashboard.more_checks.*') ? 'active' : '' }}"><a href="#"><i
                               class="la la-puzzle-piece"></i><span class="menu-title" data-i18n="nav.users.main">
                                 خيارات اضافية للفحص
                           </span></a>
                       <ul class="menu-content">
-                          <li class="{{ Route::is('dashboard.more_check.index') ? 'active' : '' }}">
-                              <a class="menu-item" href="{{ route('dashboard.more_check.index') }}"
+                          <li class="{{ Route::is('dashboard.more_checks.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.more_checks.index') }}"
                                   data-i18n="nav.users.user_profile"> خيارات اضافية للفحص
                               </a>
                           </li>

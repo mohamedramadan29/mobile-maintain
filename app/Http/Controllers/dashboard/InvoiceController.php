@@ -43,7 +43,6 @@ class InvoiceController extends Controller
     public function index(Request $request)
     {
         $query = Invoice::query();
-
         // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
         if ($request->has('invoice_status') && !empty($request->invoice_status)) {
 
@@ -64,65 +63,104 @@ class InvoiceController extends Controller
 
         return view('dashboard.invoices.index', compact('invoices', 'techs'));
     }
-    public function bulkDelete(Request $request)
-    {
-        $ids = explode(',', $request->invoice_ids);
+    // public function bulkDelete(Request $request)
+    // {
+    //     $ids = explode(',', $request->invoice_ids);
+    //     if (!empty($ids)) {
+    //         Invoice::whereIn('id', $ids)->delete();
+    //         return $this->success_message('تم حذف الفواتير المحددة بنجاح');
+    //     }
 
-        if (!empty($ids)) {
-            Invoice::whereIn('id', $ids)->delete();
-            return $this->success_message('تم حذف الفواتير المحددة بنجاح');
+    //     return $this->error_message('لم يتم تحديد أي فواتير');
+    // }
+
+    public function bulkDeleteConfirm(Request $request)
+    {
+        // الحصول على معرفات الفواتير من معلمات الاستعلام
+        $invoiceIds = explode(',', $request->query('invoice_ids', ''));
+
+        // التحقق من معرفات الفواتير
+        if (empty($invoiceIds) || !is_array($invoiceIds)) {
+            return redirect()->back()->with('error', 'لم يتم اختيار أي فواتير.');
         }
 
-        return $this->error_message('لم يتم تحديد أي فواتير');
+        // جلب الفواتير
+        $invoices = Invoice::whereIn('id', $invoiceIds)->get();
+
+        return view('dashboard.invoices.bulk_delete_confirm', compact('invoices', 'invoiceIds'));
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        // التحقق من الإدخال
+        $request->validate([
+            'invoice_ids' => 'required',
+        ]);
+
+        // الحصول على معرفات الفواتير
+        $invoiceIds = explode(',', $request->input('invoice_ids'));
+
+        // حذف الفواتير
+        Invoice::whereIn('id', $invoiceIds)->delete();
+
+        return redirect()->route('dashboard.invoices.index')->with('Success_message', 'تم حذف الفواتير المختارة بنجاح.');
     }
 
     public function delivery(Request $reques, $id)
     {
         $invoice = Invoice::findOrFail($id);
-        $invoice->delivery_status  = 1;
-        $invoice->save();
-        ############ Send Message To Client ###########
-        $message_temp = Message::where('message_type', 'تسليم الجهاز')->value('template_text');
-        //dd($message_temp);
-        ########## Send Message To Client
-        $new_phone = preg_replace('/^0/', '', $invoice->phone);
-        // إضافة رمز البلد +966
-        $new_phone = '966' . $new_phone;
-        $message = str_replace(
-            ['{name}'],
-            [$invoice->name],
-            $message_temp
-        );
-        // dd($message);
-        // تعريف المتغير
-        $params = array(
-            'instanceid' => '138796',
-            'token' => '3fc4ad69-3ea3-4307-923c-7080f7aa0d8e',
-            'phone' => $new_phone,
-            'body' => $message,
-        );
-        $queryString = http_build_query($params); // تحويل المصفوفة إلى سلسلة نصية
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.4whats.net/sendMessage/?" . $queryString, // إضافة سلسلة الاستعلام إلى عنوان URL
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        return $this->success_message('تم تسليم الجهاز بنجاح');
+        if ($reques->isMethod('post')) {
+            $invoice->delivery_status  = 1;
+            $invoice->save();
+            ############ Send Message To Client ###########
+            $message_temp = Message::where('message_type', 'تسليم الجهاز')->value('template_text');
+            //dd($message_temp);
+            ########## Send Message To Client
+            $new_phone = preg_replace('/^0/', '', $invoice->phone);
+            // إضافة رمز البلد +966
+            $new_phone = '966' . $new_phone;
+            $message = str_replace(
+                ['{name}'],
+                [$invoice->name],
+                $message_temp
+            );
+            // dd($message);
+            // تعريف المتغير
+            $params = array(
+                'instanceid' => '138796',
+                'token' => '3fc4ad69-3ea3-4307-923c-7080f7aa0d8e',
+                'phone' => $new_phone,
+                'body' => $message,
+            );
+            $queryString = http_build_query($params); // تحويل المصفوفة إلى سلسلة نصية
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://api.4whats.net/sendMessage/?" . $queryString, // إضافة سلسلة الاستعلام إلى عنوان URL
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "GET",
+            ));
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+            curl_close($curl);
+            return redirect()->route('dashboard.invoices.index')->with('Success_message', 'تم تسليم الجهاز بنجاح');
+        }
+        return view('dashboard.invoices.delivery_status', compact('invoice'));
     }
+
     public function undelivery(Request $request, $id)
     {
+        if ($request->isMethod('post')) {
+            $invoice = Invoice::findOrFail($id);
+            $invoice->delivery_status  = 0;
+            $invoice->save();
+            return redirect()->route('dashboard.invoices.index')->with('Success_message', 'تم عودة الجهاز بنجاح');
+        }
         $invoice = Invoice::findOrFail($id);
-        $invoice->delivery_status  = 0;
-        $invoice->save();
-        return $this->success_message('تم عودة الجهاز بنجاح');
+        return view('dashboard.invoices.undelivery_status', compact('invoice'));
     }
     public function create(Request $request)
     {
@@ -361,7 +399,7 @@ class InvoiceController extends Controller
                 curl_close($curl);
                 DB::commit();
                 /// Need Go to Print Code
-                //  return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
+                return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
 
 
                 //return $this->success_message(' تم اضافة الفاتورة بنجاح');
@@ -563,21 +601,25 @@ class InvoiceController extends Controller
             'invoice_more_checks'
         ));
     }
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        try {
-            $invoice = Invoice::find($id);
-            ////////// Delete Files
-            $files = InvoiceImage::where('invoice_id', $id)->get();
-            foreach ($files as $file) {
-                @unlink(public_path('assets/uploads/invoices_files/' . $file->image));
-                $file->delete();
+        if ($request->isMethod('post')) {
+            try {
+                $invoice = Invoice::find($id);
+                ////////// Delete Files
+                $files = InvoiceImage::where('invoice_id', $id)->get();
+                foreach ($files as $file) {
+                    @unlink(public_path('assets/uploads/invoices_files/' . $file->image));
+                    $file->delete();
+                }
+                $invoice->delete();
+                return redirect()->route('dashboard.invoices.index')->with('Success_message', ' تم حذف الفاتورة بنجاح');
+            } catch (Exception $e) {
+                return $this->exception_message($e);
             }
-            $invoice->delete();
-            return $this->success_message(' تم حذف الفاتورة بنجاح');
-        } catch (Exception $e) {
-            return $this->exception_message($e);
         }
+        $invoice = Invoice::find($id);
+        return view('dashboard.invoices.delete', compact('invoice'));
     }
 
     public function delete_file($id)
@@ -605,22 +647,27 @@ class InvoiceController extends Controller
         return view('dashboard.invoices.steps', compact('steps', 'invoice'));
     }
 
-    public function add_tech(Request $reques, $id)
+    public function add_tech(Request $request, $id)
     {
-        DB::beginTransaction();
+        if ($request->isMethod('post')) {
+            DB::beginTransaction();
+            $invoice = Invoice::find($id);
+            $invoice->admin_repair_id = $request->admin_repair_id;
+            $invoice->status = 'تحت الصيانة';
+            $invoice->checkout_time = now();
+            $invoice->save();
+            ############# Add Invoice Step ###############
+            $invoice_step = new InvoiceSteps();
+            $invoice_step->invoice_id = $invoice->id;
+            $invoice_step->admin_id = Auth::id();
+            $invoice_step->step_details = ' تم تعين فني من جانب المدير  ';
+            $invoice_step->save();
+            DB::commit();
+            return redirect()->route('dashboard.invoices.index')->with('Success_message', 'تم تعين فني من جانب المدير  بنجاح');
+        }
+        $techs = Admin::where('type', 'فني')->get();
         $invoice = Invoice::find($id);
-        $invoice->admin_repair_id = $reques->admin_repair_id;
-        $invoice->status = 'تحت الصيانة';
-        $invoice->checkout_time = now();
-        $invoice->save();
-        ############# Add Invoice Step ###############
-        $invoice_step = new InvoiceSteps();
-        $invoice_step->invoice_id = $invoice->id;
-        $invoice_step->admin_id = Auth::id();
-        $invoice_step->step_details = ' تم تعين فني من جانب المدير  ';
-        $invoice_step->save();
-        DB::commit();
-        return $this->success_message('تم تعين فني من جانب المدير  بنجاح');
+        return view('dashboard.invoices.add_tech_invoice', compact('techs', 'invoice'));
     }
 
     ################# Start Print BarCode ################

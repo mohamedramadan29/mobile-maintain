@@ -18,29 +18,55 @@ class MoreCheckController extends Controller
 
     public function create(Request $request)
     {
-        $request->validate([
-            'name' => 'required|unique:check_texts,name',
-        ]);
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'name' => 'required|unique:invoice_more_checks,name',
+            ]);
 
-        InvoiceMoreCheck::create(
-            ['name' => $request->name]
-        );
-        return $this->success_message(' تم اضافة   بنجاح');
+            InvoiceMoreCheck::create([
+                'name' => $request->name
+            ]);
+            return redirect()->route('dashboard.more_checks.index')
+                ->with('Success_message', 'تم اضافة الفحص الاضافي بنجاح');
+        }
+        return view('dashboard.more_check.create_page');
     }
 
-    public function update(Request $request, $id){
-        $data = $request->all();
-        $problem = InvoiceMoreCheck::find($id);
-        $problem->name = $data['name'];
-        $problem->save();
-        return $this->success_message(' تم تعديل   بنجاح');
-    }
-
-    public function destroy($id)
+    public function update(Request $request, $id)
     {
         $problem = InvoiceMoreCheck::find($id);
+        if (!$problem) {
+            return redirect()->route('dashboard.more_checks.index')
+                ->with('Error_message', 'الفحص الاضافي غير موجود');
+        }
 
-        $problem->delete();
-        return $this->success_message(' تم حذف   بنجاح');
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'name' => 'required|unique:invoice_more_checks,name,' . $problem->id,
+            ]);
+            $problem->name = $request->name;
+            $problem->save();
+            return redirect()->route('dashboard.more_checks.index')
+                ->with('Success_message', 'تم تعديل الفحص الاضافي بنجاح');
+        }
+
+        return view('dashboard.more_check.update_page', compact('problem'));
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $problem = InvoiceMoreCheck::find($id);
+        if (!$problem) {
+            return redirect()->route('dashboard.more_checks.index')
+                ->with('Error_message', 'الفحص الاضافي غير موجود');
+        }
+
+        if ($request->isMethod('post')) {
+            $problem->delete();
+            return redirect()->route('dashboard.more_checks.index')
+                ->with('Success_message', 'تم حذف الفحص الاضافي بنجاح');
+        }
+
+        return view('dashboard.more_check.delete_page', compact('problem'));
     }
 }

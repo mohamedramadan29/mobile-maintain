@@ -67,12 +67,16 @@ class RolesController extends Controller
         return view('dashboard.roles.edit',compact('role'));
     }
 
-    public function destroy($id){
+    public function destroy(Request $request,$id){
         $role = Role::find($id);
-        if(!$role || $role->admins()->count() > 0){
-            return $this->error_message('لا يمكن حذف الصلاحية لانها مرتبطة بالادمن');
+        if($request->isMethod('post')){
+
+            if(!$role || $role->admins()->count() > 0){
+                return $this->error_message('لا يمكن حذف الصلاحية لانها مرتبطة بالادمن');
+            }
+            $role->delete();
+            return redirect()->route('dashboard.roles.index')->with('Success_message', ' تم حذف الصلاحية بنجاح');
         }
-        $role->delete();
-        return $this->success_message(' تم حذف الصلاحية بنجاح');
+        return view('dashboard.roles.delete',compact('role'));
     }
 }

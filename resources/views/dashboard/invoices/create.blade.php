@@ -443,7 +443,8 @@
                                                         <!-- زر إضافة تفاصيل السعر -->
                                                         <div class="form-group">
                                                             <button type="button" class="btn btn-sm btn-primary"
-                                                                onclick="addPriceDetail()"> <i class="la la-plus"></i> إضافة تفاصيل السعر</button>
+                                                                onclick="addPriceDetail()"> <i class="la la-plus"></i>
+                                                                إضافة تفاصيل السعر</button>
                                                         </div>
 
                                                         <!-- حاوية تفاصيل السعر -->
@@ -480,12 +481,14 @@
                                                                 class="required_span"> * </span> </label>
                                                         <div class="justify-between d-flex flex-column">
                                                             <div class="form-group" style="min-width: 100%">
-                                                                    <input required type="date" name="date_delivery" class="form-control"
-                                                                        value="{{ old('date_delivery') }}">
+                                                                <input required type="date" name="date_delivery"
+                                                                    class="form-control"
+                                                                    value="{{ old('date_delivery') }}">
                                                             </div>
                                                             <div class="form-group" style="min-width: 100%">
-                                                                    <input required type="time" name="time_delivery"  class="form-control"
-                                                                        value="{{ old('time_delivery') }}">
+                                                                <input required type="time" name="time_delivery"
+                                                                    class="form-control"
+                                                                    value="{{ old('time_delivery') }}">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -800,7 +803,15 @@
                                                 </button>
                                                 <p id="loadingMessage" class="mt-2 text-info" style="display: none;">⏳
                                                     جاري رفع البيانات، الرجاء الانتظار...</p>
-
+                                                <p id="signatureError" class="mt-2 text-danger" style="display: none;">
+                                                    الرجاء التوقيع على الفاتورة
+                                                </p>
+                                                <p id="ImagesError" class="mt-2 text-danger" style="display: none;">
+                                                    الرجاء رفع صورة من الفاتورة
+                                                </p>
+                                                <p id="ChecksError" class="mt-2 text-danger" style="display: none;">
+                                                    من فضلك حدد الاعطال المناسبة حسب نوع الفحص
+                                                </p>
                                             </div>
                                         </form>
 
@@ -844,14 +855,16 @@
                                                     let checkedCount = activeProblemContainer.querySelectorAll('input[type="checkbox"]:checked').length;
                                                     if (checkedCount === 0) {
                                                         e.preventDefault();
-                                                        alert("من فضلك حدد الاعطال المناسبة حسب نوع الفحص");
+                                                        ChecksError.style.display = 'block';
+                                                       // ChecksError.textContent = 'من فضلك حدد الاعطال المناسبة حسب نوع الفحص';
                                                         return;
                                                     }
                                                 }
 
                                                 if (signaturePad.isEmpty()) {
                                                     e.preventDefault();
-                                                    alert("الرجاء التوقيع");
+                                                    signatureError.style.display = 'block';
+                                                    //  signatureError.textContent = 'الرجاء التوقيع على الفاتورة';
                                                 } else {
                                                     signatureInput.value = signaturePad.toDataURL();
 

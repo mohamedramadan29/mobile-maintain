@@ -18,30 +18,55 @@ class SpeedDeviceController extends Controller
 
     public function create(Request $request)
     {
-        $request->validate([
-            'name' => 'required|unique:check_texts,name',
-        ]);
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'name' => 'required|unique:speed_devices,name',
+            ]);
 
-        SpeedDevice::create(
-            ['name' => $request->name]
-        );
-        return $this->success_message(' تم اضافة   بنجاح');
+            SpeedDevice::create([
+                'name' => $request->name
+            ]);
+            return redirect()->route('dashboard.speed_devices.index')
+                ->with('Success_message', 'تم اضافة جهاز السرعة بنجاح');
+        }
+        return view('dashboard.speed_device.create_page');
     }
 
     public function update(Request $request, $id)
     {
-        $data = $request->all();
         $problem = SpeedDevice::find($id);
-        $problem->name = $data['name'];
-        $problem->save();
-        return $this->success_message(' تم تعديل   بنجاح');
+        if (!$problem) {
+            return redirect()->route('dashboard.speed_devices.index')
+                ->with('Error_message', 'جهاز السرعة غير موجود');
+        }
+
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'name' => 'required|unique:speed_devices,name,' . $problem->id,
+            ]);
+            $problem->name = $request->name;
+            $problem->save();
+            return redirect()->route('dashboard.speed_devices.index')
+                ->with('Success_message', 'تم تعديل جهاز السرعة بنجاح');
+        }
+
+        return view('dashboard.speed_device.update_page', compact('problem'));
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $problem = SpeedDevice::find($id);
+        if (!$problem) {
+            return redirect()->route('dashboard.speed_devices.index')
+                ->with('Error_message', 'جهاز السرعة غير موجود');
+        }
 
-        $problem->delete();
-        return $this->success_message(' تم حذف   بنجاح');
+        if ($request->isMethod('post')) {
+            $problem->delete();
+            return redirect()->route('dashboard.speed_devices.index')
+                ->with('Success_message', 'تم حذف جهاز السرعة بنجاح');
+        }
+
+        return view('dashboard.speed_device.delete_page', compact('problem'));
     }
 }

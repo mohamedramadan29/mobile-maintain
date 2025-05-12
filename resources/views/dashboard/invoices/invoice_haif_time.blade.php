@@ -95,7 +95,7 @@
                                                             {{ $invoice->date_delivery }} - {{ $invoice->time_delivery }}
                                                         </td>
                                                         <td>
-                                                            <div class="mb-1 mr-1 btn-group">
+                                                            <div class="mr-1 mb-1 btn-group">
                                                                 <button type="button"
                                                                     class="btn btn-primary btn-block dropdown-toggle btn-sm"
                                                                     data-toggle="dropdown" aria-haspopup="true"
@@ -115,10 +115,8 @@
                                                                     <a href="{{ route('dashboard.invoices.steps', $invoice->id) }}"
                                                                         class="dropdown-item" type="button"> حركة حساب
                                                                         الفاتورة </a>
-                                                                    <button class="dropdown-item" type="button"
-                                                                        data-toggle="modal"
-                                                                        data-target="#delete_invoice_{{ $invoice->id }}">
-                                                                        حذف </button>
+                                                                        <a href="{{ route('dashboard.invoices.destroy', $invoice->id) }}"
+                                                                            class="dropdown-item" type="button"> حذف </a>
 
                                                                 </div>
                                                             </div>
@@ -126,14 +124,12 @@
                                                     </tr>
                                                     <div class="form-group">
                                                     </div>
-                                                    @include('dashboard.invoices.delete')
-                                                    @include('dashboard.invoices.add_tech_invoice')
                                                 @empty
                                                     <td colspan="4"> لا يوجد بيانات </td>
                                                 @endforelse
                                             </tbody>
                                         </table>
-                                         
+
                                     </div>
                                 </div>
 

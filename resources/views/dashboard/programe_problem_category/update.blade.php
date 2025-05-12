@@ -14,18 +14,33 @@
             <div class="modal-body">
                 <form action="{{ route('dashboard.programe_problem_categories.update', $problem->id) }}" method="POST">
                     @csrf
-                    <div>
-                        <label> الاسم </label>
-                        <input type="text" class="form-control" name="name" value="{{ $problem->name }}">
+                    <div class="form-group">
+                        <label class="required"> الاسم </label>
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                            name="name" value="{{ old('name', $problem->name) }}" required>
+                        @error('name')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
                     </div>
-                    <div>
-                        <label> عدد الدقائق للاصلاح  </label>
-                        <input type="number" min="1" class="form-control" name="solved_time" value="{{ $problem->solved_time }}">
+                    <div class="form-group">
+                        <label class="required"> عدد الدقائق للاصلاح </label>
+                        <input type="number" min="1" class="form-control @error('solved_time') is-invalid @enderror" 
+                            name="solved_time" value="{{ old('solved_time', $problem->solved_time) }}" required>
+                        @error('solved_time')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn grey btn-outline-secondary" data-dismiss="modal">رجوع
+                        <button type="button" class="btn grey btn-outline-secondary" data-dismiss="modal">
+                            <i class="la la-times"></i> رجوع
                         </button>
-                        <button type="submit" class="btn btn-outline-primary"> تعديل </button>
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="la la-check-square"></i> تعديل
+                        </button>
                     </div>
                 </form>
             </div>

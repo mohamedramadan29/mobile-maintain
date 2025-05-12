@@ -124,15 +124,17 @@ class AdminController extends Controller
         $roles = Role::all();
         return view('dashboard.admins.update', compact('admin', 'roles'));
     }
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-
         $admin = Admin::find($id);
-        if ($admin->id == 1) {
-            return $this->Error_message('لا يمكن حذف المستخدم المدير');
+        if ($request->isMethod('post')) {
+            if ($admin->id == 1) {
+                return $this->Error_message('لا يمكن حذف المستخدم المدير');
+            }
+            $admin->delete();
+            return redirect()->route('dashboard.admins.index')->with('Success_message', 'تم حذف المستخدم بنجاح');
         }
-        $admin->delete();
-        return $this->success_message('تم حذف المستخدم بنجاح');
+        return view('dashboard.admins.delete', compact('admin'));
     }
 
     ################### Tech Admins الفنيين #######################
@@ -147,15 +149,23 @@ class AdminController extends Controller
 
     public function update_tech(Request $request, $id)
     {
-        $data = $request->all();
         $admin = Admin::find($id);
         if (!$admin) {
             return $this->Error_message('لا يوجد مستخدم بهذا الرقم');
         }
-        $admin->device_nums = $data['device_nums'];
-        $admin->problems = json_encode($data['problems']);
-        $admin->save();
-        return $this->success_message('تم تعديل الصلاحيات بنجاح');
+
+        if ($request->isMethod('post')) {
+            $data = $request->all();
+            $admin->device_nums = $data['device_nums'];
+            $admin->problems = json_encode($data['problems'] ?? []);
+            $admin->save();
+            return $this->success_message('تم تعديل الصلاحيات بنجاح');
+        }
+
+        $problems = ProblemCategory::all();
+        $programe_problems = ProgrameProblemCategory::all();
+        $speed_problems = SpeedProblemCategory::all();
+        return view('dashboard.admins.update_tech_page', compact('admin', 'problems', 'programe_problems', 'speed_problems'));
     }
 
     ###################### Get The Tech Invoices #######################
@@ -177,5 +187,4 @@ class AdminController extends Controller
 
         return view('dashboard.admins.tech_invoices', compact('invoices', 'id', 'totalInvoices'));
     }
-
 }

@@ -18,34 +18,58 @@ class SpeedProblemCategoryController extends Controller
 
     public function create(Request $request)
     {
-        $request->validate([
-            'name' => 'required|unique:problem_categories,name',
-            'solved_time'=>'required'
-        ]);
-        SpeedProblemCategory::create(
-            [
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'name' => 'required|unique:speed_problem_categories,name',
+                'solved_time'=>'required'
+            ]);
+            SpeedProblemCategory::create([
                 'name' => $request->name,
                 'solved_time'=>$request->solved_time,
-                ]
-        );
-        return $this->success_message(' تم اضافة القسم بنجاح');
+            ]);
+            return redirect()->route('dashboard.speed_problem_categories.index')
+                ->with('Success_message', 'تم اضافة قسم مشكلة السرعة بنجاح');
+        }
+        return view('dashboard.speed_problem_category.create_page');
     }
 
-    public function update(Request $request, $id){
-        $data = $request->all();
+    public function update(Request $request, $id) {
         $problem = SpeedProblemCategory::find($id);
-        $problem->name = $data['name'];
-        $problem->solved_time = $data['solved_time'];
-        $problem->save();
-        return $this->success_message(' تم تعديل القسم بنجاح');
+        if (!$problem) {
+            return redirect()->route('dashboard.speed_problem_categories.index')
+                ->with('Error_message', 'قسم مشكلة السرعة غير موجود');
+        }
+
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'name' => 'required|unique:speed_problem_categories,name,' . $problem->id,
+                'solved_time' => 'required'
+            ]);
+            $problem->name = $request->name;
+            $problem->solved_time = $request->solved_time;
+            $problem->save();
+            return redirect()->route('dashboard.speed_problem_categories.index')
+                ->with('Success_message', 'تم تعديل قسم مشكلة السرعة بنجاح');
+        }
+
+        return view('dashboard.speed_problem_category.update_page', compact('problem'));
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $problem = SpeedProblemCategory::find($id);
+        if (!$problem) {
+            return redirect()->route('dashboard.speed_problem_categories.index')
+                ->with('Error_message', 'قسم مشكلة السرعة غير موجود');
+        }
 
-        $problem->delete();
-        return $this->success_message(' تم حذف القسم بنجاح');
+        if ($request->isMethod('post')) {
+            $problem->delete();
+            return redirect()->route('dashboard.speed_problem_categories.index')
+                ->with('Success_message', 'تم حذف قسم مشكلة السرعة بنجاح');
+        }
+
+        return view('dashboard.speed_problem_category.delete_page', compact('problem'));
     }
 
 }

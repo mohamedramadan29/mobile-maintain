@@ -18,30 +18,55 @@ class ProgrameDeviceController extends Controller
 
     public function create(Request $request)
     {
-        $request->validate([
-            'name' => 'required|unique:check_texts,name',
-        ]);
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'name' => 'required|unique:programe_devices,name',
+            ]);
 
-        ProgrameDevice::create(
-            ['name' => $request->name]
-        );
-        return $this->success_message(' تم اضافة   بنجاح');
+            ProgrameDevice::create([
+                'name' => $request->name
+            ]);
+            return redirect()->route('dashboard.programe_devices.index')
+                ->with('Success_message', 'تم اضافة جهاز البرمجة بنجاح');
+        }
+        return view('dashboard.programe_device.create_page');
     }
 
     public function update(Request $request, $id)
     {
-        $data = $request->all();
         $problem = ProgrameDevice::find($id);
-        $problem->name = $data['name'];
-        $problem->save();
-        return $this->success_message(' تم تعديل   بنجاح');
+        if (!$problem) {
+            return redirect()->route('dashboard.programe_devices.index')
+                ->with('Error_message', 'جهاز البرمجة غير موجود');
+        }
+
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'name' => 'required|unique:programe_devices,name,' . $problem->id,
+            ]);
+            $problem->name = $request->name;
+            $problem->save();
+            return redirect()->route('dashboard.programe_devices.index')
+                ->with('Success_message', 'تم تعديل جهاز البرمجة بنجاح');
+        }
+
+        return view('dashboard.programe_device.update_page', compact('problem'));
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $problem = ProgrameDevice::find($id);
+        if (!$problem) {
+            return redirect()->route('dashboard.programe_devices.index')
+                ->with('Error_message', 'جهاز البرمجة غير موجود');
+        }
 
-        $problem->delete();
-        return $this->success_message(' تم حذف   بنجاح');
+        if ($request->isMethod('post')) {
+            $problem->delete();
+            return redirect()->route('dashboard.programe_devices.index')
+                ->with('Success_message', 'تم حذف جهاز البرمجة بنجاح');
+        }
+
+        return view('dashboard.programe_device.delete_page', compact('problem'));
     }
 }

@@ -61,20 +61,12 @@
                                                             <a class="btn btn-info btn-sm"
                                                                 href="{{ route('dashboard.roles.update', $role->id) }}"><i
                                                                     class="la la-edit"></i> تعديل </a>
-                                                            <button type="button"
-                                                                class="btn btn-danger btn-sm"
-                                                                data-toggle="modal"
-                                                                data-target="#delete_permision_{{ $role->id }}">
+                                                            <a href="{{ route('dashboard.roles.destroy', $role->id) }}"
+                                                                class="btn btn-danger btn-sm" >
                                                                 حذف <i class="la la-trash"></i>
-                                                            </button>
+                                                            </a>
                                                         </td>
-                                                    </tr>
-                                                    <div class="form-group">
-
-
-
-                                                    </div>
-                                                    @include('dashboard.roles.delete')
+                                                    </tr> 
                                                 @empty
                                                     <td colspan="4"> لا يوجد بيانات </td>
                                                 @endforelse
