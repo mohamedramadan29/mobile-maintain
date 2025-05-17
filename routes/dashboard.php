@@ -203,6 +203,7 @@ Route::group([
                 Route::match(['post', 'get'], 'bulk_delete', 'bulkDelete')->name('bulk_delete');
                 Route::get('/invoices/bulk-delete-confirm', 'bulkDeleteConfirm')->name('bulk_delete_confirm');
                 Route::get('barcode/preview/{id}', 'preview_barcode')->name('barcode.preview');
+                Route::post('send_message/{id}', 'SendMessage')->name('send_message');
             });
         });
 

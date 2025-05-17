@@ -6,6 +6,7 @@ use Exception;
 use Mpdf\Mpdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Jobs\SendCreateMessage;
 use App\Models\dashboard\Admin;
 use App\Models\dashboard\Invoice;
 use App\Models\dashboard\Message;
@@ -13,6 +14,7 @@ use App\Http\Traits\Message_Trait;
 use App\Http\Traits\Upload_Images;
 use Illuminate\Support\Facades\DB;
 use App\Models\dashboard\CheckText;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -27,9 +29,9 @@ use Picqer\Barcode\BarcodeGeneratorPNG;
 use App\Models\dashboard\ProgrameDevice;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\dashboard\ProblemCategory;
+// use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Validator;
 use App\Models\dashboard\InvoiceMoreCheck;
-// use Intervention\Image\Facades\Image;
 use App\Models\dashboard\InvoiceSpeedCheck;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\dashboard\InvoicePrograneCheck;
@@ -63,16 +65,7 @@ class InvoiceController extends Controller
 
         return view('dashboard.invoices.index', compact('invoices', 'techs'));
     }
-    // public function bulkDelete(Request $request)
-    // {
-    //     $ids = explode(',', $request->invoice_ids);
-    //     if (!empty($ids)) {
-    //         Invoice::whereIn('id', $ids)->delete();
-    //         return $this->success_message('تم حذف الفواتير المحددة بنجاح');
-    //     }
 
-    //     return $this->error_message('لم يتم تحديد أي فواتير');
-    // }
 
     public function bulkDeleteConfirm(Request $request)
     {
@@ -106,36 +99,30 @@ class InvoiceController extends Controller
         return redirect()->route('dashboard.invoices.index')->with('Success_message', 'تم حذف الفواتير المختارة بنجاح.');
     }
 
-    public function delivery(Request $reques, $id)
+    public function delivery(Request $request, $id)
     {
         $invoice = Invoice::findOrFail($id);
-        if ($reques->isMethod('post')) {
-            $invoice->delivery_status  = 1;
-            $invoice->save();
-            ############ Send Message To Client ###########
+
+        if ($request->isMethod('post')) {
+            // إعداد الرسالة المرسلة للعميل
             $message_temp = Message::where('message_type', 'تسليم الجهاز')->value('template_text');
-            //dd($message_temp);
-            ########## Send Message To Client
             $new_phone = preg_replace('/^0/', '', $invoice->phone);
-            // إضافة رمز البلد +966
-            $new_phone = '966' . $new_phone;
-            $message = str_replace(
-                ['{name}'],
-                [$invoice->name],
-                $message_temp
-            );
-            // dd($message);
-            // تعريف المتغير
+            $new_phone = '966' . $new_phone; // إضافة رمز البلد +966
+            $message = str_replace(['{name}'], [$invoice->name], $message_temp);
+
+            // إعداد الطلب لإرسال الرسالة عبر API
             $params = array(
                 'instanceid' => '138796',
                 'token' => '3fc4ad69-3ea3-4307-923c-7080f7aa0d8e',
                 'phone' => $new_phone,
                 'body' => $message,
             );
-            $queryString = http_build_query($params); // تحويل المصفوفة إلى سلسلة نصية
+            $queryString = http_build_query($params);
+
+            // إرسال الرسالة باستخدام cURL
             $curl = curl_init();
             curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://api.4whats.net/sendMessage/?" . $queryString, // إضافة سلسلة الاستعلام إلى عنوان URL
+                CURLOPT_URL => "https://api.4whats.net/sendMessage/?" . $queryString,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => "",
                 CURLOPT_MAXREDIRS => 10,
@@ -143,25 +130,128 @@ class InvoiceController extends Controller
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => "GET",
             ));
+
             $response = curl_exec($curl);
             $err = curl_error($curl);
             curl_close($curl);
-            return redirect()->route('dashboard.invoices.index')->with('Success_message', 'تم تسليم الجهاز بنجاح');
+
+            // التحقق من نتيجة الإرسال
+            if ($err) {
+                // تسجيل الخطأ في حالة وجود مشكلة في الاتصال
+                Log::error('Failed to send WhatsApp message due to connection error', [
+                    'phone' => $new_phone,
+                    'error' => $err,
+                ]);
+                return redirect()->route('dashboard.invoices.index')
+                    ->with('Error_message', 'فشل إرسال الرسالة بسبب مشكلة في الاتصال، لم يتم تسليم الجهاز');
+            }
+
+            // تحليل استجابة الـ API
+            $responseData = json_decode($response, true);
+            if (isset($responseData['sent']) && $responseData['sent'] === true) {
+                // الرسالة تم إرسالها بنجاح، قم بتسليم الجهاز
+                $invoice->delivery_status = 1;
+                $invoice->save();
+
+                Log::info('WhatsApp message sent successfully and device delivered', [
+                    'phone' => $new_phone,
+                    'response' => $responseData,
+                ]);
+                return redirect()->route('dashboard.invoices.index')
+                    ->with('Success_message', 'تم تسليم الجهاز وإرسال الرسالة بنجاح');
+            } else {
+                // تسجيل الخطأ في حالة فشل الإرسال
+                $errorMessage = $responseData['message'] ?? 'سبب غير معروف';
+                Log::error('Failed to send WhatsApp message', [
+                    'phone' => $new_phone,
+                    'response' => $responseData,
+                ]);
+                return redirect()->route('dashboard.invoices.index')
+                    ->with('Error_message', 'فشل إرسال الرسالة: ' . $errorMessage . '، لم يتم تسليم الجهاز');
+            }
         }
+
+        // عرض صفحة تسليم الفاتورة
         return view('dashboard.invoices.delivery_status', compact('invoice'));
     }
 
     public function undelivery(Request $request, $id)
     {
         if ($request->isMethod('post')) {
+            // البحث عن الفاتورة
             $invoice = Invoice::findOrFail($id);
-            $invoice->delivery_status  = 0;
-            $invoice->save();
-            return redirect()->route('dashboard.invoices.index')->with('Success_message', 'تم عودة الجهاز بنجاح');
+
+            // إعداد الرسالة المرسلة للعميل
+            $message_temp = Message::where('message_type', 'عودة الجهاز')->value('template_text');
+            $new_phone = preg_replace('/^0/', '', $invoice->phone);
+            $new_phone = '966' . $new_phone; // إضافة رمز البلد +966
+            $message = str_replace(['{name}'], [$invoice->name], $message_temp);
+
+            // إعداد الطلب لإرسال الرسالة عبر API
+            $params = array(
+                'instanceid' => '138796',
+                'token' => '3fc4ad69-3ea3-4307-923c-7080f7aa0d8e',
+                'phone' => $new_phone,
+                'body' => $message,
+            );
+            $queryString = http_build_query($params);
+
+            // إرسال الرسالة باستخدام cURL
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://api.4whats.net/sendMessage/?" . $queryString,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "GET",
+            ));
+
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+            curl_close($curl);
+
+            // التحقق من نتيجة الإرسال
+            if ($err) {
+                // تسجيل الخطأ في حالة وجود مشكلة في الاتصال
+                Log::error('Failed to send WhatsApp message due to connection error', [
+                    'phone' => $new_phone,
+                    'error' => $err,
+                ]);
+                return redirect()->route('dashboard.invoices.index')
+                    ->with('Error_message', 'فشل إرسال الرسالة بسبب مشكلة في الاتصال، لم يتم إرجاع الجهاز');
+            }
+
+            // تحليل استجابة الـ API
+            $responseData = json_decode($response, true);
+            if (isset($responseData['sent']) && $responseData['sent'] === true) {
+                // الرسالة تم إرسالها بنجاح، قم بإرجاع الجهاز
+                $invoice->delivery_status = 0;
+                $invoice->save();
+                Log::info('WhatsApp message sent successfully and device returned', [
+                    'phone' => $new_phone,
+                    'response' => $responseData,
+                ]);
+                return redirect()->route('dashboard.invoices.index')
+                    ->with('Success_message', 'تم إرجاع الجهاز وإرسال الرسالة بنجاح');
+            } else {
+                // تسجيل الخطأ في حالة فشل الإرسال
+                $errorMessage = $responseData['message'] ?? 'سبب غير معروف';
+                Log::error('Failed to send WhatsApp message', [
+                    'phone' => $new_phone,
+                    'response' => $responseData,
+                ]);
+                return redirect()->route('dashboard.invoices.index')
+                    ->with('Error_message', 'فشل إرسال الرسالة: ' . $errorMessage . '، لم يتم إرجاع الجهاز');
+            }
         }
+
+        // عرض صفحة إرجاع الفاتورة
         $invoice = Invoice::findOrFail($id);
         return view('dashboard.invoices.undelivery_status', compact('invoice'));
     }
+
     public function create(Request $request)
     {
 
@@ -349,23 +439,8 @@ class InvoiceController extends Controller
                 // إنشاء رابط عام للفاتورة
 
                 $invoice_link = url('dashboard/invoice/view/' . $invoice->id);
-                $new_phone = preg_replace('/^0/', '', $invoice->phone);
-                // إضافة رمز البلد +966
-                $new_phone = '966' . $new_phone;
-                // $new_phone = '201002292856';
 
 
-                //$new_phone = $invoice->phone;
-                // تنسيق رسالة واتساب بطريقة مميزة
-                // $message = "📄 *تفاصيل فاتورتك* 📄\n\n";
-                // $message .= "👤 *العميل:* " . $invoice->name . "\n";
-                // $message .= "📞 *رقم الهاتف:* " . $invoice->phone . "\n";
-                // $message .= "📅 *تاريخ التسليم:* " . $invoice->date_delivery . "\n";
-                // $message .= "⏰ *وقت التسليم:* " . $invoice->time_delivery . "\n";
-                // //$message .= "💰 *السعر:* " . number_format($invoice->price, 2) . " ريال\n";
-                // //$message .= "📌 *حالة الفاتورة:* " . $invoice->status . "\n\n";
-                // $message .= "🖋 *الملاحظات:* " . ($invoice->description ?? "لا توجد ملاحظات") . "\n\n";
-                // $message .= "🔗 *رابط الفاتورة:* " . $invoice_link . "\n";
                 ########### Dynamic Message
                 // استبدال المتغيرات بالقيم الفعلية
 
@@ -374,41 +449,17 @@ class InvoiceController extends Controller
                     [$invoice->name, $invoice->id, $invoice->phone, $invoice->date_delivery, $invoice->time_delivery, $invoice->description ?? "لا توجد ملاحظات", $invoice_link],
                     $message_temp
                 );
-                // dd($message);
-
-                // تعريف المتغير
-                $params = array(
-                    'instanceid' => '138796',
-                    'token' => '3fc4ad69-3ea3-4307-923c-7080f7aa0d8e',
-                    'phone' => $new_phone,
-                    'body' => $message,
-                );
-                $queryString = http_build_query($params); // تحويل المصفوفة إلى سلسلة نصية
-                $curl = curl_init();
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => "https://api.4whats.net/sendMessage/?" . $queryString, // إضافة سلسلة الاستعلام إلى عنوان URL
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => "",
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 30,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => "GET",
-                ));
-                $response = curl_exec($curl);
-                $err = curl_error($curl);
-                curl_close($curl);
+                SendCreateMessage::dispatch($invoice, $message);
                 DB::commit();
                 /// Need Go to Print Code
+                //return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
+                // return $this->success_message(' تم اضافة الفاتورة بنجاح');
                 return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
-
-
-                //return $this->success_message(' تم اضافة الفاتورة بنجاح');
             } catch (Exception $e) {
                 return Redirect()->back()->withInput()->withErrors($e->getMessage());
                 //return $this->exception_message($e);
             }
         }
-
         $problems = ProblemCategory::all();
         $programe_problems = ProgrameProblemCategory::all();
         $speed_problems = SpeedProblemCategory::all();
@@ -429,6 +480,23 @@ class InvoiceController extends Controller
         ));
     }
 
+    public function SendMessage($id)
+    {
+        $invoice = Invoice::find($id);
+        $message_temp = Message::where('message_type', 'اضافة فاتورة')->value('template_text');
+        ########### Send Message To WhatsApp
+        // إنشاء رابط عام للفاتورة
+        $invoice_link = url('dashboard/invoice/view/' . $invoice->id);
+        ########### Dynamic Message
+        // استبدال المتغيرات بالقيم الفعلية
+        $message = str_replace(
+            ['{name}', '{invoice_id}', '{phone}', '{date_delivery}', '{time_delivery}', '{description}', '{invoice_link}'],
+            [$invoice->name, $invoice->id, $invoice->phone, $invoice->date_delivery, $invoice->time_delivery, $invoice->description ?? "لا توجد ملاحظات", $invoice_link],
+            $message_temp
+        );
+        SendCreateMessage::dispatch($invoice, $message);
+        return redirect()->route('dashboard.invoices.index')->with('Success_message', 'تم اعادة ارسال الرسالة بنجاح');
+    }
     public function update(Request $request, $id)
     {
         $invoice = Invoice::find($id);

@@ -198,7 +198,7 @@
                                                                         class="dropdown-item" type="button"> تعديل </a>
                                                                     <a href="{{ route('dashboard.invoices.print', $invoice->id) }}"
                                                                         class="dropdown-item" type="button"> طباعة </a>
-                                                                    <a href="{{ route('dashboard.invoices.barcode.preview', $invoice->id) }}"
+                                                                    <a href="{{ route('dashboard.invoices.print_barcode', $invoice->id) }}"
                                                                         class="dropdown-item" type="button"> طباعة باركود
                                                                     </a>
                                                                     <a href="{{ route('dashboard.invoices.steps', $invoice->id) }}"
@@ -208,6 +208,33 @@
                                                                         class="dropdown-item" type="button"> حذف </a>
 
                                                                 </div>
+                                                                @if ($invoice->message_send == 0)
+                                                                    <form id="send_message_form"
+                                                                        action="{{ route('dashboard.invoices.send_message', $invoice->id) }}"
+                                                                        method="post">
+                                                                        @csrf
+                                                                        <button type="submit" id="send_message_button"
+                                                                            class="btn btn-warning btn-sm">
+                                                                            <i style="font-size:12px"
+                                                                                class="la la-warning"></i>
+                                                                            اعادة ارسال رسالة
+                                                                        </button>
+                                                                        <div id="loadingMessage"
+                                                                            class="spinner-border text-primary"
+                                                                            role="status" style="display: none;">
+                                                                            <span class="sr-only">جاري اعادة ارسال
+                                                                                الرسالة...</span>
+                                                                        </div>
+                                                                    </form>
+                                                                    <script>
+                                                                        document.getElementById('send_message_form').addEventListener('submit', function(e) {
+                                                                            e.preventDefault();
+                                                                            document.getElementById('send_message_button').style.display = 'none';
+                                                                            document.getElementById('loadingMessage').style.display = 'block';
+                                                                            this.submit();
+                                                                        });
+                                                                    </script>
+                                                                @endif
                                                                 @if ($invoice->delivery_status == 0)
                                                                     <a href="{{ route('dashboard.invoices.delivery', $invoice->id) }}"
                                                                         class="btn btn-success btn-sm">

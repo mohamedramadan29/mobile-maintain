@@ -11,7 +11,7 @@ trait Message_Trait
     }
     public function Error_message($msg)
     {
-        return redirect()->back()->with(['Error_Message' => $msg]);
+        return redirect()->back()->with(['Error_message' => $msg]);
     }
     public function exception_message($e){
         return redirect()->back()->withErrors(['error'=>$e->getMessage()]);

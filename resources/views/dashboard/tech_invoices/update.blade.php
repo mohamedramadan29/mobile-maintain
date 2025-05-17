@@ -476,18 +476,16 @@
                                                             </div>
                                                         </div>
                                                     </div>
-
                                                 </div>
-
                                                 <div class="row">
                                                     <div class="col-lg-12">
                                                         <div class="form-group">
                                                             <label for="price"> مصدر القطعة <span
                                                                     class="required_span"> *
                                                                 </span> </label>
-                                                            <select disabled name="piece_resource" id=""
+                                                            <select  name="piece_resource" id=""
                                                                 class="form-control">
-                                                                <option value="" selected disabled> -- حدد مصدر
+                                                                <option value="" selected > -- حدد مصدر
                                                                     القطعة -- </option>
                                                                 @foreach ($piece_resources as $resource)
                                                                     <option @selected($invoice->piece_resource == $resource->id)

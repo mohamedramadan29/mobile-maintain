@@ -172,10 +172,9 @@ class TechInvoicesController extends Controller
             try {
                 DB::beginTransaction();
                 $status_changed = $request->status != $old_invoice->status;
-
-
                 $invoice->status = $request->status;
                 $invoice->tech_notes = $request->tech_notes;
+                $invoice->piece_resource = $request->piece_resource;
                 $invoice->checkout_end_time = now();
                 $invoice->save();
                 ############# Add Invoice Step ###############
