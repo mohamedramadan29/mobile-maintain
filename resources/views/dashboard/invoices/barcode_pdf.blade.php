@@ -14,6 +14,11 @@
 </head>
 
 <body>
+    <div class="back-button">
+        <a href="{{ route('invoices.index') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-arrow-right"></i> رجوع للفواتير
+        </a>
+    </div>
     <div class="text-center">
 
         <table class="table" style="margin-bottom: 1px;padding: 0px">
@@ -98,6 +103,13 @@
             font-size: 10px;
             margin: 0;
             padding: 2px;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

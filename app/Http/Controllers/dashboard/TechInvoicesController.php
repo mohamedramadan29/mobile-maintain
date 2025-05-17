@@ -38,24 +38,24 @@ class TechInvoicesController extends Controller
         return view('dashboard.tech_invoices.index', compact('invoices'));
     }
 
-    public function search(Request $request){
+    public function search(Request $request)
+    {
         $query = Invoice::where('admin_repair_id', Auth::guard('admin')->user()->id);
 
-       // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
-       if ($request->has('invoice_status') && !empty($request->invoice_status)) {
+        // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
+        if ($request->has('invoice_status') && !empty($request->invoice_status)) {
 
-        //  dd($request->invoice_status);
-          // تحقق من القيم النصية "0" و "1"
-          if ($request->invoice_status == 'تم تسليم الجهاز') {
-              $query->where('delivery_status', 1);
-          } elseif ($request->invoice_status == 'لم يتم التسليم') {
-              $query->where('delivery_status', 0);
-          }
-           else {
-              // في حالة وجود حالة غير الأرقام (مثل "رف الاستلام" أو "تحت الصيانة")
-              $query->where('status', $request->invoice_status);
-          }
-      }
+            //  dd($request->invoice_status);
+            // تحقق من القيم النصية "0" و "1"
+            if ($request->invoice_status == 'تم تسليم الجهاز') {
+                $query->where('delivery_status', 1);
+            } elseif ($request->invoice_status == 'لم يتم التسليم') {
+                $query->where('delivery_status', 0);
+            } else {
+                // في حالة وجود حالة غير الأرقام (مثل "رف الاستلام" أو "تحت الصيانة")
+                $query->where('status', $request->invoice_status);
+            }
+        }
         $invoices = $query->orderBy('id', 'desc')->paginate(10)->appends($request->all());
 
         return view('dashboard.tech_invoices.index', compact('invoices'));
@@ -117,8 +117,8 @@ class TechInvoicesController extends Controller
                 $new_phone = '966' . $new_phone;
 
                 $message = str_replace(
-                    ['{name}', '{status}', '{invoice_link}'],
-                    [$invoice->name, $invoice->status, $invoice_link],
+                    ['{name}', '{invoice_id}', '{status}', '{invoice_link}'],
+                    [$invoice->name, $invoice->id, $invoice->status, $invoice_link],
                     $message_temp
                 );
                 // dd($message);
@@ -158,7 +158,6 @@ class TechInvoicesController extends Controller
             }
         }
         return view('dashboard.tech_invoices.checkout', compact('invoice'));
-
     }
 
     ################ Update After Repair ##################
@@ -201,8 +200,8 @@ class TechInvoicesController extends Controller
                     // $new_phone = '201011642731';
 
                     $message = str_replace(
-                        ['{name}', '{status}', '{invoice_link}'],
-                        [$invoice->name, $invoice->status, $invoice_link],
+                        ['{name}', '{invoice_id}', '{status}', '{invoice_link}'],
+                        [$invoice->name, $invoice->id, $invoice->status, $invoice_link],
                         $message_temp
                     );
                     // dd($message);
@@ -296,5 +295,4 @@ class TechInvoicesController extends Controller
         $invoice->save();
         return $this->success_message(' تم تحديث حالة التواصل مع العميل بنجاح  ');
     }
-
 }

@@ -23,6 +23,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/icheck.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/custom.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/css-rtl/plugins/forms/checkboxes-radios.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/parsleyjs/src/parsley.css">
 @endsection
 @section('content')
     <div class="app-content content">
@@ -314,7 +315,7 @@
                                                                 </span> </label>
                                                             <input required type="text" id="name"
                                                                 class="form-control" placeholder="" name="name"
-                                                                value="{{ old('name') }}">
+                                                                value="{{ old('name') }}" data-parsley-required-message="الرجاء إدخال اسم العميل ">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
@@ -364,7 +365,7 @@
                                                                 </span> </label>
                                                             <input required type="text" id="title"
                                                                 class="form-control" placeholder="" name="title"
-                                                                value="{{ old('title') }}">
+                                                                value="{{ old('title') }}" data-parsley-required-message="الرجاء إدخال  اسم الجهاز">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
@@ -437,7 +438,7 @@
                                                             <label for="price"> السعر الاولي <span
                                                                     class="required_span"> * </span> </label>
                                                             <input required type="number" step="0.01" id="price"
-                                                                class="form-control" placeholder="" name="price"
+                                                                class="form-control" placeholder="" name="price" data-parsley-required-message=" الرجاء ادخل السعر  "
                                                                 value="{{ old('price') }}">
                                                         </div>
                                                         <!-- زر إضافة تفاصيل السعر -->
@@ -476,17 +477,17 @@
                                                             }
                                                         </script>
                                                     </div>
-                                                    <div class="col-md-6">
-                                                        <label for="price"> تاريخ ووقت التسليم <span
+                                                    <div class="col-12">
+                                                        <label for="price"> التاريخ ووقت التسليم <span
                                                                 class="required_span"> * </span> </label>
                                                         <div class="justify-between d-flex flex-column">
-                                                            <div class="form-group" style="min-width: 100%">
-                                                                <input required type="date" name="date_delivery"
+                                                            <div class="form-group" style="width: 100%">
+                                                                <input required type="date" name="date_delivery" data-parsley-required-message="الرجاء إدخال التاريخ "
                                                                     class="form-control"
                                                                     value="{{ old('date_delivery') }}">
                                                             </div>
-                                                            <div class="form-group" style="min-width: 100%">
-                                                                <input required type="time" name="time_delivery"
+                                                            <div class="form-group" style="width: 100%">
+                                                                <input required type="time" name="time_delivery" data-parsley-required-message="الرجاء إدخال التاريخ "
                                                                     class="form-control"
                                                                     value="{{ old('time_delivery') }}">
                                                             </div>
@@ -551,7 +552,7 @@
                                                             <label for="price"> حدد مصدر القطعة <span
                                                                     class="required_span"> *
                                                                 </span> </label>
-                                                            <select required name="piece_resource" id=""
+                                                            <select required name="piece_resource" id="" data-parsley-required-message=" من فضلك حدد مصدر القطعة  "
                                                                 class="form-control">
                                                                 <option value="" selected disabled> -- حدد مصدر
                                                                     القطعة -- </option>
@@ -572,7 +573,7 @@
                                                         <div class="form-group">
                                                             <label for="address"> اضافة مرفقات <span
                                                                     class="required_span"> * </span> </label>
-                                                            <input required type="file" name="files_images[]"
+                                                            <input required type="file" name="files_images[]" data-parsley-required-message="الرجاء إدخال المرفقات "
                                                                 class="form-control" multiple id="imageInput">
                                                         </div>
                                                         <div id="imagePreview" class="flex-wrap mt-3 d-flex"></div>
@@ -774,7 +775,7 @@
                                                                     class="mt-2 btn btn-danger">مسح التوقيع</button>
                                                             </div>
                                                         </div>
-                                                        <input required type="hidden" name="signature" id="signature"
+                                                        <input required type="text" readonly style="opacity: 0" name="signature" id="signature" data-parsley-required-message=" الرجاء التوقيع  "
                                                             value="{{ old('signature') }}">
                                                     </div>
                                                 </div>
@@ -856,14 +857,14 @@
                                                     if (checkedCount === 0) {
                                                         e.preventDefault();
                                                         ChecksError.style.display = 'block';
-                                                       // ChecksError.textContent = 'من فضلك حدد الاعطال المناسبة حسب نوع الفحص';
+                                                        // ChecksError.textContent = 'من فضلك حدد الاعطال المناسبة حسب نوع الفحص';
                                                         return;
                                                     }
                                                 }
-
                                                 if (signaturePad.isEmpty()) {
                                                     e.preventDefault();
-                                                    signatureError.style.display = 'block';
+                                                    alert('الرجاء التوقيع على الفاتورة');
+                                                    // signatureError.style.display = 'block';
                                                     //  signatureError.textContent = 'الرجاء التوقيع على الفاتورة';
                                                 } else {
                                                     signatureInput.value = signaturePad.toDataURL();
@@ -905,9 +906,16 @@
     </style>
 @endsection
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+        eruda.init();
+    </script>
     <script src="{{ asset('assets/admin/') }}/vendors/js/forms/icheck/icheck.min.js" type="text/javascript"></script>
     <script src="{{ asset('assets/admin/') }}/js/scripts/forms/checkbox-radio.js" type="text/javascript"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/parsleyjs"></script>
+    <script>
+        $('#invoice-form').parsley();
+    </script>
     <script>
         $(document).ready(function() {
             function toggleCheckoutSections(type) {

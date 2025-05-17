@@ -198,7 +198,7 @@
                                                                         class="dropdown-item" type="button"> تعديل </a>
                                                                     <a href="{{ route('dashboard.invoices.print', $invoice->id) }}"
                                                                         class="dropdown-item" type="button"> طباعة </a>
-                                                                    <a href="{{ route('dashboard.invoices.print_barcode', $invoice->id) }}"
+                                                                    <a href="{{ route('dashboard.invoices.barcode.preview', $invoice->id) }}"
                                                                         class="dropdown-item" type="button"> طباعة باركود
                                                                     </a>
                                                                     <a href="{{ route('dashboard.invoices.steps', $invoice->id) }}"

@@ -370,8 +370,8 @@ class InvoiceController extends Controller
                 // استبدال المتغيرات بالقيم الفعلية
 
                 $message = str_replace(
-                    ['{name}', '{phone}', '{date_delivery}', '{time_delivery}', '{description}', '{invoice_link}'],
-                    [$invoice->name, $invoice->phone, $invoice->date_delivery, $invoice->time_delivery, $invoice->description ?? "لا توجد ملاحظات", $invoice_link],
+                    ['{name}', '{invoice_id}', '{phone}', '{date_delivery}', '{time_delivery}', '{description}', '{invoice_link}'],
+                    [$invoice->name, $invoice->id, $invoice->phone, $invoice->date_delivery, $invoice->time_delivery, $invoice->description ?? "لا توجد ملاحظات", $invoice_link],
                     $message_temp
                 );
                 // dd($message);
@@ -710,7 +710,18 @@ class InvoiceController extends Controller
         }
     }
     ################### End Print BarCode ################
+    ################ Priview Barcode ##################
 
+    public function preview_barcode($id)
+    {
+        $invoice = Invoice::findOrFail($id);
+        $invoiceUrl = url('dashboard/invoice/view/' . $invoice->id);
+        $qrCode = QrCode::format('png')->size(100)->margin(0)->generate($invoiceUrl);
+        $qrCodeBase64 = base64_encode($qrCode);
+
+        return view('dashboard.invoices.barcode_preview', compact('invoice', 'qrCodeBase64'));
+    }
+    ################### End Preview Barcode ####################
     ################### Start Invoice Haif time ###############
 
     public function InvoicesHaifTime()
