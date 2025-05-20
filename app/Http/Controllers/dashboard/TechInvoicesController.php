@@ -14,6 +14,7 @@ use App\Models\dashboard\CheckText;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\dashboard\PieceSource;
+use App\Models\dashboard\PriceDetail; ############# added ################
 use App\Models\dashboard\SpeedDevice;
 use App\Models\dashboard\InvoiceImage;
 use App\Models\dashboard\InvoiceSteps;
@@ -177,6 +178,23 @@ class TechInvoicesController extends Controller
                 $invoice->piece_resource = $request->piece_resource;
                 $invoice->checkout_end_time = now();
                 $invoice->save();
+                ############ Start Price Details ################
+                // حذف، تحديث، إضافة حسب البيانات
+                // حذف كل تفاصيل السعر القديمة المرتبطة بالفاتورة
+                $invoice->priceDetails()->delete();
+
+                // ثم إضافة كل التفاصيل الجديدة
+                if (!empty($request['price_details']) && is_array($request['price_details'])) {
+                    foreach ($request['price_details'] as $detail) {
+                        if (!empty($detail['amount'])) {
+                            PriceDetail::create([
+                                'invoice_id' => $invoice->id,
+                                'title' => $detail['title'] ?? '',
+                                'amount' => $detail['amount'],
+                            ]);
+                        }
+                    }
+                }
                 ############# Add Invoice Step ###############
                 if ($status_changed) {
                     $invoice_step = new InvoiceSteps();

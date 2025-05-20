@@ -297,8 +297,6 @@
                                                             {{ date('h:i A', strtotime($invoice->time_delivery)) }}
                                                         </td>
                                                     </tr>
-
-                                                    @include('dashboard.invoices.delete')
                                                 @empty
                                                     <td colspan="4"> لا يوجد بيانات </td>
                                                 @endforelse

@@ -417,17 +417,16 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="price"> السعر الاولي <span
-                                                                    class="required_span"> * </span></label>
-                                                            <input required type="number" step="0.01" id="price"
-                                                                class="form-control" name="price"
-                                                                value="{{ $invoice->price }}">
+                                                            <label for="price">السعر الأولي <span class="required_span"> * </span></label>
+                                                            <input readonly type="number" step="0.01" id="price" class="form-control" name="price"
+                                                                   value="{{ $invoice->price }}">
                                                         </div>
 
                                                         <!-- زر إضافة تفاصيل السعر -->
                                                         <div class="mt-2 form-group">
-                                                            <button type="button" class="btn btn-sm btn-primary"
-                                                                onclick="addPriceDetail()">إضافة تفاصيل السعر</button>
+                                                            <button type="button" class="btn btn-sm btn-primary" onclick="addPriceDetail()">
+                                                                إضافة تفاصيل السعر
+                                                            </button>
                                                         </div>
 
                                                         <!-- تفاصيل السعر القديمة -->
@@ -435,26 +434,18 @@
                                                             @php $detailIndex = 0; @endphp
                                                             @foreach ($invoice->priceDetails as $detail)
                                                                 <div class="mb-2 form-row">
-                                                                    <input type="hidden"
-                                                                        name="price_details[{{ $detailIndex }}][id]"
-                                                                        value="{{ $detail->id }}">
+                                                                    <input type="hidden" name="price_details[{{ $detailIndex }}][id]" value="{{ $detail->id }}">
                                                                     <div class="col-6">
-                                                                        <input type="text"
-                                                                            name="price_details[{{ $detailIndex }}][title]"
-                                                                            class="form-control"
-                                                                            placeholder="عنوان التفصيلة"
-                                                                            value="{{ $detail->title }}">
+                                                                        <input type="text" name="price_details[{{ $detailIndex }}][title]" class="form-control"
+                                                                               placeholder="عنوان التفصيلة" value="{{ $detail->title }}">
                                                                     </div>
                                                                     <div class="col-5">
-                                                                        <input type="number" step="0.01"
-                                                                            name="price_details[{{ $detailIndex }}][amount]"
-                                                                            class="form-control" placeholder="السعر"
-                                                                            value="{{ $detail->amount }}">
+                                                                        <input type="number" step="0.01" name="price_details[{{ $detailIndex }}][amount]"
+                                                                               class="form-control" placeholder="السعر" value="{{ $detail->amount }}"
+                                                                               required oninput="updateTotalPrice()">
                                                                     </div>
                                                                     <div class="col-1">
-                                                                        <button type="button"
-                                                                            class="btn btn-danger btn-sm"
-                                                                            onclick="this.parentElement.parentElement.remove()">-</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm" onclick="removePriceDetail(this)">-</button>
                                                                     </div>
                                                                 </div>
                                                                 @php $detailIndex++; @endphp
@@ -467,7 +458,6 @@
 
                                                         function addPriceDetail() {
                                                             const wrapper = document.getElementById('price-details-wrapper');
-
                                                             const detailDiv = document.createElement('div');
                                                             detailDiv.classList.add('form-row', 'mb-2');
                                                             detailDiv.innerHTML = `
@@ -475,15 +465,42 @@
                                                                     <input type="text" name="price_details[${detailIndex}][title]" class="form-control" placeholder="عنوان التفصيلة">
                                                                 </div>
                                                                 <div class="col-5">
-                                                                    <input type="number" step="0.01" name="price_details[${detailIndex}][amount]" class="form-control" placeholder="السعر">
+                                                                    <input type="number" step="0.01" name="price_details[${detailIndex}][amount]" class="form-control"
+                                                                           placeholder="السعر" required oninput="updateTotalPrice()">
                                                                 </div>
                                                                 <div class="col-1">
-                                                                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.parentElement.remove()">-</button>
+                                                                    <button type="button" class="btn btn-danger btn-sm" onclick="removePriceDetail(this)">-</button>
                                                                 </div>
                                                             `;
                                                             wrapper.appendChild(detailDiv);
                                                             detailIndex++;
+                                                            updateTotalPrice(); // تحديث المجموع بعد إضافة تفصيلة
                                                         }
+
+                                                        function removePriceDetail(button) {
+                                                            button.parentElement.parentElement.remove();
+                                                            updateTotalPrice(); // تحديث المجموع بعد إزالة تفصيلة
+                                                        }
+
+                                                        function updateTotalPrice() {
+                                                            const priceInputs = document.querySelectorAll('input[name*="price_details"][name$="[amount]"]');
+                                                            let total = 0;
+
+                                                            priceInputs.forEach(input => {
+                                                                const value = parseFloat(input.value);
+                                                                if (!isNaN(value)) {
+                                                                    total += value;
+                                                                }
+                                                            });
+
+                                                            const priceField = document.getElementById('price');
+                                                            priceField.value = total.toFixed(2); // تحديث حقل السعر الأولي
+                                                        }
+
+                                                        // تحديث المجموع عند تحميل الصفحة إذا كانت هناك بيانات محفوظة
+                                                        document.addEventListener('DOMContentLoaded', () => {
+                                                            updateTotalPrice();
+                                                        });
                                                     </script>
                                                     <div class="col-md-6">
                                                         <label for="price"> تاريخ ووقت التسليم <span

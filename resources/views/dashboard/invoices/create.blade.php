@@ -315,7 +315,8 @@
                                                                 </span> </label>
                                                             <input required type="text" id="name"
                                                                 class="form-control" placeholder="" name="name"
-                                                                value="{{ old('name') }}" data-parsley-required-message="الرجاء إدخال اسم العميل ">
+                                                                value="{{ old('name') }}"
+                                                                data-parsley-required-message="الرجاء إدخال اسم العميل ">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
@@ -365,7 +366,8 @@
                                                                 </span> </label>
                                                             <input required type="text" id="title"
                                                                 class="form-control" placeholder="" name="title"
-                                                                value="{{ old('title') }}" data-parsley-required-message="الرجاء إدخال  اسم الجهاز">
+                                                                value="{{ old('title') }}"
+                                                                data-parsley-required-message="الرجاء إدخال  اسم الجهاز">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
@@ -435,19 +437,21 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="price"> السعر الاولي <span
-                                                                    class="required_span"> * </span> </label>
-                                                            <input required type="number" step="0.01" id="price"
-                                                                class="form-control" placeholder="" name="price" data-parsley-required-message=" الرجاء ادخل السعر  "
-                                                                value="{{ old('price') }}">
+                                                            <label for="price">السعر الأولي <span
+                                                                    class="required_span"> * </span></label>
+                                                            <input readonly type="number" step="0.01" id="price"
+                                                                class="form-control"
+                                                                placeholder="سيتم حساب المجموع تلقائيًا" name="price"
+                                                                data-parsley-required-message="الرجاء إدخال تفاصيل السعر"
+                                                                value="{{ old('price', 0) }}">
                                                         </div>
                                                         <!-- زر إضافة تفاصيل السعر -->
                                                         <div class="form-group">
                                                             <button type="button" class="btn btn-sm btn-primary"
-                                                                onclick="addPriceDetail()"> <i class="la la-plus"></i>
-                                                                إضافة تفاصيل السعر</button>
+                                                                onclick="addPriceDetail()">
+                                                                <i class="la la-plus"></i> إضافة تفاصيل السعر
+                                                            </button>
                                                         </div>
-
                                                         <!-- حاوية تفاصيل السعر -->
                                                         <div id="price-details-wrapper">
                                                             <!-- سيتم إضافة تفاصيل السعر هنا -->
@@ -462,19 +466,46 @@
                                                                 const detailDiv = document.createElement('div');
                                                                 detailDiv.classList.add('form-row', 'mb-2');
                                                                 detailDiv.innerHTML = `
-                                                                        <div class="col-6">
-                                                                            <input type="text" name="price_details[${detailIndex}][title]" class="form-control" placeholder="عنوان التفصيلة ">
-                                                                        </div>
-                                                                        <div class="col-5">
-                                                                            <input type="number" step="0.01" name="price_details[${detailIndex}][amount]" class="form-control" placeholder="السعر" required>
-                                                                        </div>
-                                                                        <div class="col-1">
-                                                                            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.parentElement.remove()">-</button>
-                                                                        </div>
-                                                                    `;
+                                                                            <div class="col-6">
+                                                                                <input type="text" name="price_details[${detailIndex}][title]" class="form-control" placeholder="عنوان التفصيلة">
+                                                                            </div>
+                                                                            <div class="col-5">
+                                                                                <input type="number" step="0.01" name="price_details[${detailIndex}][amount]" class="form-control"
+                                                                                    placeholder="السعر" required oninput="updateTotalPrice()">
+                                                                            </div>
+                                                                            <div class="col-1">
+                                                                                <button type="button" class="btn btn-danger btn-sm" onclick="removePriceDetail(this)">-</button>
+                                                                            </div>
+                                                                        `;
                                                                 wrapper.appendChild(detailDiv);
                                                                 detailIndex++;
+                                                                updateTotalPrice(); // تحديث المجموع بعد إضافة تفصيلة
                                                             }
+
+                                                            function removePriceDetail(button) {
+                                                                button.parentElement.parentElement.remove();
+                                                                updateTotalPrice(); // تحديث المجموع بعد إزالة تفصيلة
+                                                            }
+
+                                                            function updateTotalPrice() {
+                                                                const priceInputs = document.querySelectorAll('input[name*="price_details"][name$="[amount]"]');
+                                                                let total = 0;
+
+                                                                priceInputs.forEach(input => {
+                                                                    const value = parseFloat(input.value);
+                                                                    if (!isNaN(value)) {
+                                                                        total += value;
+                                                                    }
+                                                                });
+
+                                                                const priceField = document.getElementById('price');
+                                                                priceField.value = total.toFixed(2); // تحديث حقل السعر الأولي
+                                                            }
+
+                                                            // تحديث المجموع عند تحميل الصفحة إذا كانت هناك بيانات محفوظة
+                                                            document.addEventListener('DOMContentLoaded', () => {
+                                                                updateTotalPrice();
+                                                            });
                                                         </script>
                                                     </div>
                                                     <div class="col-12">
@@ -482,12 +513,14 @@
                                                                 class="required_span"> * </span> </label>
                                                         <div class="justify-between d-flex flex-column">
                                                             <div class="form-group" style="width: 100%">
-                                                                <input required type="date" name="date_delivery" data-parsley-required-message="الرجاء إدخال التاريخ "
+                                                                <input required type="date" name="date_delivery"
+                                                                    data-parsley-required-message="الرجاء إدخال التاريخ "
                                                                     class="form-control"
                                                                     value="{{ old('date_delivery') }}">
                                                             </div>
                                                             <div class="form-group" style="width: 100%">
-                                                                <input required type="time" name="time_delivery" data-parsley-required-message="الرجاء إدخال التاريخ "
+                                                                <input required type="time" name="time_delivery"
+                                                                    data-parsley-required-message="الرجاء إدخال التاريخ "
                                                                     class="form-control"
                                                                     value="{{ old('time_delivery') }}">
                                                             </div>
@@ -552,7 +585,8 @@
                                                             <label for="price"> حدد مصدر القطعة <span
                                                                     class="required_span"> *
                                                                 </span> </label>
-                                                            <select required name="piece_resource" id="" data-parsley-required-message=" من فضلك حدد مصدر القطعة  "
+                                                            <select required name="piece_resource" id=""
+                                                                data-parsley-required-message=" من فضلك حدد مصدر القطعة  "
                                                                 class="form-control">
                                                                 <option value="" selected disabled> -- حدد مصدر
                                                                     القطعة -- </option>
@@ -573,7 +607,8 @@
                                                         <div class="form-group">
                                                             <label for="address"> اضافة مرفقات <span
                                                                     class="required_span"> * </span> </label>
-                                                            <input required type="file" name="files_images[]" data-parsley-required-message="الرجاء إدخال المرفقات "
+                                                            <input required type="file" name="files_images[]"
+                                                                data-parsley-required-message="الرجاء إدخال المرفقات "
                                                                 class="form-control" multiple id="imageInput">
                                                         </div>
                                                         <div id="imagePreview" class="flex-wrap mt-3 d-flex"></div>
@@ -775,7 +810,9 @@
                                                                     class="mt-2 btn btn-danger">مسح التوقيع</button>
                                                             </div>
                                                         </div>
-                                                        <input required type="text" readonly style="opacity: 0" name="signature" id="signature" data-parsley-required-message=" الرجاء التوقيع  "
+                                                        <input required type="text" readonly style="opacity: 0"
+                                                            name="signature" id="signature"
+                                                            data-parsley-required-message=" الرجاء التوقيع  "
                                                             value="{{ old('signature') }}">
                                                     </div>
                                                 </div>

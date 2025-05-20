@@ -36,8 +36,10 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header d-flex align-items-center justify-content-between flex-column">
-                                <a href="{{ route('dashboard.invoices.create') }}" class="btn btn-primary"> اضافة فاتورة
-                                </a>
+                                @can('add_invoice')
+                                    <a href="{{ route('dashboard.invoices.create') }}" class="btn btn-primary"> اضافة فاتورة
+                                    </a>
+                                @endcan
                                 <form action="{{ route('dashboard.invoices.index') }}" method="get">
                                     <div class="d-flex align-items-center justify-content-center">
                                         <div class="form-group" style="margin-left: 20px">
@@ -194,8 +196,10 @@
                                                                 <div class="dropdown-menu open-left arrow"
                                                                     x-placement="bottom-start"
                                                                     style="position: absolute; transform: translate3d(0px, 40px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                    <a href="{{ route('dashboard.invoices.update', $invoice->id) }}"
-                                                                        class="dropdown-item" type="button"> تعديل </a>
+                                                                    @can('edit_invoice')
+                                                                        <a href="{{ route('dashboard.invoices.update', $invoice->id) }}"
+                                                                            class="dropdown-item" type="button"> تعديل </a>
+                                                                    @endcan
                                                                     <a href="{{ route('dashboard.invoices.print', $invoice->id) }}"
                                                                         class="dropdown-item" type="button"> طباعة </a>
                                                                     <a href="{{ route('dashboard.invoices.print_barcode', $invoice->id) }}"
@@ -204,9 +208,10 @@
                                                                     <a href="{{ route('dashboard.invoices.steps', $invoice->id) }}"
                                                                         class="dropdown-item" type="button"> حركة حساب
                                                                         الفاتورة </a>
-                                                                    <a href="{{ route('dashboard.invoices.destroy', $invoice->id) }}"
-                                                                        class="dropdown-item" type="button"> حذف </a>
-
+                                                                    @can('delete_invoice')
+                                                                        <a href="{{ route('dashboard.invoices.destroy', $invoice->id) }}"
+                                                                            class="dropdown-item" type="button"> حذف </a>
+                                                                    @endcan
                                                                 </div>
                                                                 @if ($invoice->message_send == 0)
                                                                     <form id="send_message_form"
@@ -271,10 +276,12 @@
                                             <button type="button" class="btn btn-danger btn-sm"
                                                 onclick="submitBulkDelete()">نعم</button>
                                         </div>
+                                        @can('delete_invoice')
                                         <button type="button" class="btn btn-danger btn-sm"
                                             onclick="submitBulkDelete()">
                                             حذف المحدد
                                         </button>
+                                        @endcan
                                         {{ $invoices->links() }}
                                     </div>
                                 </div>
