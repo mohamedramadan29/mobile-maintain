@@ -120,17 +120,90 @@
                                                         src="{{ asset('assets/uploads/invoices_files/' . $invoice->signature) }}"
                                                         alt="">
                                                 </td>
-                                                <td class="text-right">
-                                                    <div class="flex-row d-flex justify-content-center">
-                                                        @foreach ($invoice->files as $file)
-                                                            <a href="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
-                                                                target="_blank">
-                                                                <img style="border: 1px solid #ccc;border-radius: 10px;padding: 2px;margin-left: 5px"
-                                                                    width="100px" height="100px" class="img-border"
-                                                                    src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
-                                                                    alt="">
-                                                            </a>
-                                                        @endforeach
+                                                <td>
+                                                    <div class="">
+                                                        <p>المرفقات</p>
+                                                        <table class="table table-borderd">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>
+                                                                        المرفق
+                                                                    </th>
+                                                                    <th>
+                                                                        عنوان المرفق
+                                                                    </th>
+                                                                    <th>
+                                                                        السعر
+                                                                    </th>
+                                                                    <th>
+                                                                        تفاصيل اضافية
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($invoice->files as $file)
+                                                                    @if ($file->price > 0)
+                                                                        <tr>
+                                                                            <td>
+                                                                                <a href="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
+                                                                                    target="_blank">
+                                                                                    <img width="100" height="100"
+                                                                                        src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
+                                                                                        alt="">
+                                                                                </a>
+                                                                            </td>
+                                                                            <td>
+                                                                                {{ $file['title'] }}
+                                                                            </td>
+                                                                            <td>
+                                                                                {{ $file['price'] }}
+                                                                            </td>
+                                                                            <td>
+                                                                                {{ $file['details'] }}
+                                                                            </td>
+                                                                        </tr>
+                                                                    @endif
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                        <p> صور حالة الجهاز </p>
+                                                        <table class="table table-borderd">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>
+                                                                        المرفق
+                                                                    </th>
+                                                                    <th>
+                                                                        عنوان المرفق
+                                                                    </th>
+                                                                    <th>
+                                                                        تفاصيل اضافية
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($invoice->files as $file)
+                                                                    @if ($file->price == 0)
+                                                                        <tr>
+                                                                            <td>
+                                                                                <a href="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
+                                                                                    target="_blank">
+                                                                                    <img width="100" height="100"
+                                                                                        src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
+                                                                                        alt="">
+                                                                                </a>
+                                                                            </td>
+                                                                            <td>
+                                                                                {{ $file['title'] }}
+                                                                            </td>
+                                                                            <td>
+                                                                                {{ $file['details'] }}
+                                                                            </td>
+                                                                        </tr>
+                                                                    @endif
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -171,21 +244,20 @@
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
                                             <tbody>
+                                                @php
+                                                    $total_details = 0;
+                                                @endphp
                                                 @foreach ($invoice->priceDetails as $detail)
+                                                    @php
+                                                        $total_details += $detail->amount;
+                                                    @endphp
                                                     <tr>
-                                                        {{-- <td>المبلغ المدخل (شامل الضريبة)</td> --}}
                                                         <td> {{ $detail->title }} </td>
                                                         <td class="text-right">{{ number_format($detail->amount, 2) }} ريال
                                                         </td>
+                                                        <td> {{ $detail->pieceResourse->name ?? 'غير محدد' }} </td>
                                                     </tr>
                                                 @endforeach
-                                                {{-- <tr> --}}
-                                                {{-- <td>المبلغ المدخل (شامل الضريبة)</td> --}}
-                                                {{-- <td> المبلغ الاولي </td>
-                                                    <td class="text-right">{{ number_format($invoice->price, 2) }} ريال
-                                                    </td> --}}
-                                                {{-- </tr> --}}
-
                                                 @php
                                                     $sub_total = 0;
                                                 @endphp
@@ -203,11 +275,11 @@
                                                         @endif
                                                     @endforeach
                                                 @endif
-
                                                 @php
-                                                    $total_price = $invoice->price + $sub_total;
-                                                    $base_price = $total_price / 1.15; // استخراج المبلغ الأساسي قبل الضريبة
-                                                    $vat = $total_price - $base_price; // حساب قيمة الضريبة المضافة
+                                                    $total_price = $sub_total + $total_details;
+                                                    //  $total_price = $invoice->price + $sub_total;
+                                                    // $base_price = $total_price / 1.15; // استخراج المبلغ الأساسي قبل الضريبة
+                                                    //  $vat = $total_price - $base_price; // حساب قيمة الضريبة المضافة
                                                 @endphp
 
                                                 {{-- <tr>

@@ -417,7 +417,7 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="price">السعر الأولي <span class="required_span"> * </span></label>
+                                                            <label for="price">السعر   <span class="required_span"> * </span></label>
                                                             <input readonly type="number" step="0.01" id="price" class="form-control" name="price"
                                                                    value="{{ $invoice->price }}">
                                                         </div>
@@ -435,14 +435,23 @@
                                                             @foreach ($invoice->priceDetails as $detail)
                                                                 <div class="mb-2 form-row">
                                                                     <input type="hidden" name="price_details[{{ $detailIndex }}][id]" value="{{ $detail->id }}">
-                                                                    <div class="col-6">
+                                                                    <div class="col-4">
                                                                         <input type="text" name="price_details[{{ $detailIndex }}][title]" class="form-control"
                                                                                placeholder="عنوان التفصيلة" value="{{ $detail->title }}">
                                                                     </div>
-                                                                    <div class="col-5">
+                                                                    <div class="col-4">
                                                                         <input type="number" step="0.01" name="price_details[{{ $detailIndex }}][amount]"
                                                                                class="form-control" placeholder="السعر" value="{{ $detail->amount }}"
                                                                                required oninput="updateTotalPrice()">
+                                                                    </div>
+                                                                    <div class="col-3">
+                                                                        <select name="price_details[{{ $detailIndex }}][piece_resource]" class="form-control">
+                                                                            @foreach ($piece_resources as $resource)
+                                                                                <option @selected($detail->piece_resource == $resource->id)
+                                                                                    value="{{ $resource->id }}">
+                                                                                    {{ $resource->name }}</option>
+                                                                            @endforeach
+                                                                        </select>
                                                                     </div>
                                                                     <div class="col-1">
                                                                         <button type="button" class="btn btn-danger btn-sm" onclick="removePriceDetail(this)">-</button>
@@ -461,12 +470,21 @@
                                                             const detailDiv = document.createElement('div');
                                                             detailDiv.classList.add('form-row', 'mb-2');
                                                             detailDiv.innerHTML = `
-                                                                <div class="col-6">
+                                                                <div class="col-4">
                                                                     <input type="text" name="price_details[${detailIndex}][title]" class="form-control" placeholder="عنوان التفصيلة">
                                                                 </div>
-                                                                <div class="col-5">
+                                                                <div class="col-4">
                                                                     <input type="number" step="0.01" name="price_details[${detailIndex}][amount]" class="form-control"
                                                                            placeholder="السعر" required oninput="updateTotalPrice()">
+                                                                </div>
+                                                                <div class="col-3">
+                                                                    <select name="price_details[${detailIndex}][piece_resource]" class="form-control">
+                                                                        @foreach ($piece_resources as $resource)
+                                                                            <option @selected(old('piece_resource') == $resource->id)
+                                                                                value="{{ $resource->id }}">
+                                                                                {{ $resource->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
                                                                 </div>
                                                                 <div class="col-1">
                                                                     <button type="button" class="btn btn-danger btn-sm" onclick="removePriceDetail(this)">-</button>
@@ -586,7 +604,7 @@
 
                                                 </div>
 
-                                                <div class="row">
+                                                {{-- <div class="row">
                                                     <div class="col-lg-12">
                                                         <div class="form-group">
                                                             <label for="price"> حدد مصدر القطعة <span
@@ -604,7 +622,7 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div> --}}
 
                                                 <div class="row">
                                                     <div class="col-lg-12">

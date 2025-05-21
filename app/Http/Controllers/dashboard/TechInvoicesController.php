@@ -175,7 +175,7 @@ class TechInvoicesController extends Controller
                 $status_changed = $request->status != $old_invoice->status;
                 $invoice->status = $request->status;
                 $invoice->tech_notes = $request->tech_notes;
-                $invoice->piece_resource = $request->piece_resource;
+                //$invoice->piece_resource = $request->piece_resource;
                 $invoice->checkout_end_time = now();
                 $invoice->save();
                 ############ Start Price Details ################
@@ -189,8 +189,9 @@ class TechInvoicesController extends Controller
                         if (!empty($detail['amount'])) {
                             PriceDetail::create([
                                 'invoice_id' => $invoice->id,
-                                'title' => $detail['title'] ?? '',
+                                'title' => $detail['title'] ?? '', // قيمة فاضية إذا ما أرسل عنوان
                                 'amount' => $detail['amount'],
+                                'piece_resource' => $detail['piece_resource'] ?? null,
                             ]);
                         }
                     }

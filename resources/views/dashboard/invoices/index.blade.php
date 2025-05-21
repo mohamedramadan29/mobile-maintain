@@ -208,6 +208,8 @@
                                                                     <a href="{{ route('dashboard.invoices.steps', $invoice->id) }}"
                                                                         class="dropdown-item" type="button"> حركة حساب
                                                                         الفاتورة </a>
+                                                                    <a href="{{ route('dashboard.invoices.show-details', $invoice->id) }}"
+                                                                        class="dropdown-item" type="button"> عرض التفاصيل </a>
                                                                     @can('delete_invoice')
                                                                         <a href="{{ route('dashboard.invoices.destroy', $invoice->id) }}"
                                                                             class="dropdown-item" type="button"> حذف </a>

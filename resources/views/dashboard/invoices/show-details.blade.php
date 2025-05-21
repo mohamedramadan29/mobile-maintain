@@ -1,6 +1,6 @@
 @extends('dashboard.layouts.app')
 
-@section('title', ' صيانة الجهاز ')
+@section('title', ' تفاصيل الفاتورة كاملة ')
 @section('css')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/icheck.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/custom.css">
@@ -11,16 +11,15 @@
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block"> صيانة الجهاز </h3>
+                    <h3 class="mb-0 content-header-title d-inline-block"> تفاصيل الفاتورة كاملة </h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.tech_invoices.index') }}"> فواتيري
-                                    </a>
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard.invoices.index') }}"> الفواتير </a>
                                 </li>
-                                <li class="breadcrumb-item active"><a href="#"> صيانة الجهاز </a>
+                                <li class="breadcrumb-item active"><a href="#"> تفاصيل الفاتورة كاملة </a>
                                 </li>
                             </ol>
                         </div>
@@ -35,7 +34,7 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title" id="basic-layout-form"> صيانة الجهاز </h4>
+                                    <h4 class="card-title" id="basic-layout-form"> تفاصيل الفاتورة كاملة </h4>
                                     <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
                                 </div>
                                 <div class="card-content collapse show">
@@ -256,7 +255,28 @@
                                                     @endforeach
                                                 </div>
 
+
                                                 <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="name"> الاستقبال <span class="required_span">
+                                                                    *
+                                                                </span> </label>
+                                                            <input disabled type="text" id="name"
+                                                                class="form-control" placeholder="" name="name"
+                                                                value="{{ $invoice->Recieved->name }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="name"> الفني <span class="required_span">
+                                                                    *
+                                                                </span> </label>
+                                                            <input disabled type="text" id="name"
+                                                                class="form-control" placeholder="" name="name"
+                                                                value="{{ $invoice->Technical->name ?? 'لا يوجد' }}">
+                                                        </div>
+                                                    </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="name"> اسم العميل <span class="required_span">
@@ -371,12 +391,12 @@
                                                         </div>
 
                                                         <!-- زر إضافة تفاصيل السعر -->
-                                                        <div class="mt-2 form-group">
+                                                        {{-- <div class="mt-2 form-group">
                                                             <button type="button" class="btn btn-sm btn-primary"
                                                                 onclick="addPriceDetail()">
                                                                 إضافة تفاصيل السعر
                                                             </button>
-                                                        </div>
+                                                        </div> --}}
 
                                                         <!-- تفاصيل السعر القديمة -->
                                                         <div id="price-details-wrapper">
@@ -387,21 +407,21 @@
                                                                         name="price_details[{{ $detailIndex }}][id]"
                                                                         value="{{ $detail->id }}">
                                                                     <div class="col-4">
-                                                                        <input type="text"
+                                                                        <input readonly type="text"
                                                                             name="price_details[{{ $detailIndex }}][title]"
                                                                             class="form-control"
                                                                             placeholder="عنوان التفصيلة"
                                                                             value="{{ $detail->title }}">
                                                                     </div>
                                                                     <div class="col-4">
-                                                                        <input type="number" step="0.01"
+                                                                        <input readonly type="number" step="0.01"
                                                                             name="price_details[{{ $detailIndex }}][amount]"
                                                                             class="form-control" placeholder="السعر"
                                                                             value="{{ $detail->amount }}" required
                                                                             oninput="updateTotalPrice()">
                                                                     </div>
                                                                     <div class="col-3">
-                                                                        <select
+                                                                        <select readonly
                                                                             name="price_details[{{ $detailIndex }}][piece_resource]"
                                                                             class="form-control">
                                                                             @foreach ($piece_resources as $resource)
@@ -411,11 +431,11 @@
                                                                             @endforeach
                                                                         </select>
                                                                     </div>
-                                                                    <div class="col-1">
+                                                                    {{-- <div class="col-1">
                                                                         <button type="button"
                                                                             class="btn btn-danger btn-sm"
                                                                             onclick="removePriceDetail(this)">-</button>
-                                                                    </div>
+                                                                    </div> --}}
                                                                 </div>
                                                                 @php $detailIndex++; @endphp
                                                             @endforeach
@@ -582,13 +602,14 @@
                                                     <div class="col-md-12">
                                                         <div class="form-group">
                                                             <label for="title"> ملاحظات فني الصيانة </label>
-                                                            <textarea name="tech_notes" id="" class="form-control">{{ $invoice->tech_notes }}</textarea>
+                                                            <textarea readonly name="tech_notes" id="" class="form-control">{{ $invoice->tech_notes }}</textarea>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="price"> حالة الجهاز </label>
-                                                            <select name="status" id="" class="form-control">
+                                                            <select readonly name="status" id=""
+                                                                class="form-control">
                                                                 <option
                                                                     {{ $invoice->status == 'تحت الصيانة' ? 'selected' : '' }}
                                                                     value="تحت الصيانة">تحت الصيانة</option>
@@ -606,7 +627,7 @@
                                                 </div>
                                             </div>
                                             <hr>
-                                            <div class="row">
+                                            {{-- <div class="row">
                                                 <div class="col-12">
                                                     <h5
                                                         style="font-weight: bold;color: #000;border-bottom: 1px dashed #ccc;margin-bottom: 10px;padding-bottom: 10px;">
@@ -669,15 +690,16 @@
                                                         <textarea name="file_status_description" id="" class="form-control">{{ old('file_status_description') }}</textarea>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> --}}
                                             <!------------------------------- And Add More Photos Status -------------------------------------->
-                                            <div class="form-actions">
+                                            {{-- <div class="form-actions">
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="la la-check-square-o"></i> حفظ
                                                 </button>
                                                 <p id="loadingMessage" class="mt-2 text-info" style="display: none;">⏳
                                                     جاري رفع البيانات، الرجاء الانتظار...</p>
                                             </div>
+                                            --}}
                                         </form>
                                         <script>
                                             document.getElementById("invoice-form").addEventListener("submit", function(e) {
@@ -836,9 +858,6 @@
                                                     <th>
                                                         تفاصيل اضافية
                                                     </th>
-                                                    <th>
-                                                        العمليات
-                                                    </th>
                                                 </tr>
                                                 @forelse ($invoice->files as $file)
                                                     @if ($file->price > 0)
@@ -865,12 +884,7 @@
                                                                     action="{{ route('dashboard.invoices.delete_file', $file['id']) }}"
                                                                     method="POST">
                                                                     @csrf
-                                                                    <div class="">
-                                                                        <button
-                                                                            onclick="return confirm('هل تريد حذف هذا المرفق؟')"
-                                                                            type="submit" class="btn btn-danger btn-sm">
-                                                                            <i class="la la-trash"></i> </button>
-                                                                    </div>
+
                                                                 </form>
                                                             </td>
                                                         </tr>
@@ -892,21 +906,15 @@
                                 <div class="card-content">
                                     <div class="card-body">
                                         <div class="row">
+
                                             <table class="table table-bordered">
-                                                <tr>
-                                                    <th>
-                                                        المرفق
-                                                    </th>
-                                                    <th>
-                                                        عنوان المرفق
-                                                    </th>
-                                                    <th>
-                                                        تفاصيل اضافية
-                                                    </th>
-                                                    <th>
-                                                        العمليات
-                                                    </th>
-                                                </tr>
+                                                <thead>
+                                                    <tr>
+                                                        <th> الصورة </th>
+                                                        <th> العنوان </th>
+                                                        <th> التفاصيل </th>
+                                                    </tr>
+                                                </thead>
                                                 <tbody>
                                                     @forelse ($invoice->files as $file)
                                                         @if ($file->price == 0)
@@ -926,23 +934,8 @@
                                                                 <td>
                                                                     {{ $file->description }}
                                                                 </td>
-                                                                <td>
-                                                                    <form
-                                                                        action="{{ route('dashboard.invoices.delete_file', $file['id']) }}"
-                                                                        method="POST">
-                                                                        @csrf
-                                                                        <div class="">
-                                                                            <button
-                                                                                onclick="return confirm('هل تريد حذف هذا المرفق؟')"
-                                                                                type="submit"
-                                                                                class="btn btn-danger btn-sm">
-                                                                                <i class="la la-trash"></i> </button>
-                                                                        </div>
-                                                                    </form>
-                                                                </td>
                                                             </tr>
                                                         @endif
-
                                                     @empty
                                                         لا يوجد صور لحالة الجهاز
                                                     @endforelse

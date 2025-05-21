@@ -330,7 +330,7 @@ class InvoiceController extends Controller
                 $invoice->device_password_text = $data['device_text_password'];
                 $invoice->device_pattern = $patternJson;
                 $invoice->checkout_type = $data['checkout_type'];
-                $invoice->piece_resource = $data['piece_resource'];
+                // $invoice->piece_resource = $data['piece_resource'];
                 $invoice->invoice_more_checks = json_encode($data['invoice_more_checks']);
                 $invoice->save();
                 ############ Start Insert Files ################
@@ -431,6 +431,7 @@ class InvoiceController extends Controller
                                 'invoice_id' => $invoice->id,
                                 'title' => $detail['title'] ?? '', // قيمة فاضية إذا ما أرسل عنوان
                                 'amount' => $detail['amount'],
+                                'piece_resource' => $detail['piece_resource'] ?? null,
                             ]);
                         }
                     }
@@ -550,22 +551,22 @@ class InvoiceController extends Controller
                 $invoice->status = $data['status'];
                 $invoice->device_password_text = $data['device_text_password'];
                 $invoice->device_pattern = $patternJson;
-                $invoice->piece_resource = $data['piece_resource'];
+                // $invoice->piece_resource = $data['piece_resource'];
                 $invoice->invoice_more_checks = json_encode($data['invoice_more_checks']);
                 $invoice->save();
                 ############ Start Price Details ################
                 // حذف، تحديث، إضافة حسب البيانات
                 // حذف كل تفاصيل السعر القديمة المرتبطة بالفاتورة
                 $invoice->priceDetails()->delete();
-
                 // ثم إضافة كل التفاصيل الجديدة
                 if (!empty($data['price_details']) && is_array($data['price_details'])) {
                     foreach ($data['price_details'] as $detail) {
                         if (!empty($detail['amount'])) {
                             PriceDetail::create([
                                 'invoice_id' => $invoice->id,
-                                'title' => $detail['title'] ?? '',
+                                'title' => $detail['title'] ?? '', // قيمة فاضية إذا ما أرسل عنوان
                                 'amount' => $detail['amount'],
+                                'piece_resource' => $detail['piece_resource'] ?? null,
                             ]);
                         }
                     }
@@ -812,4 +813,21 @@ class InvoiceController extends Controller
         return view('dashboard.invoices.invoice_haif_time', compact('invoices', 'techs'));
     }
     ################## End  Invoices Haif Time
+
+    ######################## Show Invoice All Details ############
+
+    public function show_details($id)
+    {
+        $invoice = Invoice::find($id);
+        $problems = ProblemCategory::all();
+        $checks = CheckText::all();
+        $speed_devices = SpeedDevice::all();
+        $programe_devices = ProgrameDevice::all();
+        $invoice_more_checks = InvoiceMoreCheck::all();
+        $programe_problems = ProgrameProblemCategory::all();
+        $speed_problems = SpeedProblemCategory::all();
+        $piece_resources = PieceSource::all();
+        return view('dashboard.invoices.show-details', compact('piece_resources', 'invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'invoice_more_checks', 'programe_problems', 'speed_problems'));
+    }
+    ###################### End Invoice All Details ###############
 }

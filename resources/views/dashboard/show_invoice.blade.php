@@ -366,18 +366,44 @@
                                                     alt="">
                                             </td>
                                             <td class="text-right">
-                                                <div class="flex-row d-flex justify-content-center">
-                                                    @foreach ($invoice->files as $file)
-                                                        @if ($file->price == 0)
-                                                            <a
-                                                                href="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}">
-                                                                <img style="border: 1px solid #ccc;border-radius: 10px;padding: 2px;margin-left: 5px"
-                                                                    width="100px" height="100px" class="img-border"
-                                                                    src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
-                                                                    alt="">
-                                                            </a>
-                                                        @endif
-                                                    @endforeach
+                                                <div class="">  
+                                                    <table class="table table-borderd">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>
+                                                                    المرفق
+                                                                </th>
+                                                                <th>
+                                                                    عنوان المرفق
+                                                                </th>
+                                                                <th>
+                                                                    تفاصيل اضافية
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($invoice->files as $file)
+                                                                @if ($file->price == 0)
+                                                                    <tr>
+                                                                        <td>
+                                                                            <a href="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
+                                                                                target="_blank">
+                                                                                <img width="100" height="100"
+                                                                                    src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
+                                                                                    alt="">
+                                                                            </a>
+                                                                        </td>
+                                                                        <td>
+                                                                            {{ $file['title'] }}
+                                                                        </td>
+                                                                        <td>
+                                                                            {{ $file['details'] }}
+                                                                        </td>
+                                                                    </tr>
+                                                                @endif
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
                                                 </div>
                                             </td>
                                         </tr>
