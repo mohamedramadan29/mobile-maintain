@@ -57,6 +57,17 @@
                                         <div class="alert alert-danger">{{ $error }}</div>
                                     @endforeach
                                 @endif
+                                @if(session()->has('Success_message'))
+                                <div style="margin: auto;margin-top: 20px; text-align: center;">
+                                    <p style="margin-bottom: 10px; color: green;">تم اضافة الفاتورة بنجاح</p>
+                                    <a href="{{ route('dashboard.invoices.index') }}" class="btn btn-primary btn-sm">
+                                        <i class="la la-list"></i> جميع الفواتير
+                                    </a>
+                                    <a href="{{ route('dashboard.invoices.print_barcode', session('new_invoice_id')) }}" target="_blank" class="btn btn-info btn-sm">
+                                        <i class="la la-print"></i> طباعة الباركود
+                                    </a>
+                                </div>
+                                @endif
                                 <div class="card-header">
                                     <h4 class="card-title" id="basic-layout-form"> اضافة فاتورة جديدة </h4>
                                     <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i> </a>
@@ -605,7 +616,7 @@
                                                 <div class="row">
                                                     <div class="col-lg-12">
                                                         <div class="form-group">
-                                                            <label for="address"> اضافة مرفقات <span
+                                                            <label for="address"> تصوير حالة الجهاز  <span
                                                                     class="required_span"> * </span> </label>
                                                             <input required type="file" name="files_images[]"
                                                                 data-parsley-required-message="الرجاء إدخال المرفقات "
@@ -700,7 +711,7 @@
                                                 {{-- New Updtae Images  --}}
 
 
-                                                <div class="form-group">
+                                                {{-- <div class="form-group">
                                                     <label>📸 التقاط الصور من الكاميرا</label><br>
                                                     <button class="mb-2 btn btn-primary"
                                                         onclick="startCamera(event)">تشغيل الكاميرا</button>
@@ -714,7 +725,7 @@
                                                     <div id="snapshots" class="flex-wrap mt-3 d-flex" style="gap: 10px;">
                                                     </div>
                                                     <div id="imageHiddenInputs"></div>
-                                                </div>
+                                                </div> --}}
 
 
                                                 <script>

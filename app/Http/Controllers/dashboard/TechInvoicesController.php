@@ -264,6 +264,18 @@ class TechInvoicesController extends Controller
                     $file->price = $request->file_price;
                     $file->save();
                 }
+                ################# Has Files For Images Status #############################
+                if ($request->hasFile('file_status')) {
+                    // dd($request->all());
+                    $filename_status = $this->saveImage($request->file('file_status'), public_path('assets/uploads/invoices_files'));
+                    $file = new InvoiceImage();
+                    $file->invoice_id = $invoice->id;
+                    $file->image = $filename_status;
+                    $file->user_upload = Auth::id();
+                    $file->title = $request->file_status_title;
+                    $file->description = $request->file_status_description;
+                    $file->save();
+                }
                 // return $this->success_message(' تم اضافة المرفق بنجاح  ');
                 DB::commit();
                 return $this->success_message('تم تحديث حالة الجهاز بنجاح');

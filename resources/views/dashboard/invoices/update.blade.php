@@ -609,7 +609,7 @@
                                                 <div class="row">
                                                     <div class="col-lg-12">
                                                         <div class="form-group">
-                                                            <label for="address"> اضافة مرفقات <span
+                                                            <label for="address"> تصوير حالة الحهاز <span
                                                                     class="required_span"> * </span> </label>
                                                             <input type="file" name="files_images[]"
                                                                 class="form-control" multiple id="imageInput">

@@ -91,7 +91,7 @@
                                                     @if ($invoice->tech_notes)
                                                         <b> ملاحظات فنية الصيانة </b>
                                                         {{ $invoice->tech_notes }}
-                                                        @else
+                                                    @else
                                                         <b> ملاحظات فنية الصيانة </b>
                                                         لا يوجد
                                                     @endif
@@ -110,8 +110,7 @@
                                         <thead>
                                             <tr>
                                                 <th> توقيع العميل </th>
-                                                <th class="text-right"> مرفقات الجهاز </th>
-
+                                                <th class="text-right"> صور حالة الجهاز والمرفقات </th>
                                             </tr>
                                         </thead>
                                         <tbody>

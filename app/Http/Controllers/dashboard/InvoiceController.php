@@ -454,7 +454,9 @@ class InvoiceController extends Controller
                 /// Need Go to Print Code
                 //return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
                 // return $this->success_message(' تم اضافة الفاتورة بنجاح');
-                return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
+                // إعادة توجيه مع رسالة نجاح وبيانات إضافية
+                return redirect()->route('dashboard.invoices.create')->with('Success_message', 'تم إضافة الفاتورة بنجاح')->with('new_invoice_id', $invoice->id);
+                //return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
             } catch (Exception $e) {
                 return Redirect()->back()->withInput()->withErrors($e->getMessage());
                 //return $this->exception_message($e);

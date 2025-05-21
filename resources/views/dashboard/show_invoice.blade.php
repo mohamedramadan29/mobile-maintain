@@ -100,22 +100,24 @@
                                                         class="form-control" name="check_problem_name[]">
                                                 </td>
                                                 <td>
-                                                    <input disabled readonly type="radio" value="1" class="form-control"
-                                                        name="work_{{ $check->id }}"
+                                                    <input disabled readonly type="radio" value="1"
+                                                        class="form-control" name="work_{{ $check->id }}"
                                                         {{ isset($checkResult) && $checkResult->work == 1 ? 'checked' : '' }}>
                                                 </td>
                                                 <td>
-                                                    <input disabled readonly type="radio" value="0" class="form-control"
-                                                        name="work_{{ $check->id }}"
+                                                    <input disabled readonly type="radio" value="0"
+                                                        class="form-control" name="work_{{ $check->id }}"
                                                         {{ isset($checkResult) && $checkResult->work == 0 ? 'checked' : '' }}>
                                                 </td>
                                                 <td>
-                                                    <input disabled readonly type="text" value="{{ $checkResult->notes ?? '' }}"
-                                                        class="form-control" name="notes[]">
+                                                    <input disabled readonly type="text"
+                                                        value="{{ $checkResult->notes ?? '' }}" class="form-control"
+                                                        name="notes[]">
                                                 </td>
                                                 <td>
-                                                    <input disabled readonly type="text" value="{{ $checkResult->after_check ?? '' }}"
-                                                        class="form-control" name="after_check[]">
+                                                    <input disabled readonly type="text"
+                                                        value="{{ $checkResult->after_check ?? '' }}" class="form-control"
+                                                        name="after_check[]">
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -158,22 +160,24 @@
                                                 </td>
 
                                                 <td>
-                                                    <input disabled readonly type="radio" value="1" class="form-control"
-                                                        name="speedwork_{{ $speed->id }}"
+                                                    <input disabled readonly type="radio" value="1"
+                                                        class="form-control" name="speedwork_{{ $speed->id }}"
                                                         {{ isset($speedResult) && $speedResult->work == 1 ? 'checked' : '' }}
                                                         </td>
                                                 <td>
-                                                    <input disabled readonly type="radio" value="0" class="form-control"
-                                                        name="speedwork_{{ $speed->id }}"
+                                                    <input disabled readonly type="radio" value="0"
+                                                        class="form-control" name="speedwork_{{ $speed->id }}"
                                                         {{ isset($speedResult) && $speedResult->work == 0 ? 'checked' : '' }}>
                                                 </td>
                                                 <td>
-                                                    <input disabled readonly type="text" value="{{ $speedResult->notes ?? '' }}"
-                                                        class="form-control" name="speed_notes[]">
+                                                    <input disabled readonly type="text"
+                                                        value="{{ $speedResult->notes ?? '' }}" class="form-control"
+                                                        name="speed_notes[]">
                                                 </td>
                                                 <td>
-                                                    <input disabled readonly type="text" value="{{ $speedResult->after_check ?? '' }}"
-                                                        class="form-control" name="after_check_speed[]">
+                                                    <input disabled readonly type="text"
+                                                        value="{{ $speedResult->after_check ?? '' }}" class="form-control"
+                                                        name="after_check_speed[]">
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -217,18 +221,19 @@
                                                         class="form-control" name="check_programe_name[]">
                                                 </td>
                                                 <td>
-                                                    <input disabled readonly type="radio" value="1" class="form-control"
-                                                        name="programework_{{ $programe->id }}[]"
+                                                    <input disabled readonly type="radio" value="1"
+                                                        class="form-control" name="programework_{{ $programe->id }}[]"
                                                         {{ isset($programeResult) && $programeResult->work == 1 ? 'checked' : '' }}>
                                                 </td>
                                                 <td>
-                                                    <input disabled readonly type="radio" value="0" class="form-control"
-                                                        name="programework_{{ $programe->id }}[]"
+                                                    <input disabled readonly type="radio" value="0"
+                                                        class="form-control" name="programework_{{ $programe->id }}[]"
                                                         {{ isset($programeResult) && $programeResult->work == 0 ? 'checked' : '' }}>
                                                 </td>
                                                 <td>
-                                                    <input disabled readonly type="text" value="{{ $programeResult->notes ?? '' }}"
-                                                        class="form-control" name="programe_notes[]">
+                                                    <input disabled readonly type="text"
+                                                        value="{{ $programeResult->notes ?? '' }}" class="form-control"
+                                                        name="programe_notes[]">
                                                 </td>
                                                 <td>
                                                     <input disabled readonly type="text"
@@ -350,7 +355,7 @@
                                     <thead>
                                         <tr>
                                             <th> توقيع العميل </th>
-                                            <th class="text-right"> مرفقات الجهاز </th>
+                                            <th class="text-right"> صور حالة الجهاز </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -363,13 +368,15 @@
                                             <td class="text-right">
                                                 <div class="flex-row d-flex justify-content-center">
                                                     @foreach ($invoice->files as $file)
-                                                        <a
-                                                            href="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}">
-                                                            <img style="border: 1px solid #ccc;border-radius: 10px;padding: 2px;margin-left: 5px"
-                                                                width="100px" height="100px" class="img-border"
-                                                                src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
-                                                                alt="">
-                                                        </a>
+                                                        @if ($file->price == 0)
+                                                            <a
+                                                                href="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}">
+                                                                <img style="border: 1px solid #ccc;border-radius: 10px;padding: 2px;margin-left: 5px"
+                                                                    width="100px" height="100px" class="img-border"
+                                                                    src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
+                                                                    alt="">
+                                                            </a>
+                                                        @endif
                                                     @endforeach
                                                 </div>
                                             </td>

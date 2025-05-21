@@ -363,14 +363,17 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="price">السعر الأولي <span class="required_span"> * </span></label>
-                                                            <input readonly type="number" step="0.01" id="price" class="form-control" name="price"
-                                                                   value="{{ $invoice->price }}">
+                                                            <label for="price">السعر الأولي <span
+                                                                    class="required_span"> * </span></label>
+                                                            <input readonly type="number" step="0.01" id="price"
+                                                                class="form-control" name="price"
+                                                                value="{{ $invoice->price }}">
                                                         </div>
 
                                                         <!-- زر إضافة تفاصيل السعر -->
                                                         <div class="mt-2 form-group">
-                                                            <button type="button" class="btn btn-sm btn-primary" onclick="addPriceDetail()">
+                                                            <button type="button" class="btn btn-sm btn-primary"
+                                                                onclick="addPriceDetail()">
                                                                 إضافة تفاصيل السعر
                                                             </button>
                                                         </div>
@@ -380,18 +383,27 @@
                                                             @php $detailIndex = 0; @endphp
                                                             @foreach ($invoice->priceDetails as $detail)
                                                                 <div class="mb-2 form-row">
-                                                                    <input type="hidden" name="price_details[{{ $detailIndex }}][id]" value="{{ $detail->id }}">
+                                                                    <input type="hidden"
+                                                                        name="price_details[{{ $detailIndex }}][id]"
+                                                                        value="{{ $detail->id }}">
                                                                     <div class="col-6">
-                                                                        <input type="text" name="price_details[{{ $detailIndex }}][title]" class="form-control"
-                                                                               placeholder="عنوان التفصيلة" value="{{ $detail->title }}">
+                                                                        <input type="text"
+                                                                            name="price_details[{{ $detailIndex }}][title]"
+                                                                            class="form-control"
+                                                                            placeholder="عنوان التفصيلة"
+                                                                            value="{{ $detail->title }}">
                                                                     </div>
                                                                     <div class="col-5">
-                                                                        <input type="number" step="0.01" name="price_details[{{ $detailIndex }}][amount]"
-                                                                               class="form-control" placeholder="السعر" value="{{ $detail->amount }}"
-                                                                               required oninput="updateTotalPrice()">
+                                                                        <input type="number" step="0.01"
+                                                                            name="price_details[{{ $detailIndex }}][amount]"
+                                                                            class="form-control" placeholder="السعر"
+                                                                            value="{{ $detail->amount }}" required
+                                                                            oninput="updateTotalPrice()">
                                                                     </div>
                                                                     <div class="col-1">
-                                                                        <button type="button" class="btn btn-danger btn-sm" onclick="removePriceDetail(this)">-</button>
+                                                                        <button type="button"
+                                                                            class="btn btn-danger btn-sm"
+                                                                            onclick="removePriceDetail(this)">-</button>
                                                                     </div>
                                                                 </div>
                                                                 @php $detailIndex++; @endphp
@@ -533,9 +545,9 @@
                                                             <label for="price"> مصدر القطعة <span
                                                                     class="required_span"> *
                                                                 </span> </label>
-                                                            <select  name="piece_resource" id=""
+                                                            <select name="piece_resource" id=""
                                                                 class="form-control">
-                                                                <option value="" selected > -- حدد مصدر
+                                                                <option value="" selected> -- حدد مصدر
                                                                     القطعة -- </option>
                                                                 @foreach ($piece_resources as $resource)
                                                                     <option @selected($invoice->piece_resource == $resource->id)
@@ -573,9 +585,12 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <hr>
                                             <div class="row">
                                                 <div class="col-12">
-                                                    <h5> اضافة مرفق </h5>
+                                                    <h5
+                                                        style="font-weight: bold;color: #000;border-bottom: 1px dashed #ccc;margin-bottom: 10px;padding-bottom: 10px;">
+                                                        اضافة مرفق </h5>
                                                 </div>
                                                 <div class="col-6">
                                                     <div class="form-group">
@@ -606,6 +621,36 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <hr>
+                                            <!------------------------------ Add More Photo Status ------------------------------------------>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h5
+                                                        style="font-weight: bold;color: #000;border-bottom: 1px dashed #ccc;margin-bottom: 10px;padding-bottom: 10px;">
+                                                        اضافة صور لحالة الجهاز </h5>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="address"> صورة </label>
+                                                        <input type="file" name="file_status" class="form-control">
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="address"> عنوان الصورة </label>
+                                                        <input type="text" id="title" class="form-control"
+                                                            placeholder="" name="file_status_title"
+                                                            value="{{ old('file_status_title') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="address"> تفاصيل اضافية عن الصورة </span> </label>
+                                                        <textarea name="file_status_description" id="" class="form-control">{{ old('file_status_description') }}</textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!------------------------------- And Add More Photos Status -------------------------------------->
                                             <div class="form-actions">
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="la la-check-square-o"></i> حفظ
@@ -683,6 +728,8 @@
                                     </script>
                                 </div>
                             </div> --}}
+
+
                             <div class="card">
                                 <div class="card-header">
                                     <h4 class="card-title" id="basic-layout-form"> المرفقات </h4>
@@ -773,44 +820,79 @@
                                                         العمليات
                                                     </th>
                                                 </tr>
-
                                                 @forelse ($invoice->files as $file)
-                                                    <tr>
-                                                        <td>
-                                                            <a target="_blank"
-                                                                href="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}">
-                                                                <img width="100" height="100" class="file_image"
-                                                                    src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
-                                                                    alt="Card image cap">
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                                            {{ $file->title }}
-                                                        </td>
-                                                        <td>
-                                                            {{ number_format($file->price, 2) }} ريال
-                                                        </td>
-                                                        <td>
-                                                            {{ $file->description }}
-                                                        </td>
-                                                        <td>
-                                                            <form
-                                                                action="{{ route('dashboard.invoices.delete_file', $file['id']) }}"
-                                                                method="POST">
-                                                                @csrf
-                                                                <div class="">
-                                                                    <button
-                                                                        onclick="return confirm('هل تريد حذف هذا المرفق؟')"
-                                                                        type="submit" class="btn btn-danger btn-sm">
-                                                                        <i class="la la-trash"></i> </button>
-                                                                </div>
-                                                            </form>
-                                                        </td>
-                                                    </tr>
+                                                    @if ($file->price > 0)
+                                                        <tr>
+                                                            <td>
+                                                                <a target="_blank"
+                                                                    href="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}">
+                                                                    <img width="100" height="100" class="file_image"
+                                                                        src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
+                                                                        alt="Card image cap">
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                {{ $file->title }}
+                                                            </td>
+                                                            <td>
+                                                                {{ number_format($file->price, 2) }} ريال
+                                                            </td>
+                                                            <td>
+                                                                {{ $file->description }}
+                                                            </td>
+                                                            <td>
+                                                                <form
+                                                                    action="{{ route('dashboard.invoices.delete_file', $file['id']) }}"
+                                                                    method="POST">
+                                                                    @csrf
+                                                                    <div class="">
+                                                                        <button
+                                                                            onclick="return confirm('هل تريد حذف هذا المرفق؟')"
+                                                                            type="submit" class="btn btn-danger btn-sm">
+                                                                            <i class="la la-trash"></i> </button>
+                                                                    </div>
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+                                                    @endif
                                                 @empty
                                                     لا يوجد مرفقات
                                                 @endforelse
                                             </table>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title" id="basic-layout-form"> صور حالة الجهاز </h4>
+                                </div>
+                                <div class="card-content">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            @forelse ($invoice->files as $file)
+                                                @if ($file->price == 0)
+                                                    <div class="col-lg-3 col-12">
+                                                        <a href="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
+                                                            target="_blank">
+                                                            <img width="150" height="150"
+                                                                src="{{ asset('assets/uploads/invoices_files/' . $file['image']) }}"
+                                                                alt="">
+                                                            <div>
+                                                                <p style="font-size: 12px; margin-top:10px;color:#000">
+                                                                    {{ $file->title }}</p>
+                                                                <p style="font-size: 12px;color:#000">
+                                                                    {{ $file->description }}</p>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                @endif
+
+                                            @empty
+                                                لا يوجد صور لحالة الجهاز
+                                            @endforelse
                                         </div>
 
                                     </div>
