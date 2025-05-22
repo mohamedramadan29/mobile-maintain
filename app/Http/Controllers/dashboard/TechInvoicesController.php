@@ -294,6 +294,7 @@ class TechInvoicesController extends Controller
         $speed_problems = SpeedProblemCategory::all();
         $piece_resources = PieceSource::all();
         return view('dashboard.tech_invoices.update', compact('piece_resources', 'invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'invoice_more_checks', 'programe_problems', 'speed_problems'));
+
     }
 
     public function addfile(Request $request, $id)
@@ -324,5 +325,18 @@ class TechInvoicesController extends Controller
         $invoice->client_connect_notes = $request->client_connect_notes;
         $invoice->save();
         return $this->success_message(' تم تحديث حالة التواصل مع العميل بنجاح  ');
+    }
+    public function showCompeleteInvoice($id){
+        $invoice = Invoice::find($id);
+        $problems = ProblemCategory::all();
+        $checks = CheckText::all();
+        $speed_devices = SpeedDevice::all();
+        $programe_devices = ProgrameDevice::all();
+        $invoice_more_checks = InvoiceMoreCheck::all();
+        $programe_problems = ProgrameProblemCategory::all();
+        $speed_problems = SpeedProblemCategory::all();
+        $piece_resources = PieceSource::all();
+
+        return view('dashboard.tech_invoices.compelete-invoice', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'invoice_more_checks', 'programe_problems', 'speed_problems', 'piece_resources'));
     }
 }

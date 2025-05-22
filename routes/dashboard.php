@@ -227,6 +227,7 @@ Route::group([
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
                 Route::post('addfile/{id}', 'AddFile')->name('addfile');
                 Route::post('client-connect/{id}', 'ClientConnect')->name('client-connect');
+                Route::get('show-compelete-invoice/{id}', 'showCompeleteInvoice')->name('show-compelete-invoice');
             });
         });
         ################# End Tech Invoices #####################

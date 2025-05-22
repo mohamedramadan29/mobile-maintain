@@ -131,9 +131,16 @@
                                                             {{ $invoice->time_delivery }}
                                                         </td>
                                                         <td>
-                                                            <a class="btn btn-warning btn-sm"
-                                                                href="{{ route('dashboard.tech_invoices.update', $invoice->id) }}"><i
-                                                                    class="la la-edit"></i> تعديل الصيانة </a>
+                                                            @if ($invoice->delivery_status == 1)
+                                                                <a class="btn btn-warning btn-sm"
+                                                                    href="{{ route('dashboard.tech_invoices.show-compelete-invoice', $invoice->id) }}"><i
+                                                                        class="la la-eye"></i> تفاصيل الفاتورة </a>
+                                                            @else
+                                                                <a class="btn btn-warning btn-sm"
+                                                                    href="{{ route('dashboard.tech_invoices.update', $invoice->id) }}"><i
+                                                                        class="la la-edit"></i> تعديل الصيانة </a>
+                                                            @endif
+
                                                         </td>
                                                     </tr>
                                                     <div class="form-group">
