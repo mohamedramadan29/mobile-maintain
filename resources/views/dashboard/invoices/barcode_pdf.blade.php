@@ -28,7 +28,8 @@
                         <img width="15px" src="{{ asset('assets/admin/') }}/images/logo_mobile.png" alt="">
                     </td>
                     <td style="text-align: right">
-                        <h4 class="invoice_header">فاتورة : {{ $invoice->id }}</h4>
+                        <h4 class="invoice_header"> Ticket : T - {{ $invoice->id }}</h4>
+                        <span style="font-size: 10px;color:#fff"> {{ $invoice->created_at->format('d-m-Y') }} </span>
                     </td>
                 </tr>
             </tbody>
@@ -44,12 +45,12 @@
             <table class="table" style="border-collapse: collapse; width: 100%;">
                 <tbody>
                     <tr>
-                        <td style="text-align: center;">
-                            <p> {{ $invoice->name }} </p>
-                            <p> {{ $invoice->phone }} </p>
+                        <td style="text-align: center; border: 1px solid #000;">
+                            <p>{{ $invoice->name }}</p>
+                            <p>{{ $invoice->phone }}</p>
                         </td>
-                        <td style="text-align: right;margin:auto;">
-                            <img src="data:image/png;base64,{{ $qrCodeBase64 }}" style="width: 100px; height: 36px">
+                        <td style="text-align: right; margin: auto; border: 1px solid #000;">
+                            <img src="data:image/png;base64,{{ $qrCodeBase64 }}" style="width: 150px; height: 30px; object-fit: contain;">
                         </td>
                     </tr>
                 </tbody>

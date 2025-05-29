@@ -205,6 +205,7 @@ Route::group([
                 Route::get('barcode/preview/{id}', 'preview_barcode')->name('barcode.preview');
                 Route::post('send_message/{id}', 'SendMessage')->name('send_message');
                 Route::get('show-details/{id}', 'show_details')->name('show-details');
+                Route::match(['post', 'get'], 'SendMessageRecieve/{id}', 'SendMessageRecieve')->name('SendMessageRecieve');
             });
         });
 

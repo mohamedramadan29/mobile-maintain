@@ -216,31 +216,13 @@
                                                                     @endcan
                                                                 </div>
                                                                 @if ($invoice->message_send == 0)
-                                                                    <form id="send_message_form"
-                                                                        action="{{ route('dashboard.invoices.send_message', $invoice->id) }}"
-                                                                        method="post">
-                                                                        @csrf
-                                                                        <button type="submit" id="send_message_button"
+
+                                                                        <a href="{{ route('dashboard.invoices.SendMessageRecieve', $invoice->id) }}"
                                                                             class="btn btn-warning btn-sm">
                                                                             <i style="font-size:12px"
                                                                                 class="la la-warning"></i>
-                                                                            اعادة ارسال رسالة
-                                                                        </button>
-                                                                        <div id="loadingMessage"
-                                                                            class="spinner-border text-primary"
-                                                                            role="status" style="display: none;">
-                                                                            <span class="sr-only">جاري اعادة ارسال
-                                                                                الرسالة...</span>
-                                                                        </div>
-                                                                    </form>
-                                                                    <script>
-                                                                        document.getElementById('send_message_form').addEventListener('submit', function(e) {
-                                                                            e.preventDefault();
-                                                                            document.getElementById('send_message_button').style.display = 'none';
-                                                                            document.getElementById('loadingMessage').style.display = 'block';
-                                                                            this.submit();
-                                                                        });
-                                                                    </script>
+                                                                            ارسال رسالة تسجيل الفاتورة
+                                                                        </a>
                                                                 @endif
                                                                 @if ($invoice->delivery_status == 0)
                                                                     <a href="{{ route('dashboard.invoices.delivery', $invoice->id) }}"
