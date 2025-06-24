@@ -5,6 +5,7 @@ namespace App\Jobs;
 use Carbon\Carbon;
 use App\Models\dashboard\Admin;
 use App\Models\dashboard\Invoice;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -48,6 +49,12 @@ class CheckInvoiceDeliveryJob implements ShouldQueue
             $admin_tecks = Admin::where('type', 'فني')->where('status', 1)->get();
             $admins = Admin::where('type', 'admin')->where('status', 1)->get();
             // إرسال الإشعارات للفنيين والمسؤولين
+
+            DB::table('notifications')
+                ->whereIn('notifiable_id', $admin_tecks->pluck('id')->merge($admins->pluck('id')))
+                ->where('notifiable_type', Admin::class)
+                ->delete();
+
             Notification::send($admin_tecks, new InvoiceHaifTimePassed($invoices));
             Notification::send($admins, new InvoiceHaifTimePassed($invoices));
             Log::info('CheckInvoiceDeliveryJob is running at: ' . now());
