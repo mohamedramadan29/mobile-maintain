@@ -405,7 +405,7 @@
                                                                     @endif
                                                                 </td>
                                                                 <td>
-                                                                    {{ $invoice->Recieved->name }}
+                                                                    {{ $invoice->Recieved->name ?? ' لا يوجد ' }}
                                                                 </td>
                                                                 <td>
                                                                     {{ $invoice->Technical->name ?? ' لا يوجد ' }}

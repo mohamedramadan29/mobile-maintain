@@ -29,6 +29,13 @@
 
             </div>
             <div class="content-body">
+                @if ($errors->any())
+                    @foreach ($errors->all() as $error)
+                        @php
+                            toastify()->error($error);
+                        @endphp
+                    @endforeach
+                @endif
                 <!-- Basic form layout section start -->
                 <section id="basic-form-layouts">
                     <div class="row match-height">

@@ -103,7 +103,9 @@ class TechInvoicesController extends Controller
                 $admin = Auth::guard('admin')->user();
                 $available_number = $admin->device_nums;
                 if ($invoices >= $available_number) {
-                    return $this->Error_message('لقد تجاوزت العدد المسموح به للعمل في نفس الوقت ');
+                    DB::rollBack();
+                    return view('dashboard.tech_invoices.checkout', compact('invoice'))  // نفس الـ view
+                        ->with('error_message', 'لقد تجاوزت العدد المسموح به للعمل في نفس الوقت');
                 }
                 $invoice->admin_repair_id = Auth::guard('admin')->user()->id;
                 $invoice->status = 'تحت الصيانة';
@@ -155,6 +157,7 @@ class TechInvoicesController extends Controller
                 // return $this->success_message('تم بدأ العمل علي الجهاز  بنجاح');
                 return Redirect::route('dashboard.tech_invoices.index')->with(['تم بدأ العمل علي الجهاز  بنجاح']);
             } catch (Exception $e) {
+                dd($e->getMessage());
                 return $this->exception_message($e);
             }
         }
@@ -262,7 +265,7 @@ class TechInvoicesController extends Controller
                     $file->user_upload = Auth::id();
                     $file->title = $request->file_title;
                     $file->description = $request->file_description;
-                    $file->price = $request->file_price;
+                    $file->price = $request->file_price ?? 0;
                     $file->save();
                 }
                 ################# Has Files For Images Status #############################
@@ -282,6 +285,7 @@ class TechInvoicesController extends Controller
                 return $this->success_message('تم تحديث حالة الجهاز بنجاح');
             } catch (Exception $e) {
                 dd($e);
+
                 return $this->exception_message($e);
             }
         }
@@ -294,7 +298,6 @@ class TechInvoicesController extends Controller
         $speed_problems = SpeedProblemCategory::all();
         $piece_resources = PieceSource::all();
         return view('dashboard.tech_invoices.update', compact('piece_resources', 'invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'invoice_more_checks', 'programe_problems', 'speed_problems'));
-
     }
 
     public function addfile(Request $request, $id)
@@ -310,7 +313,7 @@ class TechInvoicesController extends Controller
             $file->user_upload = Auth::id();
             $file->title = $request->title;
             $file->description = $request->description;
-            $file->price = $request->price;
+            $file->price = $request->price ?? 0;
             $file->save();
             return $this->success_message(' تم اضافة المرفق بنجاح  ');
         } catch (Exception $e) {
@@ -326,7 +329,8 @@ class TechInvoicesController extends Controller
         $invoice->save();
         return $this->success_message(' تم تحديث حالة التواصل مع العميل بنجاح  ');
     }
-    public function showCompeleteInvoice($id){
+    public function showCompeleteInvoice($id)
+    {
         $invoice = Invoice::find($id);
         $problems = ProblemCategory::all();
         $checks = CheckText::all();

@@ -9,8 +9,9 @@ trait Message_Trait
     {
         return redirect()->back()->with(['Success_message' => $msg]);
     }
-    public function Error_message($msg)
+    public function error_message($msg)
     {
+
         return redirect()->back()->with(['Error_message' => $msg]);
     }
     public function exception_message($e){

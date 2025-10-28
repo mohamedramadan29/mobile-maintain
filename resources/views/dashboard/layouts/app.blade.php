@@ -18,17 +18,22 @@
         @endphp
     @endif
     @if (Session::has('Error_message'))
+        <div class="alert alert-danger">
+            {{ \Illuminate\Support\Facades\Session::get('Error_message') }}
+        </div>
         @php
-            toastify()->error(\Illuminate\Support\Facades\Session::get('Error_message'));
+
+            // dd('Reached Error_message block', \Illuminate\Support\Facades\Session::get('Error_message'));
+            //  toastify()->error(\Illuminate\Support\Facades\Session::get('Error_message'));
         @endphp
     @endif
-    @if ($errors->any())
+    {{-- @if ($errors->any())
         @foreach ($errors->all() as $error)
             @php
                 toastify()->error($error);
             @endphp
         @endforeach
-    @endif
+    @endif --}}
     <!-- ////////////////////////////////////////////////////////////////////////////-->
     @include('dashboard.layouts._footer')
     @include('dashboard.layouts._footer_scripts')

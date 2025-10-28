@@ -17,9 +17,10 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.tech_invoices.available') }}"> الفواتير المتاحة
-                                </a>
-                            </li>
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard.tech_invoices.available') }}">
+                                        الفواتير المتاحة
+                                    </a>
+                                </li>
                                 <li class="breadcrumb-item active"><a href="#"> استلام الجهاز </a>
                                 </li>
                             </ol>
@@ -38,6 +39,23 @@
                                     <h4 class="card-title" id="basic-layout-form"> استلام الجهاز </h4>
                                     <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
                                 </div>
+
+                                @if (isset($error_message))
+                                    <div class="alert alert-danger">
+                                        {{ $error_message }}
+                                    </div>
+                                @endif
+
+                                {{-- أو للـ errors العامة --}}
+                                @if ($errors->any())
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
                                 <div class="card-content collapse show">
                                     <div class="card-body">
 

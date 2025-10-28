@@ -718,105 +718,6 @@
                                                 </script>
 
 
-                                                {{-- New Updtae Images  --}}
-
-
-                                                {{-- <div class="form-group">
-                                                    <label>📸 التقاط الصور من الكاميرا</label><br>
-                                                    <button class="mb-2 btn btn-primary"
-                                                        onclick="startCamera(event)">تشغيل الكاميرا</button>
-                                                    <button class="mb-2 btn btn-success" onclick="takeSnapshot(event)">📷
-                                                        التقاط صورة</button>
-                                                    <div>
-                                                        <video id="video" width="320" height="240" autoplay
-                                                            style="border:1px solid #ccc;"></video>
-                                                        <canvas id="canvas" style="display: none;"></canvas>
-                                                    </div>
-                                                    <div id="snapshots" class="flex-wrap mt-3 d-flex" style="gap: 10px;">
-                                                    </div>
-                                                    <div id="imageHiddenInputs"></div>
-                                                </div> --}}
-
-
-                                                <script>
-                                                    let video = document.getElementById('video');
-                                                    let canvas = document.getElementById('canvas');
-                                                    let snapshotsContainer = document.getElementById('snapshots');
-                                                    let imageHiddenInputs = document.getElementById('imageHiddenInputs');
-                                                    let stream = null;
-
-                                                    function startCamera(event) {
-                                                        event.preventDefault(); // منع أي إرسال غير مرغوب فيه
-                                                        navigator.mediaDevices.getUserMedia({
-                                                                video: true
-                                                            })
-                                                            .then(function(mediaStream) {
-                                                                stream = mediaStream;
-                                                                video.srcObject = mediaStream;
-                                                            })
-                                                            .catch(function(err) {
-                                                                alert("تعذر تشغيل الكاميرا: " + err);
-                                                            });
-                                                    }
-
-                                                    function takeSnapshot(event) {
-                                                        event.preventDefault(); // منع أي إرسال غير مرغوب فيه
-                                                        const context = canvas.getContext('2d');
-                                                        canvas.width = video.videoWidth;
-                                                        canvas.height = video.videoHeight;
-                                                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                                                        // ضغط الصورة
-                                                        let dataUrl = canvas.toDataURL('image/jpeg', 0.7); // ضغط 70%
-
-                                                        // عرض الصورة
-                                                        let img = document.createElement('img');
-                                                        img.src = dataUrl;
-                                                        img.style.width = '150px';
-                                                        img.style.border = '2px solid #ccc';
-                                                        img.style.borderRadius = '5px';
-
-                                                        // إضافة زر حذف
-                                                        let deleteButton = document.createElement('button');
-                                                        deleteButton.textContent = 'حذف';
-                                                        deleteButton.classList.add('btn', 'btn-danger', 'mt-2');
-                                                        deleteButton.onclick = function() {
-                                                            deleteImage(img, dataUrl);
-                                                        };
-
-                                                        // إنشاء حاوية للصورة وزر الحذف
-                                                        let imgContainer = document.createElement('div');
-                                                        imgContainer.style.position = 'relative';
-                                                        imgContainer.appendChild(img);
-                                                        imgContainer.appendChild(deleteButton);
-
-                                                        // إضافة الصورة والحاوية إلى الحاوية الرئيسية
-                                                        snapshotsContainer.appendChild(imgContainer);
-
-                                                        // إضافة input مخفي للإرسال
-                                                        let input = document.createElement('input');
-                                                        input.type = 'hidden';
-                                                        input.name = 'captured_images[]';
-                                                        input.value = dataUrl;
-                                                        imageHiddenInputs.appendChild(input);
-                                                    }
-
-                                                    // دالة حذف الصورة
-                                                    function deleteImage(imageElement, dataUrl) {
-                                                        // إزالة الصورة من العرض
-                                                        imageElement.parentNode.remove();
-
-                                                        // إزالة الـ input المخفي الذي يحتوي على البيانات
-                                                        let inputs = imageHiddenInputs.getElementsByTagName('input');
-                                                        for (let i = 0; i < inputs.length; i++) {
-                                                            if (inputs[i].value === dataUrl) {
-                                                                inputs[i].remove();
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                </script>
-
 
                                                 <!-- عنصر التوقيع -->
                                                 <div class="col-md-6">
@@ -919,23 +820,42 @@
                                                         return;
                                                     }
                                                 }
+
                                                 if (signaturePad.isEmpty()) {
                                                     e.preventDefault();
                                                     alert('الرجاء التوقيع على الفاتورة');
                                                     // signatureError.style.display = 'block';
-                                                    //  signatureError.textContent = 'الرجاء التوقيع على الفاتورة';
+                                                    // signatureError.textContent = 'الرجاء التوقيع على الفاتورة';
+                                                    return; // أضف return هنا عشان ميكملش
                                                 } else {
                                                     signatureInput.value = signaturePad.toDataURL();
-
-                                                    let submitBtn = this.querySelector('button[type="submit"]');
-                                                    let loadingMessage = document.getElementById('loadingMessage');
-
-                                                    submitBtn.disabled = true;
-                                                    submitBtn.innerHTML = '<i class="la la-spinner la-spin"></i> جاري الحفظ...';
-
-                                                    loadingMessage.style.display = 'block';
-
                                                 }
+
+                                                // **التحقق الشامل الجديد هنا** (قبل الـ loading)
+                                                let form = this; // الـ form نفسه
+                                                if (!form.checkValidity()) { // يتحقق من كل الحقول required في HTML
+                                                    e.preventDefault();
+                                                    // أظهر رسالة خطأ عامة أو استخدم form.reportValidity() عشان يظهر الـ browser errors
+                                                    form.reportValidity(); // ده هيظهر الـ tooltips التلقائية للحقول الفاضية
+                                                    return;
+                                                }
+
+                                                // **إضافة تحقق يدوي إضافي إذا لزم الأمر** (مثال: لو فيه حقول مش مغطاة بـ required)
+                                                // let customerName = document.getElementById('customer_name').value.trim();
+                                                // if (!customerName) {
+                                                //     e.preventDefault();
+                                                //     alert('الرجاء إدخال اسم العميل');
+                                                //     return;
+                                                // }
+                                                // ... أضف باقي التحققات
+
+                                                // الآن الـ loading آمن، لأن كل حاجة تمام
+                                                let submitBtn = this.querySelector('button[type="submit"]');
+                                                let loadingMessage = document.getElementById('loadingMessage');
+
+                                                submitBtn.disabled = true;
+                                                submitBtn.innerHTML = '<i class="la la-spinner la-spin"></i> جاري الحفظ...';
+                                                loadingMessage.style.display = 'block';
                                             });
                                         </script>
 
