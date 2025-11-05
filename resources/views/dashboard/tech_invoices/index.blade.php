@@ -134,11 +134,14 @@
                                                             @if ($invoice->delivery_status == 1)
                                                                 <a class="btn btn-warning btn-sm"
                                                                     href="{{ route('dashboard.tech_invoices.show-compelete-invoice', $invoice->id) }}"><i
-                                                                        class="la la-eye"></i> تفاصيل الفاتورة </a>
+                                                                        class="la la-eye" style="font-size: 12px"></i> تفاصيل الفاتورة </a>
                                                             @else
                                                                 <a class="btn btn-warning btn-sm"
                                                                     href="{{ route('dashboard.tech_invoices.update', $invoice->id) }}"><i
-                                                                        class="la la-edit"></i> تعديل الصيانة </a>
+                                                                        class="la la-edit" style="font-size: 12px"></i> تعديل الصيانة </a>
+                                                                <a class="mt-1 btn btn-danger btn-sm"
+                                                                    href="{{ route('dashboard.tech_invoices.ReturnToRoof', $invoice->id) }}"> ارجاع الي رف الاستلام <i
+                                                                        class="la la-chevron-left" style="font-size: 12px"></i> </a>
                                                             @endif
 
                                                         </td>

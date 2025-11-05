@@ -625,7 +625,7 @@
                                                         <input type="file" name="file" class="form-control">
                                                     </div>
                                                 </div>
-                                                <div class="col-6">
+                                                <div class="col-6 d-none">
                                                     <div class="form-group">
                                                         <label for="address"> اضف عنوان للمرفق </label>
                                                         <input type="text" id="title" class="form-control"
@@ -633,7 +633,7 @@
                                                             value="{{ old('file_title') }}">
                                                     </div>
                                                 </div>
-                                                <div class="col-6">
+                                                <div class="col-6 d-none">
                                                     <div class="form-group">
                                                         <label for="price"> سعر المرفق </label>
                                                         <input type="number" step="0.01" id="price"
@@ -641,7 +641,7 @@
                                                             value="{{ old('file_price') }}">
                                                     </div>
                                                 </div>
-                                                <div class="col-6">
+                                                <div class="col-6 d-none">
                                                     <div class="form-group">
                                                         <label for="address"> تفاصيل اضافية عن المرفق * </span> </label>
                                                         <textarea name="file_description" id="" class="form-control">{{ old('file_description') }}</textarea>
@@ -763,78 +763,14 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-body">
-                                        {{-- <h5> اضافة مرفق </h5>
-                                        <form id="addattachmentForm"
-                                            action="{{ route('dashboard.tech_invoices.addfile', $invoice->id) }}"
-                                            method="POST" enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="row">
 
-                                                <div class="col-6">
-                                                    <div class="form-group">
-                                                        <label for="address"> صورة المرفق <span class="required_span"> *
-                                                            </span> </label>
-                                                        <input required type="file" name="file"
-                                                            class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-6">
-                                                    <div class="form-group">
-                                                        <label for="address"> اضف عنوان للمرفق <span
-                                                                class="required_span">
-                                                                * </span> </label>
-                                                        <input required type="text" id="title"
-                                                            class="form-control" placeholder="" name="title"
-                                                            value="{{ old('title') }}">
-                                                    </div>
-                                                </div>
-                                                <div class="col-6">
-                                                    <div class="form-group">
-                                                        <label for="price"> سعر المرفق <span class="required_span"> *
-                                                            </span> </label>
-                                                        <input required type="number" step="0.01" id="price"
-                                                            class="form-control" placeholder="" name="price"
-                                                            value="{{ old('price') }}">
-                                                    </div>
-                                                </div>
-                                                <div class="col-6">
-                                                    <div class="form-group">
-                                                        <label for="address"> تفاصيل اضافية عن المرفق <span
-                                                                class="required_span"> * </span> </label>
-                                                        <textarea required name="description" id="" class="form-control">{{ old('description') }}</textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-actions">
-                                                <button type="submit" class="btn btn-primary btn-sm">
-                                                    اضافة المرفق <i class="la la-plus"></i>
-                                                </button>
-                                                <p id="loadingMessage" class="mt-2 text-info" style="display: none;">⏳
-                                                    جاري رفع البيانات، الرجاء الانتظار...</p>
-                                            </div>
-                                        </form> --}}
-                                        {{-- <script>
-                                            document.getElementById("addattachmentForm").addEventListener("submit", function(e) {
-                                                e.preventDefault();
-
-                                                let submitBtn = this.querySelector('button[type="submit"]');
-                                                let loadingMessage = document.getElementById('loadingMessage');
-
-                                                submitBtn.disabled = true;
-                                                submitBtn.innerHTML = '<i class="la la-spinner la-spin"></i> جاري الحفظ...';
-
-                                                loadingMessage.style.display = 'block';
-                                                this.submit();
-
-                                            });
-                                        </script> --}}
                                         <div class="row">
                                             <table class="table table-bordered">
                                                 <tr>
                                                     <th>
                                                         المرفق
                                                     </th>
-                                                    <th>
+                                                    {{-- <th>
                                                         عنوان المرفق
                                                     </th>
                                                     <th>
@@ -842,13 +778,13 @@
                                                     </th>
                                                     <th>
                                                         تفاصيل اضافية
-                                                    </th>
+                                                    </th> --}}
                                                     <th>
                                                         العمليات
                                                     </th>
                                                 </tr>
                                                 @forelse ($invoice->files as $file)
-                                                    @if ($file->price > 0)
+                                                    @if ($file->file_type == 'file' || $file->file_type == null)
                                                         <tr>
                                                             <td>
                                                                 <a target="_blank"
@@ -858,7 +794,7 @@
                                                                         alt="Card image cap">
                                                                 </a>
                                                             </td>
-                                                            <td>
+                                                            {{-- <td>
                                                                 {{ $file->title }}
                                                             </td>
                                                             <td>
@@ -866,7 +802,7 @@
                                                             </td>
                                                             <td>
                                                                 {{ $file->description }}
-                                                            </td>
+                                                            </td> --}}
                                                             <td>
                                                                 <form
                                                                     action="{{ route('dashboard.invoices.delete_file', $file['id']) }}"
@@ -882,6 +818,8 @@
                                                             </td>
                                                         </tr>
                                                     @endif
+
+
                                                 @empty
                                                     لا يوجد مرفقات
                                                 @endforelse
@@ -916,7 +854,7 @@
                                                 </tr>
                                                 <tbody>
                                                     @forelse ($invoice->files as $file)
-                                                        @if ($file->price == 0)
+                                                        @if ($file->file_type == 'status' || $file->file_type == null)
                                                             <tr>
                                                                 <td>
                                                                     <a target="_blank"

@@ -266,6 +266,7 @@ class TechInvoicesController extends Controller
                     $file->title = $request->file_title;
                     $file->description = $request->file_description;
                     $file->price = $request->file_price ?? 0;
+                    $file->file_type = 'file';
                     $file->save();
                 }
                 ################# Has Files For Images Status #############################
@@ -278,6 +279,7 @@ class TechInvoicesController extends Controller
                     $file->user_upload = Auth::id();
                     $file->title = $request->file_status_title;
                     $file->description = $request->file_status_description;
+                    $file->file_type = 'status';
                     $file->save();
                 }
                 // return $this->success_message(' تم اضافة المرفق بنجاح  ');
@@ -342,5 +344,16 @@ class TechInvoicesController extends Controller
         $piece_resources = PieceSource::all();
 
         return view('dashboard.tech_invoices.compelete-invoice', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'invoice_more_checks', 'programe_problems', 'speed_problems', 'piece_resources'));
+    }
+
+    public function ReturnToRoof($invoice_id)
+    {
+        $invoice = Invoice::find($invoice_id);
+        $invoice->admin_repair_id = null;
+        $invoice->status = 'رف الاستلام';
+        $invoice->checkout_time = null;
+        $invoice->checkout_end_time = null;
+        $invoice->save();
+        return $this->success_message('  تم ارجاع الجهاز الي رف الاستلام بنجاح  ');
     }
 }
