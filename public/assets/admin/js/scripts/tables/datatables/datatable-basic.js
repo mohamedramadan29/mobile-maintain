@@ -14,7 +14,9 @@ $(document).ready(function() {
 *       js of zero configuration        *
 ****************************************/
 
-$('.zero-configuration').DataTable();
+$('.zero-configuration').DataTable({
+      pageLength: 1000,
+});
 
 /**************************************
 *       js of default ordering        *

@@ -2,11 +2,11 @@
 @section('title', ' الفواتير ')
 @section('css')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/tables/datatable/datatables.min.css">
-    <style>
+    {{-- <style>
         div.dataTables_wrapper div.dataTables_paginate {
             display: none;
         }
-    </style>
+    </style> --}}
 @endsection
 @section('content')
     <div class="app-content content">
@@ -186,7 +186,7 @@
                                                             {{ date('h:i A', strtotime($invoice->time_delivery)) }}
                                                         </td>
                                                         <td>
-                                                            <div class="mr-1 mb-1 btn-group">
+                                                            <div class="mb-1 mr-1 btn-group">
                                                                 <button type="button"
                                                                     class="btn btn-primary btn-block dropdown-toggle btn-sm"
                                                                     data-toggle="dropdown" aria-haspopup="true"
@@ -209,20 +209,20 @@
                                                                         class="dropdown-item" type="button"> حركة حساب
                                                                         الفاتورة </a>
                                                                     <a href="{{ route('dashboard.invoices.show-details', $invoice->id) }}"
-                                                                        class="dropdown-item" type="button"> عرض التفاصيل </a>
+                                                                        class="dropdown-item" type="button"> عرض التفاصيل
+                                                                    </a>
                                                                     @can('delete_invoice')
                                                                         <a href="{{ route('dashboard.invoices.destroy', $invoice->id) }}"
                                                                             class="dropdown-item" type="button"> حذف </a>
                                                                     @endcan
                                                                 </div>
                                                                 @if ($invoice->message_send == 0)
-
-                                                                        <a href="{{ route('dashboard.invoices.SendMessageRecieve', $invoice->id) }}"
-                                                                            class="btn btn-warning btn-sm">
-                                                                            <i style="font-size:12px"
-                                                                                class="la la-warning"></i>
-                                                                            ارسال رسالة تسجيل الفاتورة
-                                                                        </a>
+                                                                    <a href="{{ route('dashboard.invoices.SendMessageRecieve', $invoice->id) }}"
+                                                                        class="btn btn-warning btn-sm">
+                                                                        <i style="font-size:12px"
+                                                                            class="la la-warning"></i>
+                                                                        ارسال رسالة تسجيل الفاتورة
+                                                                    </a>
                                                                 @endif
                                                                 @if ($invoice->delivery_status == 0)
                                                                     <a href="{{ route('dashboard.invoices.delivery', $invoice->id) }}"
@@ -261,12 +261,12 @@
                                                 onclick="submitBulkDelete()">نعم</button>
                                         </div>
                                         @can('delete_invoice')
-                                        <button type="button" class="btn btn-danger btn-sm"
-                                            onclick="submitBulkDelete()">
-                                            حذف المحدد
-                                        </button>
+                                            <button type="button" class="btn btn-danger btn-sm"
+                                                onclick="submitBulkDelete()">
+                                                حذف المحدد
+                                            </button>
                                         @endcan
-                                        {{ $invoices->links() }}
+                                        {{-- {{ $invoices->links() }} --}}
                                     </div>
                                 </div>
 
@@ -289,13 +289,18 @@
     </script>
     <script>
         $(document).ready(function() {
-            if (!$.fn.DataTable.isDataTable('#DataTables_Table_0')) {
+            // if (!$.fn.DataTable.isDataTable('#DataTables_Table_0')) {
                 $('#DataTables_Table_0').DataTable({
+                    pageLength: 100,
                     language: lang === 'ar' ? {
                         url: '//cdn.datatables.net/plug-ins/2.2.2/i18n/ar.json',
                     } : {},
                 });
-            }
+            // }
+            // $('.zero-configuration').DataTable({
+
+            //     pageLength: 100,
+            // });
         });
     </script>
     <script>

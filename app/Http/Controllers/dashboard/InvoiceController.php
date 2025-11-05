@@ -60,7 +60,7 @@ class InvoiceController extends Controller
             }
         }
 
-        $invoices = $query->orderBy('id', 'desc')->paginate(10)->appends($request->all());
+        $invoices = $query->orderBy('id', 'desc')->paginate(1000)->appends($request->all());
         $techs = Admin::where('type', 'فني')->get();
 
         return view('dashboard.invoices.index', compact('invoices', 'techs'));

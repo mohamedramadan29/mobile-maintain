@@ -366,19 +366,19 @@
                                                     alt="">
                                             </td>
                                             <td class="text-right">
-                                                <div class="">  
+                                                <div class="">
                                                     <table class="table table-borderd">
                                                         <thead>
                                                             <tr>
                                                                 <th>
                                                                     المرفق
                                                                 </th>
-                                                                <th>
+                                                                {{-- <th>
                                                                     عنوان المرفق
                                                                 </th>
                                                                 <th>
                                                                     تفاصيل اضافية
-                                                                </th>
+                                                                </th> --}}
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -393,12 +393,12 @@
                                                                                     alt="">
                                                                             </a>
                                                                         </td>
-                                                                        <td>
+                                                                        {{-- <td>
                                                                             {{ $file['title'] }}
                                                                         </td>
                                                                         <td>
                                                                             {{ $file['details'] }}
-                                                                        </td>
+                                                                        </td> --}}
                                                                     </tr>
                                                                 @endif
                                                             @endforeach
