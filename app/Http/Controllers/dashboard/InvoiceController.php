@@ -99,7 +99,8 @@ class InvoiceController extends Controller
         return redirect()->route('dashboard.invoices.index')->with('Success_message', 'تم حذف الفواتير المختارة بنجاح.');
     }
 
-    public function SendMessageRecieve(Request $request, $id){
+    public function SendMessageRecieve(Request $request, $id)
+    {
 
 
         $invoice = Invoice::findOrFail($id);
@@ -109,16 +110,16 @@ class InvoiceController extends Controller
             $message_temp = Message::where('message_type', 'اضافة فاتورة')->value('template_text');
             $new_phone = preg_replace('/^0/', '', $invoice->phone);
             $new_phone = '966' . $new_phone; // إضافة رمز البلد +966
-             ########### Send Message To WhatsApp
+            ########### Send Message To WhatsApp
             // إنشاء رابط عام للفاتورة
             $invoice_link = url('dashboard/invoice/view/' . $invoice->id);
             ########### Dynamic Message
-             // استبدال المتغيرات بالقيم الفعلية
+            // استبدال المتغيرات بالقيم الفعلية
             $message = str_replace(
-                    ['{name}', '{invoice_id}', '{phone}', '{date_delivery}', '{time_delivery}', '{description}', '{invoice_link}'],
-                    [$invoice->name, $invoice->id, $invoice->phone, $invoice->date_delivery, $invoice->time_delivery, $invoice->description ?? "لا توجد ملاحظات", $invoice_link],
-                    $message_temp
-                );
+                ['{name}', '{invoice_id}', '{phone}', '{date_delivery}', '{time_delivery}', '{description}', '{invoice_link}'],
+                [$invoice->name, $invoice->id, $invoice->phone, $invoice->date_delivery, $invoice->time_delivery, $invoice->description ?? "لا توجد ملاحظات", $invoice_link],
+                $message_temp
+            );
 
             // إعداد الطلب لإرسال الرسالة عبر API
             $params = array(
@@ -181,8 +182,6 @@ class InvoiceController extends Controller
         }
         // عرض صفحة إرسال الرسالة
         return view('dashboard.invoices.send-message-recieve', compact('invoice'));
-
-
     }
 
     public function delivery(Request $request, $id)
@@ -259,7 +258,6 @@ class InvoiceController extends Controller
 
         // عرض صفحة تسليم الفاتورة
         return view('dashboard.invoices.delivery_status', compact('invoice'));
-
     }
 
     public function undelivery(Request $request, $id)
@@ -419,7 +417,8 @@ class InvoiceController extends Controller
                 $invoice->checkout_type = $data['checkout_type'];
                 $invoice->message_send = 0;
                 // $invoice->piece_resource = $data['piece_resource'];
-                $invoice->invoice_more_checks = json_encode($data['invoice_more_checks']);
+                $more_checks = $data['invoice_more_checks'] ?? null;
+                $invoice->invoice_more_checks = $more_checks ? json_encode($data['invoice_more_checks']) : null;
                 $invoice->save();
                 ############ Start Insert Files ################
                 if ($request->hasFile('files_images')) {
@@ -538,7 +537,7 @@ class InvoiceController extends Controller
                 //     [$invoice->name, $invoice->id, $invoice->phone, $invoice->date_delivery, $invoice->time_delivery, $invoice->description ?? "لا توجد ملاحظات", $invoice_link],
                 //     $message_temp
                 // );
-               // SendCreateMessage::dispatch($invoice, $message);
+                // SendCreateMessage::dispatch($invoice, $message);
                 DB::commit();
                 /// Need Go to Print Code
                 //return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
@@ -547,6 +546,7 @@ class InvoiceController extends Controller
                 return redirect()->route('dashboard.invoices.create')->with('Success_message', 'تم إضافة الفاتورة بنجاح')->with('new_invoice_id', $invoice->id);
                 //return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
             } catch (Exception $e) {
+                dd($e);
                 return Redirect()->back()->withInput()->withErrors($e->getMessage());
                 //return $this->exception_message($e);
             }
@@ -642,7 +642,8 @@ class InvoiceController extends Controller
                 $invoice->device_password_text = $data['device_text_password'];
                 $invoice->device_pattern = $patternJson;
                 // $invoice->piece_resource = $data['piece_resource'];
-                $invoice->invoice_more_checks = json_encode($data['invoice_more_checks']);
+                $more_checks = $data['invoice_more_checks'] ?? null;
+                $invoice->invoice_more_checks = $more_checks ? json_encode($data['invoice_more_checks']) : null;
                 $invoice->save();
                 ############ Start Price Details ################
                 // حذف، تحديث، إضافة حسب البيانات

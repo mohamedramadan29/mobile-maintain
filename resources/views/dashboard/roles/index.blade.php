@@ -66,7 +66,7 @@
                                                                 حذف <i class="la la-trash"></i>
                                                             </a>
                                                         </td>
-                                                    </tr> 
+                                                    </tr>
                                                 @empty
                                                     <td colspan="4"> لا يوجد بيانات </td>
                                                 @endforelse
