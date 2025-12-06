@@ -725,7 +725,9 @@
                                                         <label>توقيع العميل <span class="required_span"> * </span> </label>
                                                         <div id="signature-pad" class="signature-pad">
                                                             <div class="signature-pad-body">
-                                                                <canvas id="signatureCanvas"></canvas>
+                                                                {{-- <canvas id="signatureCanvas"></canvas> --}}
+                                                                <canvas id="signatureCanvas" width="550"
+                                                                    height="250"></canvas>
                                                             </div>
                                                             <div class="signature-pad-footer">
                                                                 <button type="button" id="clear-signature"
@@ -881,7 +883,21 @@
             left: -15px;
             top: -12px;
         }
+
+
+
+        .signature-pad-body {
+            width: 100%;
+        }
+
+        #signatureCanvas {
+
+            border: 1px solid #999;
+            border-radius: 8px;
+            cursor: crosshair;
+        }
     </style>
+
 @endsection
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>

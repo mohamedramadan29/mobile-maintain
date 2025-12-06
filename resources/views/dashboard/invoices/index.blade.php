@@ -111,7 +111,7 @@
                                                     <th> العمليات </th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody style="overflow: scroll">
                                                 @forelse ($invoices as $invoice)
                                                     <tr>
                                                         {{-- <td style="width: 10px; padding: 10px">
