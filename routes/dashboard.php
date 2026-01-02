@@ -206,6 +206,16 @@ Route::group([
                 Route::post('send_message/{id}', 'SendMessage')->name('send_message');
                 Route::get('show-details/{id}', 'show_details')->name('show-details');
                 Route::match(['post', 'get'], 'SendMessageRecieve/{id}', 'SendMessageRecieve')->name('SendMessageRecieve');
+
+                ############################ New New New New ############################################
+                ######################################### Return To Rouf ###########################
+
+                Route::match(['get', 'post'], '/return-to-rouf/{id}', 'ReturnToRoof')->name('ReturnToRoof');
+                ######################################### End Return To Rouf ###########################
+                ################################# Start Delivery To Client WithDetails ###################
+
+                Route::match(['post', 'get'], 'delivery-with-details/{id}', 'deliveryWithDetails')->name('delivery.details');
+                ################################ End Delivery To ClientWith Details #########################
             });
         });
 
@@ -229,7 +239,7 @@ Route::group([
                 Route::post('addfile/{id}', 'AddFile')->name('addfile');
                 Route::post('client-connect/{id}', 'ClientConnect')->name('client-connect');
                 Route::get('show-compelete-invoice/{id}', 'showCompeleteInvoice')->name('show-compelete-invoice');
-                Route::match(['get','post'], '/return-to-rouf/{id}','ReturnToRoof')->name('ReturnToRoof');
+                Route::match(['get', 'post'], '/return-to-rouf/{id}', 'ReturnToRoof')->name('ReturnToRoof');
             });
         });
         ################# End Tech Invoices #####################

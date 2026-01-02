@@ -398,7 +398,7 @@ class InvoiceController extends Controller
                 // تحويل المصفوفة إلى JSON قبل التخزين
                 $patternJson = json_encode($data['pattern']);
 
-                DB::beginTransaction();
+                // DB::beginTransaction();
                 $invoice = new Invoice();
                 $invoice->invoice_number = 1;
                 $invoice->name = $data['name'];
@@ -524,24 +524,19 @@ class InvoiceController extends Controller
                     }
                 }
                 ########### Send Message To WhatsApp
+
                 // إنشاء رابط عام للفاتورة
-
-                //$invoice_link = url('dashboard/invoice/view/' . $invoice->id);
-
-
+                $invoice_link = url('dashboard/invoice/view/' . $invoice->id);
                 ########### Dynamic Message
                 // استبدال المتغيرات بالقيم الفعلية
+                $message = str_replace(
+                    ['{name}', '{invoice_id}', '{phone}', '{date_delivery}', '{time_delivery}', '{description}', '{invoice_link}'],
+                    [$invoice->name, $invoice->id, $invoice->phone, $invoice->date_delivery, $invoice->time_delivery, $invoice->description ?? "لا توجد ملاحظات", $invoice_link],
+                    $message_temp
+                );
+                SendCreateMessage::dispatch($invoice, $message);
 
-                // $message = str_replace(
-                //     ['{name}', '{invoice_id}', '{phone}', '{date_delivery}', '{time_delivery}', '{description}', '{invoice_link}'],
-                //     [$invoice->name, $invoice->id, $invoice->phone, $invoice->date_delivery, $invoice->time_delivery, $invoice->description ?? "لا توجد ملاحظات", $invoice_link],
-                //     $message_temp
-                // );
-                // SendCreateMessage::dispatch($invoice, $message);
-                DB::commit();
-                /// Need Go to Print Code
-                //return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
-                // return $this->success_message(' تم اضافة الفاتورة بنجاح');
+                // DB::commit();
                 // إعادة توجيه مع رسالة نجاح وبيانات إضافية
                 return redirect()->route('dashboard.invoices.create')->with('Success_message', 'تم إضافة الفاتورة بنجاح')->with('new_invoice_id', $invoice->id);
                 //return Redirect::route('dashboard.invoices.print_barcode', $invoice->id);
@@ -921,4 +916,108 @@ class InvoiceController extends Controller
         return view('dashboard.invoices.show-details', compact('piece_resources', 'invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'invoice_more_checks', 'programe_problems', 'speed_problems'));
     }
     ###################### End Invoice All Details ###############
+    ########################## Return To Rouf ########################
+    #############################
+    ###################################
+
+    public function ReturnToRoof($invoice_id)
+    {
+        $invoice = Invoice::find($invoice_id);
+        $invoice->admin_repair_id = null;
+        $invoice->status = 'رف الاستلام';
+        $invoice->checkout_time = null;
+        $invoice->checkout_end_time = null;
+        $invoice->save();
+        return $this->success_message('  تم ارجاع الجهاز الي رف الاستلام بنجاح  ');
+    }
+
+    ################### ################### Start Delivery Status WithDetails ###################
+    #################
+
+    public function deliveryWithDetails(Request $request, $id)
+    {
+
+        $invoice = Invoice::findOrFail($id);
+
+        $problems = ProblemCategory::all();
+        $checks = CheckText::all();
+        $speed_devices = SpeedDevice::all();
+        $programe_devices = ProgrameDevice::all();
+        $invoice_more_checks = InvoiceMoreCheck::all();
+        $programe_problems = ProgrameProblemCategory::all();
+        $speed_problems = SpeedProblemCategory::all();
+        $piece_resources = PieceSource::all();
+
+
+        if ($request->isMethod('post')) {
+            // إعداد الرسالة المرسلة للعميل
+            $message_temp = Message::where('message_type', 'تسليم الجهاز')->value('template_text');
+            $new_phone = preg_replace('/^0/', '', $invoice->phone);
+            $new_phone = '966' . $new_phone; // إضافة رمز البلد +966
+            $message = str_replace(['{name}'], [$invoice->name], $message_temp);
+
+            // إعداد الطلب لإرسال الرسالة عبر API
+            $params = array(
+                'instanceid' => '138796',
+                'token' => '3fc4ad69-3ea3-4307-923c-7080f7aa0d8e',
+                'phone' => $new_phone,
+                'body' => $message,
+            );
+            $queryString = http_build_query($params);
+
+            // إرسال الرسالة باستخدام cURL
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://api.4whats.net/sendMessage/?" . $queryString,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "GET",
+            ));
+
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+            curl_close($curl);
+
+            // التحقق من نتيجة الإرسال
+            if ($err) {
+                // تسجيل الخطأ في حالة وجود مشكلة في الاتصال
+                Log::error('Failed to send WhatsApp message due to connection error', [
+                    'phone' => $new_phone,
+                    'error' => $err,
+                ]);
+                return redirect()->route('dashboard.invoices.index')
+                    ->with('Error_message', 'فشل إرسال الرسالة بسبب مشكلة في الاتصال، لم يتم تسليم الجهاز');
+            }
+
+            // تحليل استجابة الـ API
+            $responseData = json_decode($response, true);
+            if (isset($responseData['sent']) && $responseData['sent'] === true) {
+                // الرسالة تم إرسالها بنجاح، قم بتسليم الجهاز
+                $invoice->delivery_status = 1;
+                $invoice->save();
+
+                Log::info('WhatsApp message sent successfully and device delivered', [
+                    'phone' => $new_phone,
+                    'response' => $responseData,
+                ]);
+                return redirect()->route('dashboard.invoices.index')
+                    ->with('Success_message', 'تم تسليم الجهاز وإرسال الرسالة بنجاح');
+            } else {
+                // تسجيل الخطأ في حالة فشل الإرسال
+                $errorMessage = $responseData['message'] ?? 'سبب غير معروف';
+                Log::error('Failed to send WhatsApp message', [
+                    'phone' => $new_phone,
+                    'response' => $responseData,
+                ]);
+                return redirect()->route('dashboard.invoices.index')
+                    ->with('Error_message', 'فشل إرسال الرسالة: ' . $errorMessage . '، لم يتم تسليم الجهاز');
+            }
+        }
+
+        // عرض صفحة تسليم الفاتورة
+        return view('dashboard.invoices.delivery_with_details', compact('invoice', 'programe_problems', 'speed_problems', 'piece_resources', 'problems', 'checks', 'speed_devices', 'programe_devices', 'invoice_more_checks'));
+    }
 }
