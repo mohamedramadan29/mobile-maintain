@@ -51,7 +51,7 @@
                         <a class="navbar-brand" href="#">
                             <img class="brand-logo" alt="modern admin logo"
                                 src="{{ asset('assets/admin/') }}/images/logo_mobile.png">
-                            <h3 class="brand-text"> بصمة الاهتمام للاتصالات </h3>
+                            <h3 class="brand-text"> بصمة الاهتمام للاتصالات الفرع الثاني </h3>
                         </a>
                     </li>
                     <li class="nav-item d-md-none">

@@ -847,7 +847,7 @@ class InvoiceController extends Controller
             $mpdf = new Mpdf([
                 'mode' => 'utf-8',
                 'default_font' => 'Zain',
-                'format' => [50, 25],
+                'format' => [50, 26],
                 'margin_left' => 0,
                 'margin_right' => 0,
                 'margin_top' => 0,

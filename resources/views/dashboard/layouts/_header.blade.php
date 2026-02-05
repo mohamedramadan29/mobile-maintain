@@ -9,7 +9,7 @@
                     <a class="navbar-brand" href="{{ url('/') }}">
                         <img class="brand-logo" alt="modern admin logo"
                             src="{{ asset('assets/admin/') }}/images/logo_mobile.png">
-                        <h3 class="brand-text"> بصمة الاهتمام </h3>
+                        <h3 class="brand-text"> بصمة الفرع الثاني </h3>
                     </a>
                 </li>
                 <li class="float-right nav-item d-none d-md-block"><a class="pr-0 nav-link modern-nav-toggle"
