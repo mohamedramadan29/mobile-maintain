@@ -832,6 +832,7 @@ class InvoiceController extends Controller
     {
         try {
             $invoice = Invoice::findOrFail($id);
+            $piece_resources = PieceSource::all();
             // توليد رابط الفاتورة
             $invoiceUrl = url('dashboard/invoice/view/' . $invoice->id);
             // توليد QR Code وتحويله إلى Base64
@@ -855,7 +856,7 @@ class InvoiceController extends Controller
             ]);
 
             // إرسال البيانات إلى View
-            $html = view('dashboard.invoices.barcode_pdf', compact('invoice', 'qrCodeBase64'))->render();
+            $html = view('dashboard.invoices.barcode_pdf', compact('invoice', 'qrCodeBase64','piece_resources'))->render();
 
             // كتابة الـ HTML في PDF
             $mpdf->WriteHTML($html);
