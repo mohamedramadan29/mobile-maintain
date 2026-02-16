@@ -189,6 +189,9 @@ class InvoiceController extends Controller
         $invoice = Invoice::findOrFail($id);
 
         if ($request->isMethod('post')) {
+            // الرسالة تم إرسالها بنجاح، قم بتسليم الجهاز
+            $invoice->delivery_status = 1;
+            $invoice->save();
             // إعداد الرسالة المرسلة للعميل
             $message_temp = Message::where('message_type', 'تسليم الجهاز')->value('template_text');
             $new_phone = preg_replace('/^0/', '', $invoice->phone);
@@ -227,16 +230,15 @@ class InvoiceController extends Controller
                     'phone' => $new_phone,
                     'error' => $err,
                 ]);
+
                 return redirect()->route('dashboard.invoices.index')
-                    ->with('Error_message', 'فشل إرسال الرسالة بسبب مشكلة في الاتصال، لم يتم تسليم الجهاز');
+                    ->with('Error_message', 'فشل إرسال الرسالة بسبب مشكلة في الاتصال،   تم تسليم الجهاز');
             }
 
             // تحليل استجابة الـ API
             $responseData = json_decode($response, true);
             if (isset($responseData['sent']) && $responseData['sent'] === true) {
-                // الرسالة تم إرسالها بنجاح، قم بتسليم الجهاز
-                $invoice->delivery_status = 1;
-                $invoice->save();
+
 
                 Log::info('WhatsApp message sent successfully and device delivered', [
                     'phone' => $new_phone,
@@ -252,7 +254,7 @@ class InvoiceController extends Controller
                     'response' => $responseData,
                 ]);
                 return redirect()->route('dashboard.invoices.index')
-                    ->with('Error_message', 'فشل إرسال الرسالة: ' . $errorMessage . '، لم يتم تسليم الجهاز');
+                    ->with('Error_message', 'فشل إرسال الرسالة: ' . $errorMessage . '،   تم تسليم الجهاز');
             }
         }
 
@@ -856,7 +858,7 @@ class InvoiceController extends Controller
             ]);
 
             // إرسال البيانات إلى View
-            $html = view('dashboard.invoices.barcode_pdf', compact('invoice', 'qrCodeBase64','piece_resources'))->render();
+            $html = view('dashboard.invoices.barcode_pdf', compact('invoice', 'qrCodeBase64', 'piece_resources'))->render();
 
             // كتابة الـ HTML في PDF
             $mpdf->WriteHTML($html);

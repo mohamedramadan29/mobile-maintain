@@ -187,7 +187,7 @@
                                                     {{ date('h:i A', strtotime($invoice->time_delivery)) }}
                                                 </td>
                                                 <td>
-                                                    <div class="mb-1 mr-1 btn-group">
+                                                    <div class="mr-1 mb-1 btn-group">
                                                         <button type="button"
                                                             class="btn btn-primary btn-block dropdown-toggle btn-sm"
                                                             data-toggle="dropdown" aria-haspopup="true"
