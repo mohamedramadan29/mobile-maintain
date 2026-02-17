@@ -98,7 +98,7 @@ class TechInvoicesController extends Controller
             // dd($message_temp);
             ############# Check If This User Have More Invoice Or Not ##############
             try {
-                DB::beginTransaction();
+                // DB::beginTransaction();
                 $invoices = Invoice::where('admin_repair_id', Auth::guard('admin')->user()->id)->where('status', 'تحت الصيانة')->count();
                 $admin = Auth::guard('admin')->user();
                 $available_number = $admin->device_nums;
@@ -153,7 +153,7 @@ class TechInvoicesController extends Controller
                 $invoice_step->step_details = ' تم بدء الصيانة علي الجهاز';
                 $invoice_step->save();
 
-                DB::commit();
+                // DB::commit();
                 // return $this->success_message('تم بدأ العمل علي الجهاز  بنجاح');
                 return Redirect::route('dashboard.tech_invoices.index')->with(['تم بدأ العمل علي الجهاز  بنجاح']);
             } catch (Exception $e) {
