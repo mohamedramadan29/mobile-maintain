@@ -732,12 +732,14 @@
                                                             <div class="signature-pad-footer">
                                                                 <button type="button" id="clear-signature"
                                                                     class="mt-2 btn btn-danger">مسح التوقيع</button>
+                                                                <button type="button" id="test-signature"
+                                                                    class="mt-2 btn btn-info btn-sm">اختبار التوقيع</button>
                                                             </div>
                                                         </div>
                                                         <input required type="text" readonly style="opacity: 0"
                                                             name="signature" id="signature"
                                                             data-parsley-required-message=" الرجاء التوقيع  "
-                                                            value="{{ old('signature') }}">
+                                                            value="">
                                                     </div>
                                                 </div>
 
@@ -787,80 +789,175 @@
                                             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
                                         <script>
-                                            var signcanvas = document.getElementById("signatureCanvas");
-                                            var signaturePad = new SignaturePad(signcanvas);
+                                            // Wait for DOM to be fully loaded
+                                            document.addEventListener("DOMContentLoaded", function() {
+                                                var signcanvas = document.getElementById("signatureCanvas");
 
-                                            // مسح التوقيع عند الضغط على الزر
-                                            document.getElementById("clear-signature").addEventListener("click", function() {
-                                                signaturePad.clear();
-                                            });
+                                                // Check if canvas exists before initializing
+                                                if (signcanvas) {
+                                                    var signaturePad = new SignaturePad(signcanvas, {
+                                                        backgroundColor: 'rgb(255, 255, 255)',
+                                                        penColor: 'rgb(0, 0, 0)',
+                                                        minWidth: 0.5,
+                                                        maxWidth: 2.5,
+                                                        // Tablet-specific settings
+                                                        throttle: 16,
+                                                        minDistance: 2
+                                                    });
 
-                                            document.getElementById("invoice-form").addEventListener("submit", function(e) {
-                                                var signatureInput = document.getElementById("signature");
-                                                let checkoutType = document.getElementById("checkout_type").value;
-
-                                                let problem_all_check = document.getElementById('problem_all_check');
-                                                let problem_programe_check = document.getElementById('problem_programe_check');
-                                                let problem_speed_check = document.getElementById('problem_speed_check');
-
-                                                // تحديد العنصر الذي يجب التحقق منه حسب نوع الفحص
-                                                let activeProblemContainer;
-                                                if (checkoutType === "فحص كامل") {
-                                                    activeProblemContainer = problem_all_check;
-                                                } else if (checkoutType === "فحص جهاز برمجة") {
-                                                    activeProblemContainer = problem_programe_check;
-                                                } else if (checkoutType === "فحص جهاز سريع") {
-                                                    activeProblemContainer = problem_speed_check;
-                                                }
-
-                                                if (activeProblemContainer) {
-                                                    let checkedCount = activeProblemContainer.querySelectorAll('input[type="checkbox"]:checked').length;
-                                                    if (checkedCount === 0) {
+                                                    // Prevent scrolling and touch events on canvas
+                                                    signcanvas.addEventListener('touchstart', function(e) {
                                                         e.preventDefault();
-                                                        ChecksError.style.display = 'block';
-                                                        // ChecksError.textContent = 'من فضلك حدد الاعطال المناسبة حسب نوع الفحص';
-                                                        return;
+                                                        e.stopPropagation();
+                                                    }, { passive: false });
+
+                                                    signcanvas.addEventListener('touchmove', function(e) {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                    }, { passive: false });
+
+                                                    signcanvas.addEventListener('touchend', function(e) {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                    }, { passive: false });
+
+                                                    // Prevent scrolling on the signature pad container
+                                                    var signaturePadContainer = document.getElementById('signature-pad');
+                                                    if (signaturePadContainer) {
+                                                        signaturePadContainer.addEventListener('touchstart', function(e) {
+                                                            if (e.target === signcanvas || signcanvas.contains(e.target)) {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                            }
+                                                        }, { passive: false });
+
+                                                        signaturePadContainer.addEventListener('touchmove', function(e) {
+                                                            if (e.target === signcanvas || signcanvas.contains(e.target)) {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                            }
+                                                        }, { passive: false });
                                                     }
-                                                }
 
-                                                if (signaturePad.isEmpty()) {
-                                                    e.preventDefault();
-                                                    alert('الرجاء التوقيع على الفاتورة');
-                                                    // signatureError.style.display = 'block';
-                                                    // signatureError.textContent = 'الرجاء التوقيع على الفاتورة';
-                                                    return; // أضف return هنا عشان ميكملش
+                                                    // Automatically update signature input when user stops signing
+                                                    signcanvas.addEventListener('mouseup', function() {
+                                                        if (!signaturePad.isEmpty()) {
+                                                            var signatureData = signaturePad.toDataURL('image/png', 1.0);
+                                                            document.getElementById("signature").value = signatureData;
+                                                            console.log('Signature updated on mouseup');
+                                                        }
+                                                    });
+
+                                                    signcanvas.addEventListener('touchend', function() {
+                                                        if (!signaturePad.isEmpty()) {
+                                                            var signatureData = signaturePad.toDataURL('image/png', 1.0);
+                                                            document.getElementById("signature").value = signatureData;
+                                                            console.log('Signature updated on touchend');
+                                                        }
+                                                    });
+
+                                                    // مسح التوقيع عند الضغط على الزر
+                                                    document.getElementById("clear-signature").addEventListener("click", function() {
+                                                        signaturePad.clear();
+                                                        // Also clear the hidden input field
+                                                        document.getElementById("signature").value = "";
+                                                    });
+
+                                                    // اختبار التوقيع
+                                                    document.getElementById("test-signature").addEventListener("click", function() {
+                                                        if (!signaturePad) {
+                                                            alert('Signature pad not initialized');
+                                                            return;
+                                                        }
+
+                                                        var isEmpty = signaturePad.isEmpty();
+                                                        var dataLength = signaturePad.toData().length;
+                                                        var dataURL = signaturePad.toDataURL();
+                                                        var signatureInput = document.getElementById("signature");
+
+                                                        alert('Signature Status:\n' +
+                                                              'Empty: ' + isEmpty + '\n' +
+                                                              'Data Points: ' + dataLength + '\n' +
+                                                              'Input Value Length: ' + signatureInput.value.length + '\n' +
+                                                              'DataURL Length: ' + dataURL.length);
+
+                                                        console.log('Signature test:', {
+                                                            isEmpty: isEmpty,
+                                                            dataLength: dataLength,
+                                                            dataURL: dataURL.substring(0, 50) + '...',
+                                                            inputValue: signatureInput.value
+                                                        });
+                                                    });
+
+                                                    document.getElementById("invoice-form").addEventListener("submit", function(e) {
+                                                        var signatureInput = document.getElementById("signature");
+                                                        let checkoutType = document.getElementById("checkout_type").value;
+
+                                                        let problem_all_check = document.getElementById('problem_all_check');
+                                                        let problem_programe_check = document.getElementById('problem_programe_check');
+                                                        let problem_speed_check = document.getElementById('problem_speed_check');
+
+                                                        // تحديد العنصر الذي يجب التحقق منه حسب نوع الفحص
+                                                        let activeProblemContainer;
+                                                        if (checkoutType === "فحص كامل") {
+                                                            activeProblemContainer = problem_all_check;
+                                                        } else if (checkoutType === "فحص جهاز برمجة") {
+                                                            activeProblemContainer = problem_programe_check;
+                                                        } else if (checkoutType === "فحص جهاز سريع") {
+                                                            activeProblemContainer = problem_speed_check;
+                                                        }
+
+                                                        if (activeProblemContainer) {
+                                                            let checkedCount = activeProblemContainer.querySelectorAll('input[type="checkbox"]:checked').length;
+                                                            if (checkedCount === 0) {
+                                                                e.preventDefault();
+                                                                alert('من فضلك حدد المشاكل المناسبة حسب نوع الفحص');
+                                                                return;
+                                                            }
+                                                        }
+
+                                                        // Enhanced signature validation
+                                                        console.log('Signature pad exists:', !!signaturePad);
+                                                        console.log('Signature is empty:', signaturePad.isEmpty());
+                                                        console.log('Signature data points:', signaturePad.toData().length);
+
+                                                        if (!signaturePad || signaturePad.isEmpty()) {
+                                                            e.preventDefault();
+                                                            alert('الرجاء التوقيع على الفاتورة');
+                                                            return;
+                                                        } else {
+                                                            // Get signature data with higher quality
+                                                            var signatureData = signaturePad.toDataURL('image/png', 1.0);
+                                                            signatureInput.value = signatureData;
+
+                                                            // Debug logging
+                                                            console.log('Signature data length:', signatureData.length);
+                                                            console.log('Signature input value set:', !!signatureInput.value);
+                                                            console.log('Signature captured successfully');
+
+                                                            // Visual feedback
+                                                            signatureInput.style.borderColor = 'green';
+                                                            setTimeout(() => {
+                                                                signatureInput.style.borderColor = '';
+                                                            }, 1000);
+                                                        }
+
+                                                        // **التحقق الشامل الجديد هنا** (قبل الـ loading)
+                                                        let form = this; // الـ form نفسه
+                                                        if (!form.checkValidity()) { // يتحقق من كل الحقول required في HTML
+                                                            e.preventDefault();
+                                                            return;
+                                                        }
+
+                                                        // Show loading
+                                                        document.getElementById("submitInvoice").disabled = true;
+                                                        document.getElementById("loadingMessage").style.display = "block";
+                                                    });
                                                 } else {
-                                                    signatureInput.value = signaturePad.toDataURL();
+                                                    console.error('Signature canvas not found');
                                                 }
-
-                                                // **التحقق الشامل الجديد هنا** (قبل الـ loading)
-                                                let form = this; // الـ form نفسه
-                                                if (!form.checkValidity()) { // يتحقق من كل الحقول required في HTML
-                                                    e.preventDefault();
-                                                    // أظهر رسالة خطأ عامة أو استخدم form.reportValidity() عشان يظهر الـ browser errors
-                                                    form.reportValidity(); // ده هيظهر الـ tooltips التلقائية للحقول الفاضية
-                                                    return;
-                                                }
-
-                                                // **إضافة تحقق يدوي إضافي إذا لزم الأمر** (مثال: لو فيه حقول مش مغطاة بـ required)
-                                                // let customerName = document.getElementById('customer_name').value.trim();
-                                                // if (!customerName) {
-                                                //     e.preventDefault();
-                                                //     alert('الرجاء إدخال اسم العميل');
-                                                //     return;
-                                                // }
-                                                // ... أضف باقي التحققات
-
-                                                // الآن الـ loading آمن، لأن كل حاجة تمام
-                                                let submitBtn = this.querySelector('button[type="submit"]');
-                                                let loadingMessage = document.getElementById('loadingMessage');
-
-                                                submitBtn.disabled = true;
-                                                submitBtn.innerHTML = '<i class="la la-spinner la-spin"></i> جاري الحفظ...';
-                                                loadingMessage.style.display = 'block';
                                             });
                                         </script>
-
 
                                     </div>
                                 </div>
@@ -868,8 +965,7 @@
                         </div>
 
                     </div>
-                </section>
-                <!-- // Basic form layout section end -->
+                </div>
             </div>
         </div>
     </div>
@@ -891,10 +987,31 @@
         }
 
         #signatureCanvas {
-
             border: 1px solid #999;
             border-radius: 8px;
             cursor: crosshair;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        #signature-pad {
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .signature-pad-body {
+            width: 100%;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
     </style>
 

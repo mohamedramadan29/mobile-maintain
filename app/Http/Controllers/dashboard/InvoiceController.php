@@ -268,6 +268,9 @@ class InvoiceController extends Controller
             // البحث عن الفاتورة
             $invoice = Invoice::findOrFail($id);
 
+            // الرسالة تم إرسالها بنجاح، قم بإرجاع الجهاز
+            $invoice->delivery_status = 0;
+            $invoice->save();
             // إعداد الرسالة المرسلة للعميل
             $message_temp = Message::where('message_type', 'عودة الجهاز')->value('template_text');
             $new_phone = preg_replace('/^0/', '', $invoice->phone);
@@ -307,15 +310,13 @@ class InvoiceController extends Controller
                     'error' => $err,
                 ]);
                 return redirect()->route('dashboard.invoices.index')
-                    ->with('Error_message', 'فشل إرسال الرسالة بسبب مشكلة في الاتصال، لم يتم إرجاع الجهاز');
+                    ->with('Error_message', 'فشل إرسال الرسالة بسبب مشكلة في الاتصال،   تم إرجاع الجهاز');
             }
 
             // تحليل استجابة الـ API
             $responseData = json_decode($response, true);
             if (isset($responseData['sent']) && $responseData['sent'] === true) {
-                // الرسالة تم إرسالها بنجاح، قم بإرجاع الجهاز
-                $invoice->delivery_status = 0;
-                $invoice->save();
+
                 Log::info('WhatsApp message sent successfully and device returned', [
                     'phone' => $new_phone,
                     'response' => $responseData,
@@ -330,7 +331,7 @@ class InvoiceController extends Controller
                     'response' => $responseData,
                 ]);
                 return redirect()->route('dashboard.invoices.index')
-                    ->with('Error_message', 'فشل إرسال الرسالة: ' . $errorMessage . '، لم يتم إرجاع الجهاز');
+                    ->with('Error_message', 'فشل إرسال الرسالة: ' . $errorMessage . '،   تم إرجاع الجهاز');
             }
         }
 
