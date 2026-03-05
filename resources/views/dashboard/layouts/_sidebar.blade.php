@@ -17,6 +17,16 @@
                                   data-i18n="nav.users.user_profile"> جميع الفواتير
                               </a>
                           </li>
+                          <li class="{{ Route::is('dashboard.invoices.deviceDeliverd') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.invoices.deviceDeliverd') }}"
+                                  data-i18n="nav.users.user_profile"> فواتير تم تسليمها
+                              </a>
+                          </li>
+                          <li class="{{ Route::is('dashboard.invoices.deviceUnDeliverd') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.invoices.deviceUnDeliverd') }}"
+                                  data-i18n="nav.users.user_profile">  فواتير لم يتم تسليمها
+                              </a>
+                          </li>
                           <li class="{{ Route::is('dashboard.invoices.invoice-haif-time') ? 'active' : '' }}">
                               <a class="menu-item" href="{{ route('dashboard.invoices.invoice-haif-time') }}"
                                   data-i18n="nav.users.user_profile"> فواتير مر عليها نصف الوقت او اكثر

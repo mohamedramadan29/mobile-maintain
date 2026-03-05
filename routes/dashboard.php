@@ -216,6 +216,10 @@ Route::group([
 
                 Route::match(['post', 'get'], 'delivery-with-details/{id}', 'deliveryWithDetails')->name('delivery.details');
                 ################################ End Delivery To ClientWith Details #########################
+                ################# Devive deliverd page and un delivered ###################
+
+                Route::get('/device_deliverd', 'deviceDeliverd')->name('deviceDeliverd');
+                Route::get('/device_undeliverd', 'deviceUnDeliverd')->name('deviceUnDeliverd');
             });
         });
 

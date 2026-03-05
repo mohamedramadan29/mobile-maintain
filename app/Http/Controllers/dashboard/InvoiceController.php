@@ -67,6 +67,57 @@ class InvoiceController extends Controller
     }
 
 
+    ########################################################################################
+    public function deviceDeliverd(Request $request)
+    {
+        $query = Invoice::query();
+        // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
+        if ($request->has('invoice_status') && !empty($request->invoice_status)) {
+
+            //  dd($request->invoice_status);
+            // تحقق من القيم النصية "0" و "1"
+            if ($request->invoice_status == 'تم تسليم الجهاز') {
+                $query->where('delivery_status', 1);
+            } elseif ($request->invoice_status == 'لم يتم التسليم') {
+                $query->where('delivery_status', 0);
+            } else {
+                // في حالة وجود حالة غير الأرقام (مثل "رف الاستلام" أو "تحت الصيانة")
+                $query->where('status', $request->invoice_status);
+            }
+        }
+
+        $invoices = $query->orderBy('id', 'desc')->where('delivery_status', 1)->paginate(1000)->appends($request->all());
+        $techs = Admin::where('type', 'فني')->get();
+
+        return view('dashboard.invoices.device_deliverd', compact('invoices', 'techs'));
+    }
+
+    public function deviceUnDeliverd(Request $request)
+    {
+        $query = Invoice::query();
+        // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
+        if ($request->has('invoice_status') && !empty($request->invoice_status)) {
+
+            //  dd($request->invoice_status);
+            // تحقق من القيم النصية "0" و "1"
+            if ($request->invoice_status == 'تم تسليم الجهاز') {
+                $query->where('delivery_status', 1);
+            } elseif ($request->invoice_status == 'لم يتم التسليم') {
+                $query->where('delivery_status', 0);
+            } else {
+                // في حالة وجود حالة غير الأرقام (مثل "رف الاستلام" أو "تحت الصيانة")
+                $query->where('status', $request->invoice_status);
+            }
+        }
+
+        $invoices = $query->orderBy('id', 'desc')->where('delivery_status', 0)->paginate(1000)->appends($request->all());
+        $techs = Admin::where('type', 'فني')->get();
+
+        return view('dashboard.invoices.device_undeliverd', compact('invoices', 'techs'));
+    }
+
+    ########################################################################################
+
     public function bulkDeleteConfirm(Request $request)
     {
         // الحصول على معرفات الفواتير من معلمات الاستعلام
