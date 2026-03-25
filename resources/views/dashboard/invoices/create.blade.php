@@ -76,7 +76,8 @@
                                 <div class="card-content collapse show">
                                     <div class="card-body">
                                         <form class="form" method="POST" id="invoice-form"
-                                            action="{{ route('dashboard.invoices.create') }}" enctype="multipart/form-data">
+                                            action="{{ route('dashboard.invoices.create') }}" enctype="multipart/form-data"
+                                            onsubmit="return preventMultipleSubmissions(event)">
                                             @csrf
                                             <div class="form-body">
                                                 <div class="row">
@@ -759,14 +760,17 @@
                                             </div>
 
                                             <div class="form-actions">
-                                                <button type="submit" class="btn btn-primary">
+                                                {{-- #### --}}
+                                                <button type="submit" id="submitInvoice" class="btn btn-primary">
                                                     <i class="la la-check-square-o"></i> حفظ
                                                 </button>
+                                                {{-- ##### --}}
                                                 <button type="button" class="mr-1 btn btn-warning">
                                                     <i class="ft-x"></i> رجوع
                                                 </button>
-                                                <p id="loadingMessage" class="mt-2 text-info" style="display: none;">⏳
-                                                    جاري رفع البيانات، الرجاء الانتظار...</p>
+                                                <p id="loadingMessage" class="mt-3 text-center font-weight-bold" style="display: none; color: #007bff; font-size: 16px;">
+                                                    <i class="la la-spinner la-spin"></i> جاري حفظ الفاتورة، الرجاء الانتظار...
+                                                </p>
                                                 <p id="signatureError" class="mt-2 text-danger" style="display: none;">
                                                     الرجاء التوقيع على الفاتورة
                                                 </p>
@@ -946,12 +950,12 @@
                                                         let form = this; // الـ form نفسه
                                                         if (!form.checkValidity()) { // يتحقق من كل الحقول required في HTML
                                                             e.preventDefault();
+                                                            isSubmitting = false; // Reset flag
                                                             return;
                                                         }
 
-                                                        // Show loading
-                                                        document.getElementById("submitInvoice").disabled = true;
-                                                        document.getElementById("loadingMessage").style.display = "block";
+                                                        // The loading and prevention is now handled by preventMultipleSubmissions function
+                                                        return true;
                                                     });
                                                 } else {
                                                     console.error('Signature canvas not found');
@@ -1017,6 +1021,33 @@
 
 @endsection
 @section('js')
+    <script>
+        // Global variable to prevent multiple submissions
+        let isSubmitting = false;
+
+        function preventMultipleSubmissions(event) {
+            if (isSubmitting) {
+                event.preventDefault();
+                return false;
+            }
+            isSubmitting = true;
+
+            // Show loading immediately
+            var submitBtn = document.getElementById("submitInvoice");
+            var loadingMsg = document.getElementById("loadingMessage");
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="la la-spinner la-spin"></i> جاري الحفظ...';
+            }
+
+            if (loadingMsg) {
+                loadingMsg.style.display = "block";
+            }
+
+            return true;
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>
         eruda.init();
