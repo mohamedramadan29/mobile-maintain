@@ -45,6 +45,12 @@ class InvoiceController extends Controller
     public function index(Request $request)
     {
         $query = Invoice::query();
+
+        // Exclude archived invoices for better performance
+        $query->whereDoesntHave('archives', function ($q) {
+            $q->where('status', 'archived');
+        });
+
         // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
         if ($request->has('invoice_status') && !empty($request->invoice_status)) {
 
@@ -322,6 +328,9 @@ class InvoiceController extends Controller
             // الرسالة تم إرسالها بنجاح، قم بإرجاع الجهاز
             $invoice->delivery_status = 0;
             $invoice->save();
+
+
+
             // إعداد الرسالة المرسلة للعميل
             $message_temp = Message::where('message_type', 'عودة الجهاز')->value('template_text');
             $new_phone = preg_replace('/^0/', '', $invoice->phone);
@@ -361,7 +370,7 @@ class InvoiceController extends Controller
                     'error' => $err,
                 ]);
                 return redirect()->route('dashboard.invoices.index')
-                    ->with('Error_message', 'فشل إرسال الرسالة بسبب مشكلة في الاتصال،   تم إرجاع الجهاز');
+                    ->with('Error_message', 'فشل إرسال الرسالة:    تم إرجاع الجهاز');
             }
 
             // تحليل استجابة الـ API

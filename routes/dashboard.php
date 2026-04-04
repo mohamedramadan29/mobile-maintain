@@ -1,28 +1,28 @@
 <?php
 
-use App\Http\Controllers\dashboard\MoreCheckController;
+use App\Http\Controllers\Dashboard\MoreCheckController;
 use App\Models\dashboard\CheckText;
 use App\Models\dashboard\SpeedDevice;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\dashboard\AdminController;
-use App\Http\Controllers\dashboard\RolesController;
-use App\Http\Controllers\dashboard\InvoiceController;
-use App\Http\Controllers\dashboard\MessageController;
-use App\Http\Controllers\dashboard\SettingController;
-use App\Http\Controllers\dashboard\WelcomeController;
+use App\Http\Controllers\Dashboard\AdminController;
+use App\Http\Controllers\Dashboard\RolesController;
+use App\Http\Controllers\Dashboard\InvoiceController;
+use App\Http\Controllers\Dashboard\MessageController;
+use App\Http\Controllers\Dashboard\SettingController;
+use App\Http\Controllers\Dashboard\WelcomeController;
 use App\Http\Controllers\dashboard\auth\AuthController;
-use App\Http\Controllers\dashboard\CheckTextController;
-use App\Http\Controllers\dashboard\SpeedDeviceController;
-use App\Http\Controllers\dashboard\NotificationController;
-use App\Http\Controllers\dashboard\TechInvoicesController;
-use App\Http\Controllers\dashboard\PublicInvoiceController;
-use App\Http\Controllers\dashboard\ProgrameDeviceController;
-use App\Http\Controllers\dashboard\ProblemCategoryController;
-use App\Http\Controllers\dashboard\auth\ResetPasswordController;
-use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
-use App\Http\Controllers\dashboard\PieceResourceController;
-use App\Http\Controllers\dashboard\ProgrameProblemCategoryController;
-use App\Http\Controllers\dashboard\SpeedProblemCategoryController;
+use App\Http\Controllers\Dashboard\CheckTextController;
+use App\Http\Controllers\Dashboard\SpeedDeviceController;
+use App\Http\Controllers\Dashboard\NotificationController;
+use App\Http\Controllers\Dashboard\TechInvoicesController;
+use App\Http\Controllers\Dashboard\PublicInvoiceController;
+use App\Http\Controllers\Dashboard\ProgrameDeviceController;
+use App\Http\Controllers\Dashboard\ProblemCategoryController;
+use App\Http\Controllers\Dashboard\auth\ResetPasswordController;
+use App\Http\Controllers\Dashboard\auth\ForgetPasswordController;
+use App\Http\Controllers\Dashboard\PieceResourceController;
+use App\Http\Controllers\Dashboard\ProgrameProblemCategoryController;
+use App\Http\Controllers\Dashboard\SpeedProblemCategoryController;
 
 Route::group([
     'prefix' => '/dashboard',
@@ -185,7 +185,7 @@ Route::group([
         });
         ##################### End MoreCheck Controller ###################
         ################### Start Invoices #######################
-        Route::group(['middleware' => 'can:invoices', 'prefix' => 'invoices', 'as' => 'invoices.'], function () {
+        Route::group(['middleware' => 'can:admins', 'prefix' => 'invoices', 'as' => 'invoices.'], function () {
             Route::controller(InvoiceController::class)->group(function () {
                 Route::get('index', 'index')->name('index');
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
@@ -197,7 +197,6 @@ Route::group([
                 Route::get('print_barcode/{id}', 'print_barcode')->name('print_barcode');
                 Route::get('steps/{id}', 'steps')->name('steps');
                 Route::match(['post', 'get'], 'add_tech/{id}', 'add_tech')->name('add_tech');
-                //Route::post('add_tech/{id}', 'add_tech')->name('add_tech');
                 Route::match(['post', 'get'], 'delivery/{id}', 'delivery')->name('delivery');
                 Route::match(['post', 'get'], 'undelivery/{id}', 'undelivery')->name('undelivery');
                 Route::match(['post', 'get'], 'bulk_delete', 'bulkDelete')->name('bulk_delete');
@@ -220,6 +219,17 @@ Route::group([
 
                 Route::get('/device_deliverd', 'deviceDeliverd')->name('deviceDeliverd');
                 Route::get('/device_undeliverd', 'deviceUnDeliverd')->name('deviceUnDeliverd');
+            });
+        });
+
+        // Direct archive routes - fallback
+        Route::group(['middleware' => ['web', 'auth:admin'], 'prefix' => 'invoices', 'as' => 'invoices.'], function () {
+            Route::group(['prefix' => 'archives', 'as' => 'archives.'], function () {
+                Route::get('/', [\App\Http\Controllers\Dashboard\InvoiceArchiveController::class, 'index'])->name('index');
+                Route::post('/{id}', [\App\Http\Controllers\Dashboard\InvoiceArchiveController::class, 'archive'])->name('archive');
+                Route::put('/{id}/restore', [\App\Http\Controllers\Dashboard\InvoiceArchiveController::class, 'restore'])->name('restore');
+                Route::delete('/{id}', [\App\Http\Controllers\Dashboard\InvoiceArchiveController::class, 'destroy'])->name('destroy');
+                Route::match(['get', 'post'], '/bulk', [\App\Http\Controllers\Dashboard\InvoiceArchiveController::class, 'bulkArchive'])->name('bulk');
             });
         });
 

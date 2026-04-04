@@ -387,7 +387,7 @@
                                                         <div class="form-group">
                                                             <label for="title"> حدد الاعطال <span
                                                                     class="required_span"> * </span> </label>
-                                                            <div class="skin skin-square">
+                                                            <div class="skin">
                                                                 <!----------- ############## All Check ############## ------------>
                                                                 <div class="flex-wrap col-md-12 col-sm-12 problem_check_box"
                                                                     style="display: none;" id="problem_all_check">
@@ -916,6 +916,7 @@
                                                             if (checkedCount === 0) {
                                                                 e.preventDefault();
                                                                 alert('من فضلك حدد المشاكل المناسبة حسب نوع الفحص');
+                                                                resetSubmissionState(); // Reset submission state
                                                                 return;
                                                             }
                                                         }
@@ -928,6 +929,7 @@
                                                         if (!signaturePad || signaturePad.isEmpty()) {
                                                             e.preventDefault();
                                                             alert('الرجاء التوقيع على الفاتورة');
+                                                            resetSubmissionState(); // Reset submission state
                                                             return;
                                                         } else {
                                                             // Get signature data with higher quality
@@ -1030,6 +1032,22 @@
                 event.preventDefault();
                 return false;
             }
+
+            // Check form validation first using Parsley
+            var form = document.getElementById("invoice-form");
+            var parsleyForm = $('#invoice-form').parsley();
+
+            // Trigger validation to show errors
+            parsleyForm.validate();
+
+            if (!parsleyForm.isValid()) {
+                // If form is not valid, don't proceed with submission
+                // Reset submission state so user can try again
+                isSubmitting = false;
+                return false;
+            }
+
+            // Form is valid, proceed with submission prevention
             isSubmitting = true;
 
             // Show loading immediately
@@ -1046,6 +1064,22 @@
             }
 
             return true;
+        }
+
+        // Function to reset submission state (call this if there's an error)
+        function resetSubmissionState() {
+            isSubmitting = false;
+            var submitBtn = document.getElementById("submitInvoice");
+            var loadingMsg = document.getElementById("loadingMessage");
+
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="la la-check-square-o"></i> حفظ';
+            }
+
+            if (loadingMsg) {
+                loadingMsg.style.display = "none";
+            }
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>

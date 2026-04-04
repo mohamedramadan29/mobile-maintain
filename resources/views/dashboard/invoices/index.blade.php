@@ -230,6 +230,11 @@
                                                             <a href="{{ route('dashboard.invoices.destroy', $invoice->id) }}"
                                                                 class="dropdown-item" type="button"> حذف </a>
                                                             @endcan
+                                                            <form method="POST" action="{{ route('dashboard.invoices.archives.archive', $invoice->id) }}" style="display: inline;">
+                                                            @csrf
+                                                            <button type="submit" class="dropdown-item"
+                                                                    onclick="return confirm('هل أنت متأكد من أرشفة هذه الفاتورة؟')"> أرشفة </button>
+                                                        </form>
                                                         </div>
                                                         @if ($invoice->message_send == 0)
                                                         <a href="{{ route('dashboard.invoices.SendMessageRecieve', $invoice->id) }}"
@@ -276,6 +281,9 @@
                                     @can('delete_invoice')
                                     <button type="button" class="btn btn-danger btn-sm" onclick="submitBulkDelete()">
                                         حذف المحدد
+                                    </button>
+                                    <button type="button" class="ml-2 btn btn-warning btn-sm" onclick="submitBulkArchive()">
+                                        أرشفة المحدد
                                     </button>
                                     @endcan
                                     {{-- {{ $invoices->links() }} --}}
@@ -378,5 +386,24 @@
                 }
             });
         });
-</script>
+
+        // Function for bulk archive (same as bulk delete)
+        function submitBulkArchive() {
+            var selectedInvoices = [];
+            $('input[name="invoice_select"]:checked').each(function() {
+                selectedInvoices.push($(this).val());
+            });
+
+            if (selectedInvoices.length === 0) {
+                document.getElementById('alert_no_invoices').style.display = 'block';
+                return;
+            }
+
+            // تخزين معرفات الفواتير في الحقل المخفي
+            $('#invoice_ids').val(selectedInvoices.join(','));
+
+            // إعادة التوجيه إلى صفحة الأرشفة مع تمرير معرفات الفواتير كمعلمات
+            window.location.href = "{{ route('dashboard.invoices.archives.bulk') }}?invoice_ids=" + selectedInvoices.join(',');
+        }
+    </script>
 @endsection

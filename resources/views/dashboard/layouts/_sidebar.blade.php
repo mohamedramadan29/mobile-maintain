@@ -37,6 +37,11 @@
                                   data-i18n="nav.users.user_profile"> اضافة فاتورة
                               </a>
                           </li>
+                          <li class="{{ Route::is('dashboard.invoices.archives.index') ? 'active' : '' }}">
+                              <a class="menu-item" href="{{ route('dashboard.invoices.archives.index') }}"
+                                  data-i18n="nav.users.user_profile"> الفواتير المؤرشفة
+                              </a>
+                          </li>
                       </ul>
                   </li>
               @endcan
