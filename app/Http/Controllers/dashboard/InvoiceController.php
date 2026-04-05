@@ -327,6 +327,8 @@ class InvoiceController extends Controller
 
             // الرسالة تم إرسالها بنجاح، قم بإرجاع الجهاز
             $invoice->delivery_status = 0;
+            $invoice->status = 'رف الاستلام';
+            $invoice->admin_repair_id = null;
             $invoice->save();
 
 
