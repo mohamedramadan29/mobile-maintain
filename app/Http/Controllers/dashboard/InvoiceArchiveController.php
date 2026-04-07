@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\dashboard;
+namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\dashboard\Invoice;
@@ -25,8 +25,8 @@ class InvoiceArchiveController extends Controller
             $search = $request->search;
             $query->whereHas('invoice', function ($q) use ($search) {
                 $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('phone', 'like', '%' . $search . '%')
-                  ->orWhere('id', 'like', '%' . $search . '%');
+                    ->orWhere('phone', 'like', '%' . $search . '%')
+                    ->orWhere('id', 'like', '%' . $search . '%');
             });
         }
 
