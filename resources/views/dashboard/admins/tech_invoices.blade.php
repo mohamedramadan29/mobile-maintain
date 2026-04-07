@@ -36,19 +36,39 @@
                                     @if(request()->has('start_from') && request()->has('end_to') && request()->start_from && request()->end_to)
                                         <h5>عدد الفواتير في الفترة المحددة: {{ $totalInvoices }}</h5>
                                     @endif
+                                    <div class="mt-1 row">
+                                        <div class="col-md-3">
+                                            <div class="p-1 text-center text-white rounded bg-success">
+                                                <span>ناجح (في الوقت):</span> <strong>{{ $successCount }}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="p-1 text-center text-white rounded bg-danger">
+                                                <span>تجاوز الوقت:</span> <strong>{{ $failCount }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <br>
                                     <!-- ################# Search WithMonth ##################### !-->
                                     <div class="form-group">
                                         <form action="{{ route('dashboard.admins.tech_invoices', $id) }}" method="get">
                                             @csrf
                                             <div class="row d-flex align-items-center">
-                                                <div class="col-5">
+                                                <div class="col-4">
                                                     <label>بداية التاريخ</label>
                                                     <input type="date" name="start_from" class="form-control" value="{{ request('start_from') }}">
                                                 </div>
-                                                <div class="col-5">
+                                                <div class="col-4">
                                                     <label>نهاية التاريخ</label>
                                                     <input type="date" name="end_to" class="form-control" value="{{ request('end_to') }}">
+                                                </div>
+                                                <div class="col-2">
+                                                    <label>حالة العداد</label>
+                                                    <select name="timer_status" class="form-control">
+                                                        <option value="">الكل</option>
+                                                        <option value="success" {{ request('timer_status') == 'success' ? 'selected' : '' }}>ناجح</option>
+                                                        <option value="fail" {{ request('timer_status') == 'fail' ? 'selected' : '' }}>تجاوز الوقت</option>
+                                                    </select>
                                                 </div>
                                                 <div class="col-2">
                                                     <button style="margin-top: 30px" type="submit" class="btn btn-primary btn-sm">بحث <i class="la la-search"></i></button>
@@ -70,6 +90,7 @@
                                                 <th> العنوان </th>
                                                 <th> المشاكل </th>
                                                 <th> الحالة </th>
+                                                <th> التزام بالوقت </th>
                                                 <th> تاريخ ووقت البدء </th>
                                                 <th> تاريخ ووقت التسليم </th>
                                             </tr>
@@ -93,6 +114,21 @@
                                                         <span class="badge badge-info">
                                                             {{ $invoice->status }}
                                                         </span>
+                                                    </td>
+                                                    <td>
+                                                        @if ($invoice->repair_timer_status == 'نجاح')
+                                                        <span class="badge badge-success">
+                                                            {{ $invoice->repair_timer_status }}
+                                                        </span>
+                                                        @elseif ($invoice->repair_timer_status == 'تجاوز الوقت')
+                                                        <span class="badge badge-danger">
+                                                            {{ $invoice->repair_timer_status }}
+                                                        </span>
+                                                        @else
+                                                        <span class="badge badge-info">
+                                                            {{ $invoice->repair_timer_status }}
+                                                        </span>
+                                                        @endif
                                                     </td>
                                                     <td> {{ $invoice->checkout_time }} </td>
                                                     <td> {{ $invoice->date_delivery }} // {{ $invoice->time_delivery }}

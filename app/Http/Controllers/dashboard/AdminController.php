@@ -174,6 +174,7 @@ class AdminController extends Controller
         // استخراج التاريخين من الطلب
         $startFrom = $request->input('start_from');
         $endTo = $request->input('end_to');
+        $timerStatus = $request->input('timer_status');
 
         // التحقق من وجود القيم وتصفية النتائج
         $query = Invoice::where('admin_repair_id', $id);
@@ -181,10 +182,32 @@ class AdminController extends Controller
         if ($startFrom && $endTo) {
             $query->whereBetween('checkout_time', [$startFrom, $endTo]);
         }
-        $invoices = $query->orderBy('id', 'desc')->paginate(10);
+
         // حساب العدد الإجمالي للفواتير في الفترة المحددة
         $totalInvoices = $query->count();
 
-        return view('dashboard.admins.tech_invoices', compact('invoices', 'id', 'totalInvoices'));
+        // حساب عدد الفواتير الناجحة والمتجاوزة للوقت (باستخدام SQL لضمان الدقة مع NOW() للفواتير التي لم تنتهي)
+        $successCountQuery = clone $query;
+        $successCount = $successCountQuery->whereNotNull('checkout_time')
+            ->whereRaw('TIMESTAMPDIFF(MINUTE, checkout_time, COALESCE(checkout_end_time, NOW())) <= COALESCE(expected_repair_time, 30)')
+            ->count();
+
+        $failCountQuery = clone $query;
+        $failCount = $failCountQuery->whereNotNull('checkout_time')
+            ->whereRaw('TIMESTAMPDIFF(MINUTE, checkout_time, COALESCE(checkout_end_time, NOW())) > COALESCE(expected_repair_time, 30)')
+            ->count();
+
+        // تطبيق فلتر حالة العداد إذا وجد
+        if ($timerStatus === 'success') {
+            $query->whereNotNull('checkout_time')
+                  ->whereRaw('TIMESTAMPDIFF(MINUTE, checkout_time, COALESCE(checkout_end_time, NOW())) <= COALESCE(expected_repair_time, 30)');
+        } elseif ($timerStatus === 'fail') {
+            $query->whereNotNull('checkout_time')
+                  ->whereRaw('TIMESTAMPDIFF(MINUTE, checkout_time, COALESCE(checkout_end_time, NOW())) > COALESCE(expected_repair_time, 30)');
+        }
+
+        $invoices = $query->orderBy('id', 'desc')->paginate(10);
+
+        return view('dashboard.admins.tech_invoices', compact('invoices', 'id', 'totalInvoices', 'successCount', 'failCount'));
     }
 }

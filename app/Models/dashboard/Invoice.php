@@ -12,6 +12,26 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Invoice extends Model
 {
     protected $guarded = [];
+    protected $appends = ['repair_timer_status'];
+
+    public function getRepairTimerStatusAttribute()
+    {
+        if (!$this->checkout_time) {
+            return 'لم يبدأ';
+        }
+
+        $expectedTime = $this->expected_repair_time ?? 30; // المدة الطبيعية بالدقائق
+        $endTime = $this->checkout_end_time ? \Carbon\Carbon::parse($this->checkout_end_time) : now();
+        $startTime = \Carbon\Carbon::parse($this->checkout_time);
+
+        $durationInMinutes = $startTime->diffInMinutes($endTime);
+
+        if ($durationInMinutes <= $expectedTime) {
+            return 'نجاح';
+        }
+
+        return 'تجاوز الوقت';
+    }
 
     public function Problems()
     {
