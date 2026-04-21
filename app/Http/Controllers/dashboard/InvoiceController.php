@@ -1086,4 +1086,27 @@ class InvoiceController extends Controller
         // عرض صفحة تسليم الفاتورة
         return view('dashboard.invoices.delivery_with_details', compact('invoice', 'programe_problems', 'speed_problems', 'piece_resources', 'problems', 'checks', 'speed_devices', 'programe_devices', 'invoice_more_checks'));
     }
+
+    public function bulkFilter(Request $request)
+    {
+        // التحقق من الإدخال
+        $request->validate([
+            'invoice_ids' => 'required',
+        ]);
+
+        // الحصول على معرفات الفواتير
+        $invoiceIds = explode(',', $request->input('invoice_ids'));
+
+        // تحديث الفواتير المحددة
+        Invoice::whereIn('id', $invoiceIds)->update([
+            'status' => 'تم الاصلاح',
+            'delivery_status' => 1,
+            'admin_repair_id'=>17,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تصفية الفواتير المختارة بنجاح'
+        ]);
+    }
 }

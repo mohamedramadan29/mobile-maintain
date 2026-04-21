@@ -35,7 +35,7 @@ class TechInvoicesController extends Controller
 
     public function index()
     {
-        $invoices = Invoice::where('admin_repair_id', Auth::guard('admin')->user()->id)->where('status', 'تحت الصيانة')->orderBy('id', 'desc')->paginate(10);
+        $invoices = Invoice::where('admin_repair_id', Auth::guard('admin')->user()->id)->where('status', 'تحت الصيانة')->orderBy('id', 'desc')->paginate(500);
         return view('dashboard.tech_invoices.index', compact('invoices'));
     }
 
@@ -57,14 +57,14 @@ class TechInvoicesController extends Controller
                 $query->where('status', $request->invoice_status);
             }
         }
-        $invoices = $query->orderBy('id', 'desc')->paginate(10)->appends($request->all());
+        $invoices = $query->orderBy('id', 'desc')->paginate(100)->appends($request->all());
 
         return view('dashboard.tech_invoices.index', compact('invoices'));
     }
 
     public function available()
     {
-        $invoices = Invoice::where('admin_repair_id', null)->orderBy('id', 'desc')->paginate(10);
+        $invoices = Invoice::where('admin_repair_id', null)->orderBy('id', 'desc')->paginate(500);
         return view('dashboard.tech_invoices.available', compact('invoices'));
     }
 

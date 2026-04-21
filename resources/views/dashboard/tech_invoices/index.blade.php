@@ -77,7 +77,7 @@
                             <div class="card-content collapse show">
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped">
+                                        <table class="table table-bordered table-striped" id="DataTables_Table_0">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
@@ -168,3 +168,27 @@
 
 
 @endsection
+
+@section('js')
+    <script src="{{ asset('assets/admin/') }}/vendors/js/tables/datatable/datatables.min.js" type="text/javascript">
+    </script>
+    <script src="{{ asset('assets/admin/') }}/js/scripts/tables/datatables/datatable-basic.js" type="text/javascript">
+    </script>
+    <script>
+        $(document).ready(function() {
+            // if (!$.fn.DataTable.isDataTable('#DataTables_Table_0')) {
+            $('#DataTables_Table_0').DataTable({
+                pageLength: 100,
+                language: lang === 'ar' ? {
+                    url: '//cdn.datatables.net/plug-ins/2.2.2/i18n/ar.json',
+                } : {},
+            });
+            // }
+            // $('.zero-configuration').DataTable({
+
+            //     pageLength: 100,
+            // });
+        });
+    </script>
+
+    @endsection
