@@ -65,13 +65,18 @@
          <div class="barcode_users">
              <table class="table" style="width: 100%; border-spacing: 0;">
                  <tbody>
-                     <tr style="">
-                         <td style="text-align: right; font-size: 6px; padding: 2px;">
+                     <tr dir="rtl">
+                         <td style="">
+                             <p style="font-size: 6.5px;color:#000;text-align:center"> الرمز :
+                                 {{ $invoice->device_password_text ?? 'لا يوجد رمز' }} </p>
+                         </td>
+                         <td style="text-algin:right;font-size: 6px; padding: 2px;">
                              <p style="font-size: 5.5px;text-algin:center"> ملاحظات
                                  الاستقبال:{{ $invoice->description ?? 'لا توجد ملاحظات' }}</p>
-                             <p style="font-size: 5.5px;text-align:center"> ملاحظات
-                                 الفني:{{ $invoice->tech_notes ?? 'لا توجد ملاحظات' }}</p>
+                             {{-- <p style="font-size: 5.5px;text-align:center"> ملاحظات
+                                 الفني:{{ $invoice->tech_notes ?? 'لا توجد ملاحظات' }}</p> --}}
                          </td>
+
                      </tr>
                  </tbody>
              </table>
