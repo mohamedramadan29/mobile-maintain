@@ -1,4 +1,3 @@
-
 @extends('dashboard.layouts.app')
 @section('title', ' فواتير لم يتم تسليمها  ')
 @section('css')
@@ -20,7 +19,7 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item active">  فواتير لم يتم تسليمها
+                                <li class="breadcrumb-item active">فواتير لم يتم تسليمها
                                 </li>
                             </ol>
                         </div>
@@ -31,6 +30,44 @@
                 </div>
             </div>
             <div class="content-body">
+                <!-- eCommerce statistic -->
+                <div class="row">
+                    <div class="col-xl-6 col-lg-6 col-12">
+                        <div class="card pull-up">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <div class="media d-flex">
+                                        <div class="text-left media-body">
+                                            <h3 class="info"> {{ $total_delivered }} </h3>
+                                            <h6> فواتير تم تسليمها </h6>
+                                        </div>
+                                        <div>
+                                            <i class="float-right icon-basket-loaded info font-large-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-12">
+                        <div class="card pull-up">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <div class="media d-flex">
+                                        <div class="text-left media-body">
+                                            <h3 class="danger"> {{ $total_undelivered }} </h3>
+                                            <h6> فواتير لم يتم تسليمها </h6>
+                                        </div>
+                                        <div>
+                                            <i class="float-right icon-basket-loaded danger font-large-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--/ eCommerce statistic -->
 
                 <!-- Bordered striped start -->
                 <div class="row">
@@ -41,8 +78,16 @@
                                     <a href="{{ route('dashboard.invoices.create') }}" class="btn btn-primary"> اضافة فاتورة
                                     </a>
                                 @endcan
-                                <form action="{{ route('dashboard.invoices.index') }}" method="get">
-                                    <div class="d-flex align-items-center justify-content-center">
+                                <form action="{{ route('dashboard.invoices.deviceUnDeliverd') }}" method="get">
+                                    <div class="flex-wrap d-flex align-items-center justify-content-center">
+                                        <div class="form-group" style="margin-left: 20px">
+                                            <label> من تاريخ </label>
+                                            <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control">
+                                        </div>
+                                        <div class="form-group" style="margin-left: 20px">
+                                            <label> الي تاريخ </label>
+                                            <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
+                                        </div>
                                         <div class="form-group" style="margin-left: 20px">
                                             <label> حالة الفاتورة </label>
                                             <select name="invoice_status" class="form-control">
@@ -172,7 +217,7 @@
                                                             @endif
                                                         </td>
                                                         <td>
-                                                            {{ $invoice->Recieved->name ?? '' }}
+                                                            {{ $invoice->Recieved->name }}
                                                         </td>
                                                         <td>
                                                             @if (!$invoice->admin_repair_id)
@@ -191,7 +236,7 @@
                                                             {{ date('h:i A', strtotime($invoice->time_delivery)) }}
                                                         </td>
                                                         <td>
-                                                            <div class="mr-1 mb-1 btn-group">
+                                                            <div class="mb-1 mr-1 btn-group">
                                                                 <button type="button"
                                                                     class="btn btn-primary btn-block dropdown-toggle btn-sm"
                                                                     data-toggle="dropdown" aria-haspopup="true"
@@ -235,6 +280,14 @@
                                                                         <a href="{{ route('dashboard.invoices.destroy', $invoice->id) }}"
                                                                             class="dropdown-item" type="button"> حذف </a>
                                                                     @endcan
+                                                                    <form method="POST"
+                                                                        action="{{ route('dashboard.invoices.archives.archive', $invoice->id) }}"
+                                                                        style="display: inline;">
+                                                                        @csrf
+                                                                        <button type="submit" class="dropdown-item"
+                                                                            onclick="return confirm('هل أنت متأكد من أرشفة هذه الفاتورة؟')">
+                                                                            أرشفة </button>
+                                                                    </form>
                                                                 </div>
                                                                 @if ($invoice->message_send == 0)
                                                                     <a href="{{ route('dashboard.invoices.SendMessageRecieve', $invoice->id) }}"
@@ -244,7 +297,7 @@
                                                                         ارسال رسالة تسجيل الفاتورة
                                                                     </a>
                                                                 @endif
-                                                                @if ($invoice->delivery_status == 0)
+                                                                @if ($invoice->delivery_status == 0 && ($invoice->status == 'تم الاصلاح' || $invoice->status == 'لم يتم الاصلاح'))
                                                                     <a href="{{ route('dashboard.invoices.delivery', $invoice->id) }}"
                                                                         class="btn btn-success btn-sm">
                                                                         <i style="font-size:12px" class="la la-check"></i>
@@ -284,6 +337,14 @@
                                             <button type="button" class="btn btn-danger btn-sm"
                                                 onclick="submitBulkDelete()">
                                                 حذف المحدد
+                                            </button>
+                                            <button type="button" class="ml-2 btn btn-warning btn-sm"
+                                                onclick="submitBulkArchive()">
+                                                أرشفة المحدد
+                                            </button>
+                                            <button type="button" class="ml-2 btn btn-info btn-sm"
+                                                onclick="submitBulkFilter()">
+                                                تصفية الفواتير
                                             </button>
                                         @endcan
                                         {{-- {{ $invoices->links() }} --}}
@@ -386,5 +447,69 @@
                 }
             });
         });
+
+        // Function for bulk archive (same as bulk delete)
+        function submitBulkArchive() {
+            var selectedInvoices = [];
+            $('input[name="invoice_select"]:checked').each(function() {
+                selectedInvoices.push($(this).val());
+            });
+
+            if (selectedInvoices.length === 0) {
+                document.getElementById('alert_no_invoices').style.display = 'block';
+                return;
+            }
+
+            // تخزين معرفات الفواتير في الحقل المخفي
+            $('#invoice_ids').val(selectedInvoices.join(','));
+
+            // إعادة التوجيه إلى صفحة الأرشفة مع تمرير معرفات الفواتير كمعلمات
+            window.location.href = "{{ route('dashboard.invoices.archives.bulk') }}?invoice_ids=" + selectedInvoices.join(
+                ',');
+        }
+
+        // Function for bulk filter
+        function submitBulkFilter() {
+            var selectedInvoices = [];
+            $('input[name="invoice_select"]:checked').each(function() {
+                selectedInvoices.push($(this).val());
+            });
+
+            if (selectedInvoices.length === 0) {
+                document.getElementById('alert_no_invoices').style.display = 'block';
+                return;
+            }
+
+            // تخزين معرفات الفواتير في الحقل المخفي
+            $('#invoice_ids').val(selectedInvoices.join(','));
+
+            // إرسال طلب لتصفية الفواتير
+            $.ajax({
+                url: "{{ route('dashboard.invoices.bulk.filter') }}",
+                method: 'POST',
+                data: {
+                    invoice_ids: selectedInvoices.join(','),
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message || 'تم تصفية الفواتير بنجاح');
+                        // إعادة تحميل الصفحة لعرض التغييرات
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        alert(response.message || 'حدث خطأ أثناء تصفية الفواتير');
+                    }
+                },
+                error: function(xhr) {
+                    var errorMessage = 'حدث خطأ أثناء تصفية الفواتير';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    alert(errorMessage);
+                }
+            });
+        }
     </script>
 @endsection

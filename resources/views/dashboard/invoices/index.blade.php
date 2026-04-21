@@ -30,6 +30,44 @@
                 </div>
             </div>
             <div class="content-body">
+                <!-- eCommerce statistic -->
+                <div class="row">
+                    <div class="col-xl-6 col-lg-6 col-12">
+                        <div class="card pull-up">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <div class="media d-flex">
+                                        <div class="text-left media-body">
+                                            <h3 class="info"> {{ $total_delivered }} </h3>
+                                            <h6> فواتير تم تسليمها </h6>
+                                        </div>
+                                        <div>
+                                            <i class="float-right icon-basket-loaded info font-large-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-12">
+                        <div class="card pull-up">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <div class="media d-flex">
+                                        <div class="text-left media-body">
+                                            <h3 class="danger"> {{ $total_undelivered }} </h3>
+                                            <h6> فواتير لم يتم تسليمها </h6>
+                                        </div>
+                                        <div>
+                                            <i class="float-right icon-basket-loaded danger font-large-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--/ eCommerce statistic -->
 
                 <!-- Bordered striped start -->
                 <div class="row">
@@ -41,7 +79,15 @@
                                     </a>
                                 @endcan
                                 <form action="{{ route('dashboard.invoices.index') }}" method="get">
-                                    <div class="d-flex align-items-center justify-content-center">
+                                    <div class="d-flex align-items-center justify-content-center flex-wrap">
+                                        <div class="form-group" style="margin-left: 20px">
+                                            <label> من تاريخ </label>
+                                            <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control">
+                                        </div>
+                                        <div class="form-group" style="margin-left: 20px">
+                                            <label> الي تاريخ </label>
+                                            <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
+                                        </div>
                                         <div class="form-group" style="margin-left: 20px">
                                             <label> حالة الفاتورة </label>
                                             <select name="invoice_status" class="form-control">

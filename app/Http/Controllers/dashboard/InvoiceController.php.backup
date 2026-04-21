@@ -46,14 +46,6 @@ class InvoiceController extends Controller
     {
         $query = Invoice::query();
 
-        // Date range filter
-        if ($request->has('from_date') && !empty($request->from_date)) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->has('to_date') && !empty($request->to_date)) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
         // Exclude archived invoices for better performance
         $query->whereDoesntHave('archives', function ($q) {
             $q->where('status', 'archived');
@@ -74,22 +66,10 @@ class InvoiceController extends Controller
             }
         }
 
-        // Calculate statistics based on the same date range filters
-        $statsQuery = Invoice::query();
-        if ($request->has('from_date') && !empty($request->from_date)) {
-            $statsQuery->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->has('to_date') && !empty($request->to_date)) {
-            $statsQuery->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        $total_delivered = (clone $statsQuery)->where('delivery_status', 1)->count();
-        $total_undelivered = (clone $statsQuery)->where('delivery_status', 0)->count();
-
         $invoices = $query->orderBy('id', 'desc')->paginate(1000)->appends($request->all());
         $techs = Admin::where('type', 'فني')->get();
 
-        return view('dashboard.invoices.index', compact('invoices', 'techs', 'total_delivered', 'total_undelivered'));
+        return view('dashboard.invoices.index', compact('invoices', 'techs'));
     }
 
 
@@ -97,83 +77,49 @@ class InvoiceController extends Controller
     public function deviceDeliverd(Request $request)
     {
         $query = Invoice::query();
-        
-        // Date range filter
-        if ($request->has('from_date') && !empty($request->from_date)) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->has('to_date') && !empty($request->to_date)) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
         // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
         if ($request->has('invoice_status') && !empty($request->invoice_status)) {
+
+            //  dd($request->invoice_status);
+            // تحقق من القيم النصية "0" و "1"
             if ($request->invoice_status == 'تم تسليم الجهاز') {
                 $query->where('delivery_status', 1);
             } elseif ($request->invoice_status == 'لم يتم التسليم') {
                 $query->where('delivery_status', 0);
             } else {
+                // في حالة وجود حالة غير الأرقام (مثل "رف الاستلام" أو "تحت الصيانة")
                 $query->where('status', $request->invoice_status);
             }
         }
 
-        // Calculate statistics based on the same date range filters
-        $statsQuery = Invoice::query();
-        if ($request->has('from_date') && !empty($request->from_date)) {
-            $statsQuery->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->has('to_date') && !empty($request->to_date)) {
-            $statsQuery->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        $total_delivered = (clone $statsQuery)->where('delivery_status', 1)->count();
-        $total_undelivered = (clone $statsQuery)->where('delivery_status', 0)->count();
-
         $invoices = $query->orderBy('id', 'desc')->where('delivery_status', 1)->paginate(1000)->appends($request->all());
         $techs = Admin::where('type', 'فني')->get();
 
-        return view('dashboard.invoices.device_deliverd', compact('invoices', 'techs', 'total_delivered', 'total_undelivered'));
+        return view('dashboard.invoices.device_deliverd', compact('invoices', 'techs'));
     }
 
     public function deviceUnDeliverd(Request $request)
     {
         $query = Invoice::query();
-
-        // Date range filter
-        if ($request->has('from_date') && !empty($request->from_date)) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->has('to_date') && !empty($request->to_date)) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
         // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
         if ($request->has('invoice_status') && !empty($request->invoice_status)) {
+
+            //  dd($request->invoice_status);
+            // تحقق من القيم النصية "0" و "1"
             if ($request->invoice_status == 'تم تسليم الجهاز') {
                 $query->where('delivery_status', 1);
             } elseif ($request->invoice_status == 'لم يتم التسليم') {
                 $query->where('delivery_status', 0);
             } else {
+                // في حالة وجود حالة غير الأرقام (مثل "رف الاستلام" أو "تحت الصيانة")
                 $query->where('status', $request->invoice_status);
             }
         }
 
-        // Calculate statistics based on the same date range filters
-        $statsQuery = Invoice::query();
-        if ($request->has('from_date') && !empty($request->from_date)) {
-            $statsQuery->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->has('to_date') && !empty($request->to_date)) {
-            $statsQuery->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        $total_delivered = (clone $statsQuery)->where('delivery_status', 1)->count();
-        $total_undelivered = (clone $statsQuery)->where('delivery_status', 0)->count();
-
         $invoices = $query->orderBy('id', 'desc')->where('delivery_status', 0)->paginate(1000)->appends($request->all());
         $techs = Admin::where('type', 'فني')->get();
 
-        return view('dashboard.invoices.device_undeliverd', compact('invoices', 'techs', 'total_delivered', 'total_undelivered'));
+        return view('dashboard.invoices.device_undeliverd', compact('invoices', 'techs'));
     }
 
     ########################################################################################
