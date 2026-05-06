@@ -439,6 +439,7 @@
                                     <form id="delivery_form"
                                         action="{{ route('dashboard.invoices.delivery', $invoice->id) }}" method="POST">
                                         @csrf
+                                        <input type="hidden" name="redirect_to" value="{{ request('redirect_to') }}">
                                         <div class="card-footer">
                                             <button type="submit" class="btn btn-primary" id="delivery_button">
                                                 تسليم الجهاز

@@ -162,8 +162,9 @@
                                                     <th> الاستقبال </th>
                                                     <th> الفني </th>
                                                     <th> تاريخ الاستلام </th>
-                                                    <th> تاريخ ووقت التسليم </th>
-                                                    <th> العمليات </th>
+                                                     <th> تاريخ ووقت التسليم (المتوقع) </th>
+                                                     <th> تاريخ التسليم الفعلي </th>
+                                                     <th> العمليات </th>
                                                 </tr>
                                             </thead>
                                             <tbody style="overflow: scroll">
@@ -236,9 +237,13 @@
                                                         <td>
                                                             {{ date('Y-m-d h:i A', strtotime($invoice->created_at)) }}
                                                         </td>
-                                                        <td>
+                                                         <td>
                                                             {{ $invoice->date_delivery }}
                                                             {{ date('h:i A', strtotime($invoice->time_delivery)) }}
+                                                        </td>
+                                                        <td>
+                                                            {{ $invoice->actual_date_delivery ?? '---' }}
+                                                            {{ $invoice->actual_time_delivery ? date('h:i A', strtotime($invoice->actual_time_delivery)) : '' }}
                                                         </td>
                                                         <td>
                                                             <div class="mb-1 mr-1 btn-group">

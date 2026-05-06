@@ -139,7 +139,30 @@
                                 </form>
                             </div>
                             <div class="card-content collapse show">
-                                <div class="card-body">
+                                 <div class="card-body">
+                                    <div class="mb-2">
+                                        <div class="alert alert-danger" id="alert_no_invoices" style="display: none;">
+                                            من فضلك اختر فواتير لحذفها.
+                                        </div>
+                                        <div class="alert alert-danger" id="alert_delete_invoices" style="display: none;">
+                                            هل انت متاكد من حذف الفواتير المحددة؟
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="submitBulkDelete()">نعم</button>
+                                        </div>
+                                        @can('delete_invoice')
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="submitBulkDelete()">
+                                                حذف المحدد
+                                            </button>
+                                            <button type="button" class="ml-2 btn btn-warning btn-sm" onclick="submitBulkArchive()">
+                                                أرشفة المحدد
+                                            </button>
+                                            <button type="button" class="ml-2 btn btn-info btn-sm" onclick="submitBulkFilter()">
+                                                تصفية الفواتير
+                                            </button>
+                                            <button type="button" class="ml-2 btn btn-success btn-sm" onclick="submitBulkDelivery()">
+                                                تسليم المحدد
+                                            </button>
+                                        @endcan
+                                    </div>
                                     <div class="table-responsive">
                                         <form id="bulkDeleteForm" action="{{ route('dashboard.invoices.bulk_delete') }}"
                                             method="POST" style="display: none;">
@@ -162,7 +185,8 @@
                                                     <th> الاستقبال </th>
                                                     <th> الفني </th>
                                                     <th> تاريخ الاستلام </th>
-                                                    <th> تاريخ ووقت التسليم </th>
+                                                    <th> تاريخ ووقت التسليم (المتوقع) </th>
+                                                    <th> تاريخ التسليم الفعلي </th>
                                                     <th> العمليات </th>
                                                 </tr>
                                             </thead>
@@ -241,6 +265,10 @@
                                                             {{ date('h:i A', strtotime($invoice->time_delivery)) }}
                                                         </td>
                                                         <td>
+                                                            {{ $invoice->actual_date_delivery ?? '---' }}
+                                                            {{ $invoice->actual_time_delivery ? date('h:i A', strtotime($invoice->actual_time_delivery)) : '' }}
+                                                        </td>
+                                                        <td>
                                                             <div class="mb-1 mr-1 btn-group">
                                                                 <button type="button"
                                                                     class="btn btn-primary btn-block dropdown-toggle btn-sm"
@@ -269,7 +297,7 @@
                                                                     @endif
 
                                                                     @if ($invoice->delivery_status == 0)
-                                                                        <a href="{{ route('dashboard.invoices.delivery.details', $invoice->id) }}"
+                                                                        <a href="{{ route('dashboard.invoices.delivery.details', $invoice->id) }}?redirect_to={{ urlencode(url()->full()) }}"
                                                                             class="dropdown-item">
                                                                             مختصر الفاتورة والتسليم
                                                                         </a>
@@ -303,13 +331,13 @@
                                                                     </a>
                                                                 @endif
                                                                 @if ($invoice->delivery_status == 0 && ($invoice->status == 'تم الاصلاح' || $invoice->status == 'لم يتم الاصلاح'))
-                                                                    <a href="{{ route('dashboard.invoices.delivery', $invoice->id) }}"
+                                                                    <a href="{{ route('dashboard.invoices.delivery', $invoice->id) }}?redirect_to={{ urlencode(url()->full()) }}"
                                                                         class="btn btn-success btn-sm">
                                                                         <i style="font-size:12px" class="la la-check"></i>
                                                                         تسليم الجهاز
                                                                     </a>
                                                                 @elseif ($invoice->delivery_status == 1)
-                                                                    <a href="{{ route('dashboard.invoices.undelivery', $invoice->id) }}"
+                                                                    <a href="{{ route('dashboard.invoices.undelivery', $invoice->id) }}?redirect_to={{ urlencode(url()->full()) }}"
                                                                         class="btn btn-danger btn-sm">
                                                                         <i style="font-size:12px" class="la la-undo"></i>
                                                                         عودة الجهاز
@@ -329,30 +357,7 @@
 
                                             </tfoot>
                                         </table>
-                                        <div class="alert alert-danger" id="alert_no_invoices" style="display: none;">
-                                            من فضلك اختر فواتير لحذفها.
-                                        </div>
-                                        <div class="alert alert-danger" id="alert_delete_invoices"
-                                            style="display: none;">
-                                            هل انت متاكد من حذف الفواتير المحددة؟
-                                            <button type="button" class="btn btn-danger btn-sm"
-                                                onclick="submitBulkDelete()">نعم</button>
-                                        </div>
-                                        @can('delete_invoice')
-                                            <button type="button" class="btn btn-danger btn-sm"
-                                                onclick="submitBulkDelete()">
-                                                حذف المحدد
-                                            </button>
-                                            <button type="button" class="ml-2 btn btn-warning btn-sm"
-                                                onclick="submitBulkArchive()">
-                                                أرشفة المحدد
-                                            </button>
-                                            <button type="button" class="ml-2 btn btn-info btn-sm"
-                                                onclick="submitBulkFilter()">
-                                                تصفية الفواتير
-                                            </button>
-                                        @endcan
-                                        {{-- {{ $invoices->links() }} --}}
+                                         {{-- {{ $invoices->links() }} --}}
                                     </div>
                                 </div>
 
@@ -509,6 +514,49 @@
                 },
                 error: function(xhr) {
                     var errorMessage = 'حدث خطأ أثناء تصفية الفواتير';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    alert(errorMessage);
+                }
+            });
+        }
+
+        // Function for bulk delivery
+        function submitBulkDelivery() {
+            var selectedInvoices = [];
+            $('input[name="invoice_select"]:checked').each(function() {
+                selectedInvoices.push($(this).val());
+            });
+
+            if (selectedInvoices.length === 0) {
+                document.getElementById('alert_no_invoices').style.display = 'block';
+                return;
+            }
+
+            if (!confirm('هل أنت متأكد من تسليم جميع الأجهزة المختارة؟')) return;
+
+            // إرسال طلب لتسليم الفواتير
+            $.ajax({
+                url: "{{ route('dashboard.invoices.bulk.delivery') }}",
+                method: 'POST',
+                data: {
+                    invoice_ids: selectedInvoices.join(','),
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message || 'تم تسليم الفواتير بنجاح');
+                        // إعادة تحميل الصفحة لعرض التغييرات
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        alert(response.message || 'حدث خطأ أثناء تسليم الفواتير');
+                    }
+                },
+                error: function(xhr) {
+                    var errorMessage = 'حدث خطأ أثناء تسليم الفواتير';
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;
                     }

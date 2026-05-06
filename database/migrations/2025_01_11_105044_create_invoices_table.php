@@ -21,6 +21,8 @@ return new class extends Migration {
             $table->double('price');
             $table->string('date_delivery')->nullable();
             $table->string('time_delivery')->nullable();
+            $table->string('actual_date_delivery')->nullable();
+            $table->string('actual_time_delivery')->nullable();
             $table->string('status');
             $table->string('status_notes')->nullable();
             $table->string('signature');

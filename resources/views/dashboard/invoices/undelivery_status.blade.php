@@ -36,6 +36,7 @@
                                             action="{{ route('dashboard.invoices.undelivery', $invoice->id) }}"
                                             method="POST">
                                             @csrf
+                                            <input type="hidden" name="redirect_to" value="{{ request('redirect_to') }}">
                                             <div class="form-group">
                                                 <label> رقم الفاتورة  </label>
                                                 <input type="text" name="delivery_date" class="form-control"

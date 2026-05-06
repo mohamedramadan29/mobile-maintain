@@ -109,7 +109,7 @@ class InvoiceController extends Controller
     public function deviceDeliverd(Request $request)
     {
         $query = Invoice::query();
-        
+
         // البحث العام (رقم الفاتورة، الاسم، الهاتف)
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
@@ -334,6 +334,8 @@ class InvoiceController extends Controller
         if ($request->isMethod('post')) {
             // الرسالة تم إرسالها بنجاح، قم بتسليم الجهاز
             $invoice->delivery_status = 1;
+            $invoice->actual_date_delivery = date('Y-m-d');
+            $invoice->actual_time_delivery = date('H:i:s');
             $invoice->save();
             // إعداد الرسالة المرسلة للعميل
             $message_temp = Message::where('message_type', 'تسليم الجهاز')->value('template_text');
@@ -374,7 +376,7 @@ class InvoiceController extends Controller
                     'error' => $err,
                 ]);
 
-                return redirect()->route('dashboard.invoices.index')
+                return redirect($request->redirect_to ?? route('dashboard.invoices.index'))
                     ->with('Error_message', 'فشل إرسال الرسالة بسبب مشكلة في الاتصال،   تم تسليم الجهاز');
             }
 
@@ -387,7 +389,7 @@ class InvoiceController extends Controller
                     'phone' => $new_phone,
                     'response' => $responseData,
                 ]);
-                return redirect()->route('dashboard.invoices.index')
+                return redirect($request->redirect_to ?? route('dashboard.invoices.index'))
                     ->with('Success_message', 'تم تسليم الجهاز وإرسال الرسالة بنجاح');
             } else {
                 // تسجيل الخطأ في حالة فشل الإرسال
@@ -396,7 +398,7 @@ class InvoiceController extends Controller
                     'phone' => $new_phone,
                     'response' => $responseData,
                 ]);
-                return redirect()->route('dashboard.invoices.index')
+                return redirect($request->redirect_to ?? route('dashboard.invoices.index'))
                     ->with('Error_message', 'فشل إرسال الرسالة: ' . $errorMessage . '،   تم تسليم الجهاز');
             }
         }
@@ -413,8 +415,9 @@ class InvoiceController extends Controller
 
             // الرسالة تم إرسالها بنجاح، قم بإرجاع الجهاز
             $invoice->delivery_status = 0;
-            $invoice->status = 'رف الاستلام';
-            $invoice->admin_repair_id = null;
+            $invoice->status = 'تحت الصيانة';
+            $invoice->actual_date_delivery = null;
+            $invoice->actual_time_delivery = null;
             $invoice->save();
 
 
@@ -457,7 +460,7 @@ class InvoiceController extends Controller
                     'phone' => $new_phone,
                     'error' => $err,
                 ]);
-                return redirect()->route('dashboard.invoices.index')
+                return redirect($request->redirect_to ?? route('dashboard.invoices.index'))
                     ->with('Error_message', 'فشل إرسال الرسالة:    تم إرجاع الجهاز');
             }
 
@@ -469,7 +472,7 @@ class InvoiceController extends Controller
                     'phone' => $new_phone,
                     'response' => $responseData,
                 ]);
-                return redirect()->route('dashboard.invoices.index')
+                return redirect($request->redirect_to ?? route('dashboard.invoices.index'))
                     ->with('Success_message', 'تم إرجاع الجهاز وإرسال الرسالة بنجاح');
             } else {
                 // تسجيل الخطأ في حالة فشل الإرسال
@@ -478,7 +481,7 @@ class InvoiceController extends Controller
                     'phone' => $new_phone,
                     'response' => $responseData,
                 ]);
-                return redirect()->route('dashboard.invoices.index')
+                return redirect($request->redirect_to ?? route('dashboard.invoices.index'))
                     ->with('Error_message', 'فشل إرسال الرسالة: ' . $errorMessage . '،   تم إرجاع الجهاز');
             }
         }
@@ -1102,6 +1105,11 @@ class InvoiceController extends Controller
 
 
         if ($request->isMethod('post')) {
+            // الرسالة تم إرسالها بنجاح، قم بتسليم الجهاز
+            $invoice->delivery_status = 1;
+            $invoice->actual_date_delivery = date('Y-m-d');
+            $invoice->actual_time_delivery = date('H:i:s');
+            $invoice->save();
             // إعداد الرسالة المرسلة للعميل
             $message_temp = Message::where('message_type', 'تسليم الجهاز')->value('template_text');
             $new_phone = preg_replace('/^0/', '', $invoice->phone);
@@ -1140,22 +1148,20 @@ class InvoiceController extends Controller
                     'phone' => $new_phone,
                     'error' => $err,
                 ]);
-                return redirect()->route('dashboard.invoices.index')
+                return redirect($request->redirect_to ?? route('dashboard.invoices.index'))
                     ->with('Error_message', 'فشل إرسال الرسالة بسبب مشكلة في الاتصال، لم يتم تسليم الجهاز');
             }
 
             // تحليل استجابة الـ API
             $responseData = json_decode($response, true);
             if (isset($responseData['sent']) && $responseData['sent'] === true) {
-                // الرسالة تم إرسالها بنجاح، قم بتسليم الجهاز
-                $invoice->delivery_status = 1;
-                $invoice->save();
+
 
                 Log::info('WhatsApp message sent successfully and device delivered', [
                     'phone' => $new_phone,
                     'response' => $responseData,
                 ]);
-                return redirect()->route('dashboard.invoices.index')
+                return redirect($request->redirect_to ?? route('dashboard.invoices.index'))
                     ->with('Success_message', 'تم تسليم الجهاز وإرسال الرسالة بنجاح');
             } else {
                 // تسجيل الخطأ في حالة فشل الإرسال
@@ -1164,7 +1170,7 @@ class InvoiceController extends Controller
                     'phone' => $new_phone,
                     'response' => $responseData,
                 ]);
-                return redirect()->route('dashboard.invoices.index')
+                return redirect($request->redirect_to ?? route('dashboard.invoices.index'))
                     ->with('Error_message', 'فشل إرسال الرسالة: ' . $errorMessage . '، لم يتم تسليم الجهاز');
             }
         }
@@ -1193,6 +1199,46 @@ class InvoiceController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'تم تصفية الفواتير المختارة بنجاح'
+        ]);
+    }
+    public function bulkDelivery(Request $request)
+    {
+        // التحقق من الإدخال
+        $request->validate([
+            'invoice_ids' => 'required',
+        ]);
+
+        // الحصول على معرفات الفواتير
+        $invoiceIds = explode(',', $request->input('invoice_ids'));
+        $invoices = Invoice::whereIn('id', $invoiceIds)->where('delivery_status', 0)->get();
+
+        if ($invoices->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لم يتم العثور على فواتير صالحة للتسليم'
+            ]);
+        }
+
+        // إعداد الرسالة المرسلة للعميل
+        $message_temp = Message::where('message_type', 'تسليم الجهاز')->value('template_text');
+
+        foreach ($invoices as $invoice) {
+            // تحديث حالة التسليم
+            $invoice->delivery_status = 1;
+            $invoice->actual_date_delivery = date('Y-m-d');
+            $invoice->actual_time_delivery = date('H:i:s');
+            $invoice->save();
+
+            // إرسال رسالة الواتساب إذا وجد قالب
+            if ($message_temp) {
+                $message = str_replace(['{name}'], [$invoice->name], $message_temp);
+                SendCreateMessage::dispatch($invoice, $message);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تسليم الفواتير المختارة بنجاح وإرسال رسائل الواتساب'
         ]);
     }
 }
