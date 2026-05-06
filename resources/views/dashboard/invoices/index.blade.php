@@ -79,7 +79,12 @@
                                     </a>
                                 @endcan
                                 <form action="{{ route('dashboard.invoices.index') }}" method="get">
-                                    <div class="d-flex align-items-center justify-content-center flex-wrap">
+                                    <div class="flex-wrap d-flex align-items-center justify-content-center">
+                                        <div class="form-group" style="margin-left: 20px">
+                                            <label> بحث (رقم، اسم، هاتف) </label>
+                                            <input type="text" name="search" value="{{ request('search') }}"
+                                                class="form-control" placeholder="ادخل نص البحث...">
+                                        </div>
                                         <div class="form-group" style="margin-left: 20px">
                                             <label> من تاريخ </label>
                                             <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control">
@@ -217,7 +222,7 @@
                                                             @endif
                                                         </td>
                                                         <td>
-                                                            {{ $invoice->Recieved->name }}
+                                                            {{ $invoice->Recieved->name ?? '' }}
                                                         </td>
                                                         <td>
                                                             @if (!$invoice->admin_repair_id)
@@ -225,7 +230,7 @@
                                                                 <a href="{{ route('dashboard.invoices.add_tech', $invoice->id) }}"
                                                                     class="btn btn-warning btn-sm"> تعين فني </a>
                                                             @else
-                                                                {{ $invoice->Technical->name }}
+                                                                {{ $invoice->Technical->name ?? '' }}
                                                             @endif
                                                         </td>
                                                         <td>
@@ -236,7 +241,7 @@
                                                             {{ date('h:i A', strtotime($invoice->time_delivery)) }}
                                                         </td>
                                                         <td>
-                                                            <div class="mr-1 mb-1 btn-group">
+                                                            <div class="mb-1 mr-1 btn-group">
                                                                 <button type="button"
                                                                     class="btn btn-primary btn-block dropdown-toggle btn-sm"
                                                                     data-toggle="dropdown" aria-haspopup="true"

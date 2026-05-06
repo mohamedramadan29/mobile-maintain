@@ -81,6 +81,11 @@
                                 <form action="{{ route('dashboard.invoices.deviceDeliverd') }}" method="get">
                                     <div class="flex-wrap d-flex align-items-center justify-content-center">
                                         <div class="form-group" style="margin-left: 20px">
+                                            <label> بحث (رقم، اسم، هاتف) </label>
+                                            <input type="text" name="search" value="{{ request('search') }}"
+                                                class="form-control" placeholder="ادخل نص البحث...">
+                                        </div>
+                                        <div class="form-group" style="margin-left: 20px">
                                             <label> من تاريخ </label>
                                             <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control">
                                         </div>

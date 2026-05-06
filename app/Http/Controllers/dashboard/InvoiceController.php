@@ -46,6 +46,16 @@ class InvoiceController extends Controller
     {
         $query = Invoice::query();
 
+        // البحث العام (رقم الفاتورة، الاسم، الهاتف)
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%");
+            });
+        }
+
         // Date range filter
         if ($request->has('from_date') && !empty($request->from_date)) {
             $query->whereDate('created_at', '>=', $request->from_date);
@@ -54,10 +64,12 @@ class InvoiceController extends Controller
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        // Exclude archived invoices for better performance
-        $query->whereDoesntHave('archives', function ($q) {
-            $q->where('status', 'archived');
-        });
+        // Exclude archived invoices for better performance, unless searching specifically
+        if (!$request->has('search') || empty($request->search)) {
+            $query->whereDoesntHave('archives', function ($q) {
+                $q->where('status', 'archived');
+            });
+        }
 
         // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
         if ($request->has('invoice_status') && !empty($request->invoice_status)) {
@@ -98,6 +110,16 @@ class InvoiceController extends Controller
     {
         $query = Invoice::query();
         
+        // البحث العام (رقم الفاتورة، الاسم، الهاتف)
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%");
+            });
+        }
+
         // Date range filter
         if ($request->has('from_date') && !empty($request->from_date)) {
             $query->whereDate('created_at', '>=', $request->from_date);
@@ -138,6 +160,16 @@ class InvoiceController extends Controller
     public function deviceUnDeliverd(Request $request)
     {
         $query = Invoice::query();
+
+        // البحث العام (رقم الفاتورة، الاسم، الهاتف)
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%");
+            });
+        }
 
         // Date range filter
         if ($request->has('from_date') && !empty($request->from_date)) {
