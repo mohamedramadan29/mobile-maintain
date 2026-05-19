@@ -64,7 +64,7 @@ class TechInvoicesController extends Controller
 
     public function available()
     {
-        $invoices = Invoice::where('admin_repair_id', null)->orderBy('id', 'desc')->paginate(500);
+        $invoices = Invoice::where('admin_repair_id', null)->where('status',"!=", 'تم الاصلاح')->orderBy('id', 'desc')->paginate(500);
         return view('dashboard.tech_invoices.available', compact('invoices'));
     }
 
