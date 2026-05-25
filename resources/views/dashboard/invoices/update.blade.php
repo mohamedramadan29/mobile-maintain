@@ -79,12 +79,12 @@
                                                                 <option
                                                                     {{ $invoice->checkout_type == 'فحص جهاز سريع' ? 'selected' : '' }}
                                                                     value="فحص جهاز سريع"> فحص جهاز سريع </option>
-                                                                <option
+                                                                {{-- <option
                                                                     {{ $invoice->checkout_type == 'فحص جهاز سوني' ? 'selected' : '' }}
-                                                                    value="فحص جهاز سوني"> فحص جهاز سوني </option>
+                                                                    value="فحص جهاز سوني"> فحص جهاز سوني </option> --}}
                                                                 <option
                                                                     {{ $invoice->checkout_type == 'فحص جهاز pc' ? 'selected' : '' }}
-                                                                    value="فحص جهاز pc"> فحص جهاز pc </option>
+                                                                    value="فحص جهاز pc"> فحص جهاز pc وسوني  </option>
                                                             </select>
 
                                                         </div>

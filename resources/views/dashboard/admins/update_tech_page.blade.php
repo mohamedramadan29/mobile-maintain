@@ -83,7 +83,7 @@
                                                                 </fieldset>
                                                             @endforeach
                                                         </div>
-                                                        <div class="mb-3">
+                                                        {{-- <div class="mb-3">
                                                             <h5>صلاحيات اعطال سوني </h5>
                                                             @foreach ($sony_problems as $sony_problem)
                                                                 <fieldset class="mb-1">
@@ -95,9 +95,9 @@
                                                                     </label>
                                                                 </fieldset>
                                                             @endforeach
-                                                        </div>
+                                                        </div> --}}
                                                          <div class="mb-3">
-                                                            <h5>صلاحيات اعطال  pc</h5>
+                                                            <h5>صلاحيات اعطال  pc وسوني </h5>
                                                             @foreach ($pc_problems as $pc_problem)
                                                                 <fieldset class="mb-1">
                                                                     <input {{ in_array($pc_problem->name, $admin_problems) ? 'checked' : '' }}

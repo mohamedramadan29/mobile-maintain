@@ -299,7 +299,7 @@
                                                 <!--################### Start Pc Device Check  ###################-->
                                                 <div class="row" id="pc_check"
                                                     style="{{ $invoice->checkout_type === 'فحص جهاز pc' ? 'display: block' : 'display: none' }}">
-                                                    <h5> جهاز pc <span class="required_span"> * </span> </h5>
+                                                    <h5> جهاز pc وسوني  <span class="required_span"> * </span> </h5>
                                                     <table class="table">
                                                         <thead>
                                                             <tr>

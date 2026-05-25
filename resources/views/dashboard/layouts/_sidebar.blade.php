@@ -126,14 +126,14 @@
                             </li>
                             <li class="{{ Route::is('dashboard.pc_problem_categories.index') ? 'active' : '' }}">
                                 <a class="menu-item" href="{{ route('dashboard.pc_problem_categories.index') }}"
-                                    data-i18n="nav.users.user_profile"> فحص جهاز كمبيوتر
+                                    data-i18n="nav.users.user_profile"> فحص جهاز كمبيوتر وسوني
                                 </a>
                             </li>
-                            <li class="{{ Route::is('dashboard.sony_problem_categories.index') ? 'active' : '' }}">
+                            {{-- <li class="{{ Route::is('dashboard.sony_problem_categories.index') ? 'active' : '' }}">
                                 <a class="menu-item" href="{{ route('dashboard.sony_problem_categories.index') }}"
                                     data-i18n="nav.users.user_profile"> فحص جهاز سوني
                                 </a>
-                            </li>
+                            </li> --}}
 
                         </ul>
                     </li>
@@ -181,18 +181,18 @@
                     <li class="nav-item {{ Route::is('dashboard.pc_devices.*') ? 'active' : '' }}"><a href="#"><i
                                 class="la la-puzzle-piece"></i><span class="menu-title" data-i18n="nav.users.main">
                                 ادارة
-                                جهاز كمبيوتر
+                                اجهزة الكمبيوتر وسوني
                             </span></a>
                         <ul class="menu-content">
                             <li class="{{ Route::is('dashboard.pc_devices.index') ? 'active' : '' }}">
                                 <a class="menu-item" href="{{ route('dashboard.pc_devices.index') }}"
-                                    data-i18n="nav.users.user_profile"> جهاز كمبيوتر
+                                    data-i18n="nav.users.user_profile"> جهاز كمبيوتر وسوني
                                 </a>
                             </li>
 
                         </ul>
                     </li>
-                    <li class="nav-item {{ Route::is('dashboard.sony_devices.*') ? 'active' : '' }}"><a href="#"><i
+                    {{-- <li class="nav-item {{ Route::is('dashboard.sony_devices.*') ? 'active' : '' }}"><a href="#"><i
                                 class="la la-puzzle-piece"></i><span class="menu-title" data-i18n="nav.users.main">
                                 ادارة
                                 جهاز سوني
@@ -205,7 +205,7 @@
                             </li>
 
                         </ul>
-                    </li>
+                    </li> --}}
                     @endcan
 
                     @can('admins')

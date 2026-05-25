@@ -1,17 +1,17 @@
 @extends('dashboard.layouts.app')
-@section('title', 'ادارة اعطال فحص كمبيوتر  ')
+@section('title', 'ادارة اعطال فحص كمبيوتر وسوني  ')
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block"> ادارة اعطال فحص كمبيوتر  </h3>
+                    <h3 class="mb-0 content-header-title d-inline-block"> ادارة اعطال فحص كمبيوتر وسوني </h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item active"> ادارة اعطال فحص كمبيوتر
+                                <li class="breadcrumb-item active"> ادارة اعطال فحص كمبيوتر وسوني 
                                 </li>
                             </ol>
                         </div>

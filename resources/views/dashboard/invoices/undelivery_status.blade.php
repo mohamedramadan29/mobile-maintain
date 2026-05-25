@@ -44,7 +44,7 @@
                                             </div>
                                             <div class="card-footer">
                                                 <button type="submit" class="btn btn-primary btn-sm" id="delivery_button">
-                                                    عودة الجهاز
+                                                    عودة الجهاز الي الفني
                                                 </button>
                                                 <div id="loadingMessage" class="spinner-border text-primary" role="status"
                                                     style="display: none;">

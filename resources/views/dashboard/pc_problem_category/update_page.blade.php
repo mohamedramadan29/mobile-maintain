@@ -1,17 +1,17 @@
 @extends('dashboard.layouts.app')
-@section('title', 'تعديل قسم مشكلة كمبيوتر')
+@section('title', 'تعديل قسم مشكلة كمبيوتر وسوني ')
 @section('content')
     <div class="app-content content">
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block">تعديل قسم مشكلة كمبيوتر</h3>
+                    <h3 class="mb-0 content-header-title d-inline-block">تعديل قسم مشكلة كمبيوتر وسوني </h3>
                     <div class="row breadcrumbs-top d-inline-block">
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.pc_problem_categories.index') }}">اقسام مشاكل كمبيوتر</a></li>
-                                <li class="breadcrumb-item active">تعديل قسم مشكلة كمبيوتر</li>
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard.pc_problem_categories.index') }}">اقسام مشاكل كمبيوتر وسوني </a></li>
+                                <li class="breadcrumb-item active">تعديل قسم مشكلة كمبيوتر وسوني </li>
                             </ol>
                         </div>
                     </div>
@@ -24,7 +24,7 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title">تعديل قسم مشكلة كمبيوتر</h4>
+                                    <h4 class="card-title">تعديل قسم مشكلة كمبيوتر وسوني </h4>
                                 </div>
                                 <div class="card-content collapse show">
                                     <div class="card-body">
