@@ -78,6 +78,20 @@ class Invoice extends Model
         return $this->hasMany(InvoicePrograneCheck::class, 'invoice_id');
     }
 
+    ############# Sony  Check ###############
+
+    public function sonyResults()
+    {
+        return $this->hasMany(InvoiceSonyCheck::class, 'invoice_id');
+    }
+
+    ############# Pc  Check ###############
+
+    public function pcResults()
+    {
+        return $this->hasMany(InvoicePcCheck::class, 'invoice_id');
+    }
+
     public function priceDetails()
     {
         return $this->hasMany(PriceDetail::class, 'invoice_id');

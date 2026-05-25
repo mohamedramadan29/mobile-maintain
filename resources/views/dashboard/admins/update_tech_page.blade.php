@@ -83,6 +83,32 @@
                                                                 </fieldset>
                                                             @endforeach
                                                         </div>
+                                                        <div class="mb-3">
+                                                            <h5>صلاحيات اعطال سوني </h5>
+                                                            @foreach ($sony_problems as $sony_problem)
+                                                                <fieldset class="mb-1">
+                                                                    <input {{ in_array($sony_problem->name, $admin_problems) ? 'checked' : '' }}
+                                                                        type="checkbox" id="input sony-{{ $sony_problem->id }}" name="problems[]"
+                                                                        value="{{ $sony_problem->name }}">
+                                                                    <label for="input sony-{{ $sony_problem->id }}">
+                                                                        {{ $sony_problem->name }}
+                                                                    </label>
+                                                                </fieldset>
+                                                            @endforeach
+                                                        </div>
+                                                         <div class="mb-3">
+                                                            <h5>صلاحيات اعطال  pc</h5>
+                                                            @foreach ($pc_problems as $pc_problem)
+                                                                <fieldset class="mb-1">
+                                                                    <input {{ in_array($pc_problem->name, $admin_problems) ? 'checked' : '' }}
+                                                                        type="checkbox" id="input pc-{{ $pc_problem->id }}" name="problems[]"
+                                                                        value="{{ $pc_problem->name }}">
+                                                                    <label for="input pc-{{ $pc_problem->id }}">
+                                                                        {{ $pc_problem->name }}
+                                                                    </label>
+                                                                </fieldset>
+                                                            @endforeach
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -90,7 +116,7 @@
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="la la-check-square-o"></i> تحديث
                                                 </button>
-                                                <a href="{{ route('dashboard.admins.tech') }}" class="btn btn-warning mr-1">
+                                                <a href="{{ route('dashboard.admins.tech') }}" class="mr-1 btn btn-warning">
                                                     <i class="la la-times"></i> الغاء
                                                 </a>
                                             </div>

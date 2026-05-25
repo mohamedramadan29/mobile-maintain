@@ -2,41 +2,46 @@
 
 namespace App\Http\Controllers\dashboard;
 
-use Exception;
-use Mpdf\Mpdf;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use App\Jobs\SendCreateMessage;
-use App\Models\dashboard\Admin;
-use App\Models\dashboard\Invoice;
-use App\Models\dashboard\Message;
+use App\Http\Controllers\Controller;
 use App\Http\Traits\Message_Trait;
 use App\Http\Traits\Upload_Images;
-use Illuminate\Support\Facades\DB;
+use App\Jobs\SendCreateMessage;
+use App\Models\dashboard\Admin;
 use App\Models\dashboard\CheckText;
-use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
-use App\Models\dashboard\PieceSource;
-use App\Models\dashboard\PriceDetail;
-use App\Models\dashboard\SpeedDevice;
-use Intervention\Image\Facades\Image;
+use App\Models\dashboard\Invoice;
 use App\Models\dashboard\InvoiceCheck;
 use App\Models\dashboard\InvoiceImage;
-use App\Models\dashboard\InvoiceSteps;
-use Picqer\Barcode\BarcodeGeneratorPNG;
-use App\Models\dashboard\ProgrameDevice;
-use Illuminate\Support\Facades\Redirect;
-use App\Models\dashboard\ProblemCategory;
-// use Intervention\Image\Facades\Image;
-use Illuminate\Support\Facades\Validator;
 use App\Models\dashboard\InvoiceMoreCheck;
-use App\Models\dashboard\InvoiceSpeedCheck;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Models\dashboard\InvoicePcCheck;
 use App\Models\dashboard\InvoicePrograneCheck;
-use App\Models\dashboard\SpeedProblemCategory;
+use App\Models\dashboard\InvoiceSonyCheck;
+use App\Models\dashboard\InvoiceSpeedCheck;
+use App\Models\dashboard\InvoiceSteps;
+use App\Models\dashboard\Message;
+use App\Models\dashboard\PcDevice;
+use App\Models\dashboard\PcProblemCategory;
+use App\Models\dashboard\PieceSource;
+use App\Models\dashboard\PriceDetail;
+use App\Models\dashboard\ProblemCategory;
+use App\Models\dashboard\ProgrameDevice;
 use App\Models\dashboard\ProgrameProblemCategory;
+use App\Models\dashboard\SonyDevice;
+use App\Models\dashboard\SonyProblemCategory;
+use App\Models\dashboard\SpeedDevice;
+use App\Models\dashboard\SpeedProblemCategory;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
+use Intervention\Image\Facades\Image;
+use Mpdf\Mpdf;
+use Picqer\Barcode\BarcodeGeneratorPNG;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class InvoiceController extends Controller
 {
@@ -663,6 +668,38 @@ class InvoiceController extends Controller
                         }
                     }
                 }
+                if ($invoice->checkout_type == 'فحص جهاز سوني') {
+                    // إضافة نتائج الفحص للجهاز السريع
+                    if (isset($data['sony_id']) && is_array($data['sony_id'])) {
+                        foreach ($data['sony_id'] as $index => $sonyId) {
+                            $checkSony = new InvoiceSonyCheck();
+                            $checkSony->invoice_id = $invoice->id;
+                            $checkSony->sony_id = $sonyId;
+                            $checkSony->problem_name = $data['check_sony_name'][$index] ?? '';
+
+                            $checkSony->work = $data["sonywork_{$sonyId}"] ?? 0;
+                            $checkSony->notes = $data['sony_notes'][$index] ?? null;
+                            $checkSony->after_check = $data['after_check_sony'][$index] ?? null;
+                            $checkSony->save();
+                        }
+                    }
+                }
+                   if ($invoice->checkout_type == 'فحص جهاز pc') {
+                    // إضافة نتائج الفحص للجهاز السريع
+                    if (isset($data['pc_id']) && is_array($data['pc_id'])) {
+                        foreach ($data['pc_id'] as $index => $pcId) {
+                            $checkPc = new InvoicePcCheck();
+                            $checkPc->invoice_id = $invoice->id;
+                            $checkPc->pc_id = $pcId;
+                            $checkPc->problem_name = $data['check_pc_name'][$index] ?? '';
+
+                            $checkPc->work = $data["pcwork_{$pcId}"] ?? 0;
+                            $checkPc->notes = $data['pc_notes'][$index] ?? null;
+                            $checkPc->after_check = $data['after_check_pc'][$index] ?? null;
+                            $checkPc->save();
+                        }
+                    }
+                }
                 ########## ADD Price Details ##################
                 // حفظ تفاصيل السعر إن وجدت
                 if (!empty($data['price_details']) && is_array($data['price_details'])) {
@@ -703,9 +740,13 @@ class InvoiceController extends Controller
         $problems = ProblemCategory::all();
         $programe_problems = ProgrameProblemCategory::all();
         $speed_problems = SpeedProblemCategory::all();
+        $sony_problems = SonyProblemCategory::all();
+        $pc_problems = PcProblemCategory::all();
         $checks = CheckText::all();
         $speed_devices = SpeedDevice::all();
         $programe_devices = ProgrameDevice::all();
+        $sony_devices = SonyDevice::all();
+        $pc_devices = PcDevice::all();
         $piece_resources = PieceSource::all();
         $invoice_more_checks = InvoiceMoreCheck::all();
         return view('dashboard.invoices.create', compact(
@@ -713,8 +754,12 @@ class InvoiceController extends Controller
             'checks',
             'speed_devices',
             'programe_devices',
+            'sony_devices',
+            'pc_devices',
             'programe_problems',
             'speed_problems',
+            'pc_problems',
+            'sony_problems',
             'piece_resources',
             'invoice_more_checks'
         ));
@@ -888,6 +933,44 @@ class InvoiceController extends Controller
                         }
                     }
                 }
+                if ($invoice->checkout_type == 'فحص جهاز سوني') {
+                    // إضافة نتائج الفحص للجهاز السوني
+                    if (isset($data['sony_id']) && is_array($data['sony_id'])) {
+                        foreach ($data['sony_id'] as $index => $sonyId) {
+                            $checkSony = InvoiceSonyCheck::updateOrCreate(
+                                [
+                                    "invoice_id" => $invoice->id,
+                                    "sony_id" => $sonyId,
+                                ],
+                                [
+                                    "problem_name" => $data['check_sony_name'][$index] ?? '',
+                                    "work" => isset($data["sonywork_{$sonyId}"]) ? (is_array($data["sonywork_{$sonyId}"]) ? reset($data["sonywork_{$sonyId}"]) : $data["sonywork_{$sonyId}"]) : 0,
+                                    "notes" => $data['sony_notes'][$index] ?? null,
+                                    "after_check" => $data['after_check_sony'][$index] ?? null,
+                                ]
+                            );
+                        }
+                    }
+                }
+                if ($invoice->checkout_type == 'فحص جهاز pc') {
+                    // إضافة نتائج الفحص لجهاز pc
+                    if (isset($data['pc_id']) && is_array($data['pc_id'])) {
+                        foreach ($data['pc_id'] as $index => $pcId) {
+                            $checkPc = InvoicePcCheck::updateOrCreate(
+                                [
+                                    "invoice_id" => $invoice->id,
+                                    "pc_id" => $pcId,
+                                ],
+                                [
+                                    "problem_name" => $data['check_pc_name'][$index] ?? '',
+                                    "work" => isset($data["pcwork_{$pcId}"]) ? (is_array($data["pcwork_{$pcId}"]) ? reset($data["pcwork_{$pcId}"]) : $data["pcwork_{$pcId}"]) : 0,
+                                    "notes" => $data['pc_notes'][$index] ?? null,
+                                    "after_check" => $data['after_check_pc'][$index] ?? null,
+                                ]
+                            );
+                        }
+                    }
+                }
                 DB::commit();
                 return $this->success_message(' تم تعديل الفاتورة بنجاح');
             } catch (Exception $e) {
@@ -898,16 +981,24 @@ class InvoiceController extends Controller
         $problems = ProblemCategory::all();
         $programe_problems = ProgrameProblemCategory::all();
         $speed_problems = SpeedProblemCategory::all();
+        $sony_problems = SonyProblemCategory::all();
+        $pc_problems = PcProblemCategory::all();
         $speed_devices = SpeedDevice::all();
         $programe_devices = ProgrameDevice::all();
+        $sony_devices = SonyDevice::all();
+        $pc_devices = PcDevice::all();
         return view('dashboard.invoices.update', compact(
             'invoice',
             'problems',
             'checks',
             'speed_devices',
             'programe_devices',
+            'sony_devices',
+            'pc_devices',
             'programe_problems',
             'speed_problems',
+            'sony_problems',
+            'pc_problems',
             'piece_resources',
             'invoice_more_checks'
         ));
@@ -1064,11 +1155,15 @@ class InvoiceController extends Controller
         $checks = CheckText::all();
         $speed_devices = SpeedDevice::all();
         $programe_devices = ProgrameDevice::all();
+        $sony_devices = SonyDevice::all();
+        $pc_devices = PcDevice::all();
         $invoice_more_checks = InvoiceMoreCheck::all();
         $programe_problems = ProgrameProblemCategory::all();
         $speed_problems = SpeedProblemCategory::all();
+        $sony_problems = SonyProblemCategory::all();
+        $pc_problems = PcProblemCategory::all();
         $piece_resources = PieceSource::all();
-        return view('dashboard.invoices.show-details', compact('piece_resources', 'invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'invoice_more_checks', 'programe_problems', 'speed_problems'));
+        return view('dashboard.invoices.show-details', compact('piece_resources', 'invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'sony_devices', 'pc_devices', 'invoice_more_checks', 'programe_problems', 'speed_problems', 'sony_problems', 'pc_problems'));
     }
     ###################### End Invoice All Details ###############
     ########################## Return To Rouf ########################

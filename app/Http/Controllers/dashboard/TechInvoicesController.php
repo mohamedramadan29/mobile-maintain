@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\dashboard\PieceSource;
 use App\Models\dashboard\PriceDetail; ############# added ################
 use App\Models\dashboard\SpeedDevice;
+use App\Models\dashboard\SonyDevice;
+use App\Models\dashboard\PcDevice;
+use App\Models\dashboard\SonyProblemCategory;
+use App\Models\dashboard\PcProblemCategory;
 use App\Models\dashboard\InvoiceImage;
 use App\Models\dashboard\InvoiceSteps;
 use App\Models\dashboard\ProgrameDevice;
@@ -75,18 +79,26 @@ class TechInvoicesController extends Controller
         $checks = CheckText::all();
         $speed_devices = SpeedDevice::all();
         $programe_devices = ProgrameDevice::all();
+        $sony_devices = SonyDevice::all();
+        $pc_devices = PcDevice::all();
         $invoice_more_checks = InvoiceMoreCheck::all();
         $programe_problems = ProgrameProblemCategory::all();
         $speed_problems = SpeedProblemCategory::all();
+        $sony_problems = SonyProblemCategory::all();
+        $pc_problems = PcProblemCategory::all();
         return view('dashboard.tech_invoices.show', compact(
             'invoice',
             'invoice_more_checks',
             'programe_problems',
             'speed_problems',
+            'sony_problems',
+            'pc_problems',
             'problems',
             'checks',
             'speed_devices',
-            'programe_devices'
+            'programe_devices',
+            'sony_devices',
+            'pc_devices'
         ));
     }
 
@@ -295,11 +307,15 @@ class TechInvoicesController extends Controller
         $checks = CheckText::all();
         $speed_devices = SpeedDevice::all();
         $programe_devices = ProgrameDevice::all();
+        $sony_devices = SonyDevice::all();
+        $pc_devices = PcDevice::all();
         $invoice_more_checks = InvoiceMoreCheck::all();
         $programe_problems = ProgrameProblemCategory::all();
         $speed_problems = SpeedProblemCategory::all();
+        $sony_problems = SonyProblemCategory::all();
+        $pc_problems = PcProblemCategory::all();
         $piece_resources = PieceSource::all();
-        return view('dashboard.tech_invoices.update', compact('piece_resources', 'invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'invoice_more_checks', 'programe_problems', 'speed_problems'));
+        return view('dashboard.tech_invoices.update', compact('piece_resources', 'invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'sony_devices', 'pc_devices', 'invoice_more_checks', 'programe_problems', 'speed_problems', 'sony_problems', 'pc_problems'));
     }
 
     public function addfile(Request $request, $id)
@@ -338,12 +354,16 @@ class TechInvoicesController extends Controller
         $checks = CheckText::all();
         $speed_devices = SpeedDevice::all();
         $programe_devices = ProgrameDevice::all();
+        $sony_devices = SonyDevice::all();
+        $pc_devices = PcDevice::all();
         $invoice_more_checks = InvoiceMoreCheck::all();
         $programe_problems = ProgrameProblemCategory::all();
         $speed_problems = SpeedProblemCategory::all();
+        $sony_problems = SonyProblemCategory::all();
+        $pc_problems = PcProblemCategory::all();
         $piece_resources = PieceSource::all();
 
-        return view('dashboard.tech_invoices.compelete-invoice', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'invoice_more_checks', 'programe_problems', 'speed_problems', 'piece_resources'));
+        return view('dashboard.tech_invoices.compelete-invoice', compact('invoice', 'problems', 'checks', 'speed_devices', 'programe_devices', 'sony_devices', 'pc_devices', 'invoice_more_checks', 'programe_problems', 'speed_problems', 'sony_problems', 'pc_problems', 'piece_resources'));
     }
 
     public function ReturnToRoof($invoice_id)

@@ -1,351 +1,491 @@
 @extends('dashboard.layouts.app')
 @section('title', 'ا ضافة فاتورة جديدة ')
 @section('css')
-    <style>
-        .problem_check_box {
-            display: flex;
-            justify-content: space-around;
-        }
+<style>
+    .problem_check_box {
+        display: flex;
+        justify-content: space-around;
+    }
 
-        .table th,
-        .table td {
-            padding: 0;
-        }
+    .table th,
+    .table td {
+        padding: 0;
+    }
 
-        .table td input {
-            min-width: 150px;
-        }
+    .table td input {
+        min-width: 150px;
+    }
 
-        .table td select {
-            min-width: 120px;
-        }
-    </style>
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/icheck.css">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/custom.css">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/css-rtl/plugins/forms/checkboxes-radios.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/parsleyjs/src/parsley.css">
+    .table td select {
+        min-width: 120px;
+    }
+</style>
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/icheck.css">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/custom.css">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/css-rtl/plugins/forms/checkboxes-radios.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/parsleyjs/src/parsley.css">
 @endsection
 @section('content')
-    <div class="app-content content">
-        <div class="content-wrapper">
-            <div class="content-header row">
-                <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
-                    <h3 class="mb-0 content-header-title d-inline-block"> اضافة فاتورة جديدة </h3>
-                    <div class="row breadcrumbs-top d-inline-block">
-                        <div class="breadcrumb-wrapper col-12">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
-                                </li>
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard.invoices.index') }}"> الفواتير </a>
-                                </li>
-                                <li class="breadcrumb-item active"><a href="#"> اضافة فاتورة جديدة </a>
-                                </li>
-                            </ol>
-                        </div>
+<div class="app-content content">
+    <div class="content-wrapper">
+        <div class="content-header row">
+            <div class="mb-2 content-header-left col-md-6 col-12 breadcrumb-new">
+                <h3 class="mb-0 content-header-title d-inline-block"> اضافة فاتورة جديدة </h3>
+                <div class="row breadcrumbs-top d-inline-block">
+                    <div class="breadcrumb-wrapper col-12">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="{{ route('dashboard.invoices.index') }}"> الفواتير </a>
+                            </li>
+                            <li class="breadcrumb-item active"><a href="#"> اضافة فاتورة جديدة </a>
+                            </li>
+                        </ol>
                     </div>
                 </div>
-
             </div>
-            <div class="content-body">
-                <!-- Basic form layout section start -->
-                <section id="basic-form-layouts">
-                    <div class="row match-height">
-                        <div class="col-md-12">
-                            <div class="card">
-                                @if ($errors->any())
-                                    @foreach ($errors->all() as $error)
-                                        <div class="alert alert-danger">{{ $error }}</div>
-                                    @endforeach
-                                @endif
-                                @if (session()->has('Success_message'))
-                                    <div style="margin: auto;margin-top: 20px; text-align: center;">
-                                        <p style="margin-bottom: 10px; color: green;">تم اضافة الفاتورة بنجاح</p>
-                                        <a href="{{ route('dashboard.invoices.index') }}" class="btn btn-primary btn-sm">
-                                            <i class="la la-list"></i> جميع الفواتير
-                                        </a>
-                                        <a href="{{ route('dashboard.invoices.print_barcode', session('new_invoice_id')) }}"
-                                            target="_blank" class="btn btn-info btn-sm">
-                                            <i class="la la-print"></i> طباعة الباركود
-                                        </a>
-                                    </div>
-                                @endif
-                                <div class="card-header">
-                                    <h4 class="card-title" id="basic-layout-form"> اضافة فاتورة جديدة </h4>
-                                    <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i> </a>
-                                </div>
-                                <div class="card-content collapse show">
-                                    <div class="card-body">
-                                        <form class="form" method="POST" id="invoice-form"
-                                            action="{{ route('dashboard.invoices.create') }}" enctype="multipart/form-data"
-                                            onsubmit="return preventMultipleSubmissions(event)">
-                                            @csrf
-                                            <div class="form-body">
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for=""> حدد نوع الفحص </label>
-                                                            <select required name="checkout_type" id="checkout_type"
-                                                                class="form-control">
-                                                                <option value="" selected disabled> حدد نوع الفحص
-                                                                </option>
-                                                                <option
-                                                                    {{ old('checkout_type') == 'فحص كامل' ? 'selected' : '' }}
-                                                                    value="فحص كامل"> فحص كامل </option>
-                                                                <option
-                                                                    {{ old('checkout_type') == 'فحص جهاز برمجة' ? 'selected' : '' }}
-                                                                    value="فحص جهاز برمجة"> فحص جهاز برمجة </option>
-                                                                <option
-                                                                    {{ old('checkout_type') == 'فحص جهاز سريع' ? 'selected' : '' }}
-                                                                    value="فحص جهاز سريع"> فحص جهاز سريع </option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <!--################### Start Add ChecksResults ###################-->
-                                                <div class="row" id="full_check" style="display: none;">
-                                                    <h5> فحص الجهاز <span class="required_span"> * </span> </h5>
-                                                    <div class="table-responsive">
-                                                        <table class="table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th> # </th>
-                                                                    <th> اساسيات الفحص </th>
-                                                                    <th> حالة العمل </th>
-                                                                    <th> ملاحظات </th>
-                                                                    <th> بعد الفحص </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach ($checks as $check)
-                                                                    <tr>
-                                                                        <td> {{ $loop->iteration }}</td>
-                                                                        <td>
-                                                                            <input type="hidden" name="problem_id[]"
-                                                                                value="{{ $check->id }}">
-                                                                            <input readonly type="text"
-                                                                                value="{{ $check->name }}"
-                                                                                class="form-control w-100"
-                                                                                name="check_problem_name[]">
-                                                                        </td>
-                                                                        <td>
-                                                                            <select name="work_{{ $check->id }}"
-                                                                                class="form-control">
-                                                                                <option value="">-- اختر الحالة --
-                                                                                </option>
-                                                                                <option value="1"
-                                                                                    {{ old('work_' . $check->id) == '1' ? 'selected' : '' }}>
-                                                                                    يعمل</option>
-                                                                                <option value="0"
-                                                                                    {{ old('work_' . $check->id) == '0' ? 'selected' : '' }}>
-                                                                                    لا يعمل</option>
-                                                                            </select>
-                                                                        </td>
-                                                                        <td>
-                                                                            <input type="text"
-                                                                                value="{{ old('notes.' . $loop->index) }}"
-                                                                                class="form-control" name="notes[]">
-                                                                        </td>
-                                                                        <td>
-                                                                            <input type="text"
-                                                                                value="{{ old('after_check.' . $loop->index) }}"
-                                                                                class="form-control" name="after_check[]">
-                                                                        </td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <!--################### End Add ChecksResults #####################-->
-                                                <!--################### Start Speed Device Check  ###################-->
-                                                <div class="row" id="speed_check" style="display: none;">
-                                                    <h5> جهاز سريع <span class="required_span"> * </span> </h5>
-                                                    <div class="table-responsive">
-                                                        <table class="table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th> # </th>
-                                                                    <th> اساسيات الفحص </th>
-                                                                    <th> حالة العمل </th>
-                                                                    <th> ملاحظات </th>
-                                                                    <th> بعد الفحص </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach ($speed_devices as $speed)
-                                                                    <tr>
-                                                                        <td> {{ $loop->iteration }}</td>
-                                                                        <td>
-                                                                            <input type="hidden" name="speed_id[]"
-                                                                                value="{{ $speed->id }}">
-                                                                            <input readonly type="text"
-                                                                                value="{{ $speed->name }}"
-                                                                                class="form-control"
-                                                                                name="check_speed_name[]">
-                                                                        </td>
-                                                                        <td>
-                                                                            <select name="speedwork_{{ $speed->id }}"
-                                                                                class="form-control">
-                                                                                <option value="">-- اختر الحالة --
-                                                                                </option>
-                                                                                <option value="1"
-                                                                                    {{ old('speedwork_' . $speed->id) == '1' ? 'selected' : '' }}>
-                                                                                    يعمل</option>
-                                                                                <option value="0"
-                                                                                    {{ old('speedwork_' . $speed->id) == '0' ? 'selected' : '' }}>
-                                                                                    لا يعمل</option>
-                                                                            </select>
-                                                                        </td>
 
-                                                                        {{-- <td>
-                                                                        <input type="radio" value="1"
-                                                                            class="form-control"
-                                                                            name="speedwork_{{ $speed->id }}[]"
-                                                                            {{ old('speedwork_' . $speed->id) == '1' ? 'checked' : '' }}>
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="radio" value="0"
-                                                                            class="form-control"
-                                                                            name="speedwork_{{ $speed->id }}[]"
-                                                                            {{ old('speedwork_' . $speed->id) == '0' ? 'checked' : '' }}>
-                                                                    </td> --}}
-                                                                        <td>
-                                                                            <input type="text"
-                                                                                value="{{ old('speed_notes.' . $loop->index) }}"
-                                                                                class="form-control" name="speed_notes[]">
-                                                                        </td>
-                                                                        <td>
-                                                                            <input type="text"
-                                                                                value="{{ old('after_check_speed.' . $loop->index) }}"
-                                                                                class="form-control"
-                                                                                name="after_check_speed[]">
-                                                                        </td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
+        </div>
+        <div class="content-body">
+            <!-- Basic form layout section start -->
+            <section id="basic-form-layouts">
+                <div class="row match-height">
+                    <div class="col-md-12">
+                        <div class="card">
+                            @if ($errors->any())
+                            @foreach ($errors->all() as $error)
+                            <div class="alert alert-danger">{{ $error }}</div>
+                            @endforeach
+                            @endif
+                            @if (session()->has('Success_message'))
+                            <div style="margin: auto;margin-top: 20px; text-align: center;">
+                                <p style="margin-bottom: 10px; color: green;">تم اضافة الفاتورة بنجاح</p>
+                                <a href="{{ route('dashboard.invoices.index') }}" class="btn btn-primary btn-sm">
+                                    <i class="la la-list"></i> جميع الفواتير
+                                </a>
+                                <a href="{{ route('dashboard.invoices.print_barcode', session('new_invoice_id')) }}"
+                                    target="_blank" class="btn btn-info btn-sm">
+                                    <i class="la la-print"></i> طباعة الباركود
+                                </a>
+                            </div>
+                            @endif
+                            <div class="card-header">
+                                <h4 class="card-title" id="basic-layout-form"> اضافة فاتورة جديدة </h4>
+                                <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i> </a>
+                            </div>
+                            <div class="card-content collapse show">
+                                <div class="card-body">
+                                    <form class="form" method="POST" id="invoice-form"
+                                        action="{{ route('dashboard.invoices.create') }}" enctype="multipart/form-data"
+                                        onsubmit="return preventMultipleSubmissions(event)">
+                                        @csrf
+                                        <div class="form-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for=""> حدد نوع الفحص </label>
+                                                        <select required name="checkout_type" id="checkout_type"
+                                                            class="form-control">
+                                                            <option value="" selected disabled> حدد نوع الفحص
+                                                            </option>
+                                                            <option {{ old('checkout_type')=='فحص كامل' ? 'selected'
+                                                                : '' }} value="فحص كامل"> فحص كامل </option>
+                                                            <option {{ old('checkout_type')=='فحص جهاز برمجة'
+                                                                ? 'selected' : '' }} value="فحص جهاز برمجة"> فحص جهاز
+                                                                برمجة </option>
+                                                            <option {{ old('checkout_type')=='فحص جهاز سريع'
+                                                                ? 'selected' : '' }} value="فحص جهاز سريع"> فحص جهاز
+                                                                سريع </option>
+                                                            <option {{ old('checkout_type')=='فحص جهاز سوني'
+                                                                ? 'selected' : '' }} value="فحص جهاز سوني"> فحص جهاز
+                                                                سوني </option>
+                                                            <option {{ old('checkout_type')=='فحص جهاز pc' ? 'selected'
+                                                                : '' }} value="فحص جهاز pc"> فحص جهاز pc </option>
+                                                        </select>
                                                     </div>
                                                 </div>
-                                                <!--################### End Speed Device Check  #####################-->
-                                                <!--################### Start Programe Device Check  ###################-->
-                                                <div class="row" id="programe_check" style="display: none;">
-                                                    <h5> جهاز برمجة <span class="required_span"> * </span> </h5>
-                                                    <div class="table-responsive">
-                                                        <table class="table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th> # </th>
-                                                                    <th> اساسيات الفحص </th>
-                                                                    <th> حالة العمل </th>
-                                                                    <th> ملاحظات </th>
-                                                                    <th> بعد الفحص </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach ($programe_devices as $programe)
-                                                                    <tr>
-                                                                        <td> {{ $loop->iteration }}</td>
-                                                                        <td>
-                                                                            <input type="hidden" name="programe_id[]"
-                                                                                value="{{ $programe->id }}">
-                                                                            <input readonly type="text"
-                                                                                value="{{ $programe->name }}"
-                                                                                class="form-control"
-                                                                                name="check_programe_name[]">
-                                                                        </td>
-                                                                        <td>
-                                                                            <select
-                                                                                name="programework_{{ $programe->id }}"
-                                                                                class="form-control">
-                                                                                <option value="">-- اختر الحالة --
-                                                                                </option>
-                                                                                <option value="1"
-                                                                                    {{ old('programework_' . $programe->id) == '1' ? 'selected' : '' }}>
-                                                                                    يعمل</option>
-                                                                                <option value="0"
-                                                                                    {{ old('programework_' . $programe->id) == '0' ? 'selected' : '' }}>
-                                                                                    لا يعمل</option>
-                                                                            </select>
-                                                                        </td>
+                                            </div>
+                                            <!--################### Start Add ChecksResults ###################-->
+                                            <div class="row" id="full_check" style="display: none;">
+                                                <h5> فحص الجهاز <span class="required_span"> * </span> </h5>
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th> # </th>
+                                                                <th> اساسيات الفحص </th>
+                                                                <th> حالة العمل </th>
+                                                                <th> ملاحظات </th>
+                                                                <th> بعد الفحص </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($checks as $check)
+                                                            <tr>
+                                                                <td> {{ $loop->iteration }}</td>
+                                                                <td>
+                                                                    <input type="hidden" name="problem_id[]"
+                                                                        value="{{ $check->id }}">
+                                                                    <input readonly type="text"
+                                                                        value="{{ $check->name }}"
+                                                                        class="form-control w-100"
+                                                                        name="check_problem_name[]">
+                                                                </td>
+                                                                <td>
+                                                                    <select name="work_{{ $check->id }}"
+                                                                        class="form-control">
+                                                                        <option value="">-- اختر الحالة --
+                                                                        </option>
+                                                                        <option value="1" {{ old('work_' . $check->id)
+                                                                            == '1' ? 'selected' : '' }}>
+                                                                            يعمل</option>
+                                                                        <option value="0" {{ old('work_' . $check->id)
+                                                                            == '0' ? 'selected' : '' }}>
+                                                                            لا يعمل</option>
+                                                                    </select>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text"
+                                                                        value="{{ old('notes.' . $loop->index) }}"
+                                                                        class="form-control" name="notes[]">
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text"
+                                                                        value="{{ old('after_check.' . $loop->index) }}"
+                                                                        class="form-control" name="after_check[]">
+                                                                </td>
+                                                            </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <!--################### End Add ChecksResults #####################-->
+                                            <!--################### Start Speed Device Check  ###################-->
+                                            <div class="row" id="speed_check" style="display: none;">
+                                                <h5> جهاز سريع <span class="required_span"> * </span> </h5>
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th> # </th>
+                                                                <th> اساسيات الفحص </th>
+                                                                <th> حالة العمل </th>
+                                                                <th> ملاحظات </th>
+                                                                <th> بعد الفحص </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($speed_devices as $speed)
+                                                            <tr>
+                                                                <td> {{ $loop->iteration }}</td>
+                                                                <td>
+                                                                    <input type="hidden" name="speed_id[]"
+                                                                        value="{{ $speed->id }}">
+                                                                    <input readonly type="text"
+                                                                        value="{{ $speed->name }}" class="form-control"
+                                                                        name="check_speed_name[]">
+                                                                </td>
+                                                                <td>
+                                                                    <select name="speedwork_{{ $speed->id }}"
+                                                                        class="form-control">
+                                                                        <option value="">-- اختر الحالة --
+                                                                        </option>
+                                                                        <option value="1" {{ old('speedwork_' . $speed->
+                                                                            id) == '1' ? 'selected' : '' }}>
+                                                                            يعمل</option>
+                                                                        <option value="0" {{ old('speedwork_' . $speed->
+                                                                            id) == '0' ? 'selected' : '' }}>
+                                                                            لا يعمل</option>
+                                                                    </select>
+                                                                </td>
 
-                                                                        {{-- <td>
-                                                                        <input type="radio" value="1"
-                                                                            class="form-control"
-                                                                            name="programework_{{ $programe->id }}[]"
-                                                                            {{ old('programework_' . $programe->id) == '1' ? 'checked' : '' }}>
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="radio" value="0"
-                                                                            class="form-control"
-                                                                            name="programework_{{ $programe->id }}[]"
-                                                                            {{ old('programework_' . $programe->id) == '0' ? 'checked' : '' }}>
-                                                                    </td> --}}
-                                                                        <td>
-                                                                            <input type="text"
-                                                                                value="{{ old('programe_notes.' . $loop->index) }}"
-                                                                                class="form-control"
-                                                                                name="programe_notes[]">
-                                                                        </td>
-                                                                        <td>
-                                                                            <input type="text"
-                                                                                value="{{ old('after_check_programe.' . $loop->index) }}"
-                                                                                class="form-control"
-                                                                                name="after_check_programe[]">
-                                                                        </td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
+                                                                {{-- <td>
+                                                                    <input type="radio" value="1" class="form-control"
+                                                                        name="speedwork_{{ $speed->id }}[]" {{
+                                                                        old('speedwork_' . $speed->id) == '1' ?
+                                                                    'checked' : '' }}>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="radio" value="0" class="form-control"
+                                                                        name="speedwork_{{ $speed->id }}[]" {{
+                                                                        old('speedwork_' . $speed->id) == '0' ?
+                                                                    'checked' : '' }}>
+                                                                </td> --}}
+                                                                <td>
+                                                                    <input type="text"
+                                                                        value="{{ old('speed_notes.' . $loop->index) }}"
+                                                                        class="form-control" name="speed_notes[]">
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text"
+                                                                        value="{{ old('after_check_speed.' . $loop->index) }}"
+                                                                        class="form-control" name="after_check_speed[]">
+                                                                </td>
+                                                            </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
                                                 </div>
-                                                <!--################### End Programe Device Check  #####################-->
+                                            </div>
+                                            <!--################### End Speed Device Check  #####################-->
+                                            <!--################### Start Programe Device Check  ###################-->
+                                            <div class="row" id="programe_check" style="display: none;">
+                                                <h5> جهاز برمجة <span class="required_span"> * </span> </h5>
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th> # </th>
+                                                                <th> اساسيات الفحص </th>
+                                                                <th> حالة العمل </th>
+                                                                <th> ملاحظات </th>
+                                                                <th> بعد الفحص </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($programe_devices as $programe)
+                                                            <tr>
+                                                                <td> {{ $loop->iteration }}</td>
+                                                                <td>
+                                                                    <input type="hidden" name="programe_id[]"
+                                                                        value="{{ $programe->id }}">
+                                                                    <input readonly type="text"
+                                                                        value="{{ $programe->name }}"
+                                                                        class="form-control"
+                                                                        name="check_programe_name[]">
+                                                                </td>
+                                                                <td>
+                                                                    <select name="programework_{{ $programe->id }}"
+                                                                        class="form-control">
+                                                                        <option value="">-- اختر الحالة --
+                                                                        </option>
+                                                                        <option value="1" {{ old('programework_' .
+                                                                            $programe->id) == '1' ? 'selected' : '' }}>
+                                                                            يعمل</option>
+                                                                        <option value="0" {{ old('programework_' .
+                                                                            $programe->id) == '0' ? 'selected' : '' }}>
+                                                                            لا يعمل</option>
+                                                                    </select>
+                                                                </td>
 
-                                                <div class="row">
-                                                    @foreach ($invoice_more_checks as $invoice_more_check)
-                                                        <div class="col-6">
-                                                            {{-- <div class="skin skin-square"> --}}
-                                                            <fieldset>
-                                                                <input type="checkbox"
-                                                                    id="inputmorecheck-{{ $invoice_more_check->id }}"
-                                                                    name="invoice_more_checks[]"
-                                                                    value="{{ $invoice_more_check->id }}"
-                                                                    @checked(in_array($invoice_more_check->id, old('invoice_more_checks', [])))>
-                                                                <label
-                                                                    for="inputmorecheck-{{ $invoice_more_check->id }}">{{ $invoice_more_check->name }}
-                                                                </label>
-                                                            </fieldset>
-                                                            {{-- </div> --}}
-                                                        </div>
-                                                    @endforeach
+                                                                {{-- <td>
+                                                                    <input type="radio" value="1" class="form-control"
+                                                                        name="programework_{{ $programe->id }}[]" {{
+                                                                        old('programework_' . $programe->id) == '1' ?
+                                                                    'checked' : '' }}>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="radio" value="0" class="form-control"
+                                                                        name="programework_{{ $programe->id }}[]" {{
+                                                                        old('programework_' . $programe->id) == '0' ?
+                                                                    'checked' : '' }}>
+                                                                </td> --}}
+                                                                <td>
+                                                                    <input type="text"
+                                                                        value="{{ old('programe_notes.' . $loop->index) }}"
+                                                                        class="form-control" name="programe_notes[]">
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text"
+                                                                        value="{{ old('after_check_programe.' . $loop->index) }}"
+                                                                        class="form-control"
+                                                                        name="after_check_programe[]">
+                                                                </td>
+                                                            </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
                                                 </div>
-                                                <br>
-                                                <!-- باقي الحقول -->
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="name"> اسم العميل <span class="required_span">
-                                                                    *
-                                                                </span> </label>
-                                                            <input required type="text" id="name"
-                                                                class="form-control" placeholder="" name="name"
-                                                                value="{{ old('name') }}"
-                                                                data-parsley-required-message="الرجاء إدخال اسم العميل ">
-                                                        </div>
+                                            </div>
+                                            <!--################### End Programe Device Check  #####################-->
+
+
+                                            <!--################### Start Sony  Device Check  ###################-->
+                                            <div class="row" id="sony_check" style="display: none;">
+                                                <h5> جهاز برمجة <span class="required_span"> * </span> </h5>
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th> # </th>
+                                                                <th> اساسيات الفحص </th>
+                                                                <th> حالة العمل </th>
+                                                                <th> ملاحظات </th>
+                                                                <th> بعد الفحص </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($sony_devices as $sony)
+                                                            <tr>
+                                                                <td> {{ $loop->iteration }}</td>
+                                                                <td>
+                                                                    <input type="hidden" name="sony_id[]"
+                                                                        value="{{ $sony->id }}">
+                                                                    <input readonly type="text"
+                                                                        value="{{ $sony->name }}" class="form-control"
+                                                                        name="check_sony_name[]">
+                                                                </td>
+                                                                <td>
+                                                                    <select name="sonywork_{{ $sony->id }}"
+                                                                        class="form-control">
+                                                                        <option value="">-- اختر الحالة --
+                                                                        </option>
+                                                                        <option value="1" {{ old('sonywork_' . $sony->
+                                                                            id) == '1' ? 'selected' : '' }}>
+                                                                            يعمل</option>
+                                                                        <option value="0" {{ old('sonywork_' . $sony->
+                                                                            id) == '0' ? 'selected' : '' }}>
+                                                                            لا يعمل</option>
+                                                                    </select>
+                                                                </td>
+
+                                                                {{-- <td>
+                                                                    <input type="radio" value="1" class="form-control"
+                                                                        name="sonywork_{{ $sony->id }}[]" {{
+                                                                        old('sonywork_' . $sony->id) == '1' ?
+                                                                    'checked' : '' }}>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="radio" value="0" class="form-control"
+                                                                        name="sonywork_{{ $sony->id }}[]" {{
+                                                                        old('sonywork_' . $sony->id) == '0' ?
+                                                                    'checked' : '' }}>
+                                                                </td> --}}
+                                                                <td>
+                                                                    <input type="text"
+                                                                        value="{{ old('sony_notes.' . $loop->index) }}"
+                                                                        class="form-control" name="sony_notes[]">
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text"
+                                                                        value="{{ old('after_check_sony.' . $loop->index) }}"
+                                                                        class="form-control" name="after_check_sony[]">
+                                                                </td>
+                                                            </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <!--################### End Sony  Device Check  #####################-->
+
+                                            <!--################### Start Pc Device Check  ###################-->
+                                            <div class="row" id="pc_check" style="display: none;">
+                                                <h5> جهاز برمجة <span class="required_span"> * </span> </h5>
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th> # </th>
+                                                                <th> اساسيات الفحص </th>
+                                                                <th> حالة العمل </th>
+                                                                <th> ملاحظات </th>
+                                                                <th> بعد الفحص </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($pc_devices as $pc)
+                                                            <tr>
+                                                                <td> {{ $loop->iteration }}</td>
+                                                                <td>
+                                                                    <input type="hidden" name="pc_id[]"
+                                                                        value="{{ $pc->id }}">
+                                                                    <input readonly type="text" value="{{ $pc->name }}"
+                                                                        class="form-control" name="check_pc_name[]">
+                                                                </td>
+                                                                <td>
+                                                                    <select name="pcwork_{{ $pc->id }}"
+                                                                        class="form-control">
+                                                                        <option value="">-- اختر الحالة --
+                                                                        </option>
+                                                                        <option value="1" {{ old('pcwork_' . $pc->id) ==
+                                                                            '1' ? 'selected' : '' }}>
+                                                                            يعمل</option>
+                                                                        <option value="0" {{ old('pcwork_' . $pc->id) ==
+                                                                            '0' ? 'selected' : '' }}>
+                                                                            لا يعمل</option>
+                                                                    </select>
+                                                                </td>
+
+                                                                {{-- <td>
+                                                                    <input type="radio" value="1" class="form-control"
+                                                                        name="pcwork_{{ $pc->id }}[]" {{ old('pcwork_' .
+                                                                        $pc->id) == '1' ?
+                                                                    'checked' : '' }}>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="radio" value="0" class="form-control"
+                                                                        name="pcwork_{{ $pc->id }}[]" {{ old('pcwork_' .
+                                                                        $pc->id) == '0' ?
+                                                                    'checked' : '' }}>
+                                                                </td> --}}
+                                                                <td>
+                                                                    <input type="text"
+                                                                        value="{{ old('pc_notes.' . $loop->index) }}"
+                                                                        class="form-control" name="pc_notes[]">
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text"
+                                                                        value="{{ old('after_check_pc.' . $loop->index) }}"
+                                                                        class="form-control" name="after_check_pc[]">
+                                                                </td>
+                                                            </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <!--################### End Pc   Device Check  #####################-->
+
+
+                                            <div class="row">
+                                                @foreach ($invoice_more_checks as $invoice_more_check)
+                                                <div class="col-6">
+                                                    {{-- <div class="skin skin-square"> --}}
+                                                        <fieldset>
+                                                            <input type="checkbox"
+                                                                id="inputmorecheck-{{ $invoice_more_check->id }}"
+                                                                name="invoice_more_checks[]"
+                                                                value="{{ $invoice_more_check->id }}"
+                                                                @checked(in_array($invoice_more_check->id,
+                                                            old('invoice_more_checks', [])))>
+                                                            <label for="inputmorecheck-{{ $invoice_more_check->id }}">{{
+                                                                $invoice_more_check->name }}
+                                                            </label>
+                                                        </fieldset>
+                                                        {{--
+                                                    </div> --}}
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                            <br>
+                                            <!-- باقي الحقول -->
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="name"> اسم العميل <span class="required_span">
+                                                                *
+                                                            </span> </label>
+                                                        <input required type="text" id="name" class="form-control"
+                                                            placeholder="" name="name" value="{{ old('name') }}"
+                                                            data-parsley-required-message="الرجاء إدخال اسم العميل ">
                                                     </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="phone"> رقم الهاتف <span class="required_span">
-                                                                    *</span> </label>
-                                                            <input required type="text" id="phone"
-                                                                class="form-control" placeholder="مثال: 0500000000"
-                                                                name="phone" value="{{ old('phone') }}"
-                                                                maxlength="10" oninput="validatePhoneNumber(this)">
-                                                            <small id="phone-error" class="text-danger"
-                                                                style="display: none;">يجب أن يكون الرقم مكونًا من 10 أرقام
-                                                                ويبدأ بـ 0</small>
-                                                        </div>
-                                                        <script>
-                                                            function validatePhoneNumber(input) {
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="phone"> رقم الهاتف <span class="required_span">
+                                                                *</span> </label>
+                                                        <input required type="text" id="phone" class="form-control"
+                                                            placeholder="مثال: 0500000000" name="phone"
+                                                            value="{{ old('phone') }}" maxlength="10"
+                                                            oninput="validatePhoneNumber(this)">
+                                                        <small id="phone-error" class="text-danger"
+                                                            style="display: none;">يجب أن يكون الرقم مكونًا من 10 أرقام
+                                                            ويبدأ بـ 0</small>
+                                                    </div>
+                                                    <script>
+                                                        function validatePhoneNumber(input) {
                                                                 let phone = input.value;
                                                                 let errorMsg = document.getElementById("phone-error");
 
@@ -369,109 +509,141 @@
                                                                     errorMsg.style.display = "none";
                                                                 }
                                                             }
-                                                        </script>
+                                                    </script>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="title"> اسم الجهاز <span class="required_span">
+                                                                *
+                                                            </span> </label>
+                                                        <input required type="text" id="title" class="form-control"
+                                                            placeholder="" name="title" value="{{ old('title') }}"
+                                                            data-parsley-required-message="الرجاء إدخال  اسم الجهاز">
                                                     </div>
-
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="title"> اسم الجهاز <span class="required_span">
-                                                                    *
-                                                                </span> </label>
-                                                            <input required type="text" id="title"
-                                                                class="form-control" placeholder="" name="title"
-                                                                value="{{ old('title') }}"
-                                                                data-parsley-required-message="الرجاء إدخال  اسم الجهاز">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="title"> حدد الاعطال <span
-                                                                    class="required_span"> * </span> </label>
-                                                            <div class="skin">
-                                                                <!----------- ############## All Check ############## ------------>
-                                                                <div class="flex-wrap col-md-12 col-sm-12 problem_check_box"
-                                                                    style="display: none;" id="problem_all_check">
-                                                                    @foreach ($problems as $problem)
-                                                                        <fieldset style="min-width: 120px">
-                                                                            <input type="checkbox"
-                                                                                id="input-{{ $problem->id }}"
-                                                                                name="problems[]"
-                                                                                value="{{ $problem->name }}">
-                                                                            <label
-                                                                                for="input-{{ $problem->id }}">{{ $problem->name }}
-                                                                            </label>
-                                                                        </fieldset>
-                                                                    @endforeach
-                                                                </div>
-
-                                                                <!-- ################ End All Check ################## -->
-
-                                                                <!-------############# Start Programe Check ##################-------------->
-                                                                <div class="flex-wrap col-md-12 col-sm-12 problem_check_box"
-                                                                    style="display: none;" id="problem_programe_check">
-                                                                    @foreach ($programe_problems as $programe_problem)
-                                                                        <fieldset style="min-width: 120px">
-                                                                            <input type="checkbox"
-                                                                                id="inputprograme-{{ $programe_problem->id }}"
-                                                                                name="problems[]"
-                                                                                value="{{ $programe_problem->name }}">
-                                                                            <label
-                                                                                for="inputprograme-{{ $programe_problem->id }}">{{ $programe_problem->name }}
-                                                                            </label>
-                                                                        </fieldset>
-                                                                    @endforeach
-                                                                </div>
-                                                                <!-------############# End  Programe Check ##################-------------->
-
-                                                                <!-------############# Start Programe Check ##################-------------->
-                                                                <div class="flex-wrap col-md-12 col-sm-12 problem_check_box"
-                                                                    style="display: none;" id="problem_speed_check">
-                                                                    @foreach ($speed_problems as $speed_problem)
-                                                                        <fieldset style="min-width: 120px">
-                                                                            <input type="checkbox"
-                                                                                id="inputspeed-{{ $speed_problem->id }}"
-                                                                                name="problems[]"
-                                                                                value="{{ $speed_problem->name }}">
-                                                                            <label
-                                                                                for="inputspeed-{{ $speed_problem->id }}">{{ $speed_problem->name }}
-                                                                            </label>
-                                                                        </fieldset>
-                                                                    @endforeach
-                                                                </div>
-                                                                <!-------############# End  Programe Check ##################-------------->
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="title"> حدد الاعطال <span class="required_span"> *
+                                                            </span> </label>
+                                                        <div class="skin">
+                                                            <!----------- ############## All Check ############## ------------>
+                                                            <div class="flex-wrap col-md-12 col-sm-12 problem_check_box"
+                                                                style="display: none;" id="problem_all_check">
+                                                                @foreach ($problems as $problem)
+                                                                <fieldset style="min-width: 120px">
+                                                                    <input type="checkbox" id="input-{{ $problem->id }}"
+                                                                        name="problems[]" value="{{ $problem->name }}">
+                                                                    <label for="input-{{ $problem->id }}">{{
+                                                                        $problem->name }}
+                                                                    </label>
+                                                                </fieldset>
+                                                                @endforeach
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <div class="form-group">
-                                                            <label for="title"> ملاحظات </label>
-                                                            <textarea name="description" class="form-control">{{ old('description') }}</textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="price">السعر <span class="required_span"> *
-                                                                </span></label>
-                                                            <input readonly type="number" step="0.01" id="price"
-                                                                class="form-control"
-                                                                placeholder="سيتم حساب المجموع تلقائيًا" name="price"
-                                                                data-parsley-required-message="الرجاء إدخال تفاصيل السعر"
-                                                                value="{{ old('price', 0) }}">
-                                                        </div>
-                                                        <!-- زر إضافة تفاصيل السعر -->
-                                                        <div class="form-group">
-                                                            <button type="button" class="btn btn-sm btn-primary"
-                                                                onclick="addPriceDetail()">
-                                                                <i class="la la-plus"></i> إضافة تفاصيل السعر
-                                                            </button>
-                                                        </div>
-                                                        <!-- حاوية تفاصيل السعر -->
-                                                        <div id="price-details-wrapper">
-                                                            <!-- سيتم إضافة تفاصيل السعر هنا -->
-                                                        </div>
 
-                                                        <script>
-                                                            let detailIndex = 0;
+                                                            <!-- ################ End All Check ################## -->
+
+                                                            <!-------############# Start Programe Check ##################-------------->
+                                                            <div class="flex-wrap col-md-12 col-sm-12 problem_check_box"
+                                                                style="display: none;" id="problem_programe_check">
+                                                                @foreach ($programe_problems as $programe_problem)
+                                                                <fieldset style="min-width: 120px">
+                                                                    <input type="checkbox"
+                                                                        id="inputprograme-{{ $programe_problem->id }}"
+                                                                        name="problems[]"
+                                                                        value="{{ $programe_problem->name }}">
+                                                                    <label
+                                                                        for="inputprograme-{{ $programe_problem->id }}">{{
+                                                                        $programe_problem->name }}
+                                                                    </label>
+                                                                </fieldset>
+                                                                @endforeach
+                                                            </div>
+                                                            <!-------############# End  Programe Check ##################-------------->
+
+                                                            <!-------############# Start Speed Check ##################-------------->
+                                                            <div class="flex-wrap col-md-12 col-sm-12 problem_check_box"
+                                                                style="display: none;" id="problem_speed_check">
+                                                                @foreach ($speed_problems as $speed_problem)
+                                                                <fieldset style="min-width: 120px">
+                                                                    <input type="checkbox"
+                                                                        id="inputspeed-{{ $speed_problem->id }}"
+                                                                        name="problems[]"
+                                                                        value="{{ $speed_problem->name }}">
+                                                                    <label for="inputspeed-{{ $speed_problem->id }}">{{
+                                                                        $speed_problem->name }}
+                                                                    </label>
+                                                                </fieldset>
+                                                                @endforeach
+                                                            </div>
+                                                            <!-------############# End Speed Check ##################-------------->
+
+                                                            <!-------############# Start Sony Check ##################-------------->
+                                                            <div class="flex-wrap col-md-12 col-sm-12 problem_check_box"
+                                                                style="display: none;" id="problem_sony_check">
+                                                                @foreach ($sony_problems as $sony_problem)
+                                                                <fieldset style="min-width: 120px">
+                                                                    <input type="checkbox"
+                                                                        id="inputsony-{{ $sony_problem->id }}"
+                                                                        name="problems[]"
+                                                                        value="{{ $sony_problem->name }}">
+                                                                    <label for="inputsony-{{ $sony_problem->id }}">{{
+                                                                        $sony_problem->name }}
+                                                                    </label>
+                                                                </fieldset>
+                                                                @endforeach
+                                                            </div>
+                                                            <!-------############# End Speed Check ##################-------------->
+                                                            <!-------############# Start Pc Check ##################-------------->
+                                                            <div class="flex-wrap col-md-12 col-sm-12 problem_check_box"
+                                                                style="display: none;" id="problem_pc_check">
+                                                                @foreach ($pc_problems as $pc_problem)
+                                                                <fieldset style="min-width: 120px">
+                                                                    <input type="checkbox"
+                                                                        id="inputpc-{{ $pc_problem->id }}"
+                                                                        name="problems[]"
+                                                                        value="{{ $pc_problem->name }}">
+                                                                    <label for="inputpc-{{ $pc_problem->id }}">{{
+                                                                        $pc_problem->name }}
+                                                                    </label>
+                                                                </fieldset>
+                                                                @endforeach
+                                                            </div>
+                                                            <!-------############# End Speed Check ##################-------------->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="title"> ملاحظات </label>
+                                                        <textarea name="description"
+                                                            class="form-control">{{ old('description') }}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="price">السعر <span class="required_span"> *
+                                                            </span></label>
+                                                        <input readonly type="number" step="0.01" id="price"
+                                                            class="form-control"
+                                                            placeholder="سيتم حساب المجموع تلقائيًا" name="price"
+                                                            data-parsley-required-message="الرجاء إدخال تفاصيل السعر"
+                                                            value="{{ old('price', 0) }}">
+                                                    </div>
+                                                    <!-- زر إضافة تفاصيل السعر -->
+                                                    <div class="form-group">
+                                                        <button type="button" class="btn btn-sm btn-primary"
+                                                            onclick="addPriceDetail()">
+                                                            <i class="la la-plus"></i> إضافة تفاصيل السعر
+                                                        </button>
+                                                    </div>
+                                                    <!-- حاوية تفاصيل السعر -->
+                                                    <div id="price-details-wrapper">
+                                                        <!-- سيتم إضافة تفاصيل السعر هنا -->
+                                                    </div>
+
+                                                    <script>
+                                                        let detailIndex = 0;
 
                                                             function addPriceDetail() {
                                                                 const wrapper = document.getElementById('price-details-wrapper');
@@ -528,117 +700,114 @@
                                                             document.addEventListener('DOMContentLoaded', () => {
                                                                 updateTotalPrice();
                                                             });
-                                                        </script>
+                                                    </script>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label for="price"> التاريخ ووقت التسليم <span
+                                                            class="required_span"> * </span> </label>
+                                                    <div class="justify-between d-flex flex-column">
+                                                        <div class="form-group" style="width: 100%">
+                                                            <input required type="date" name="date_delivery"
+                                                                data-parsley-required-message="الرجاء إدخال التاريخ "
+                                                                class="form-control" value="{{ old('date_delivery') }}">
+                                                        </div>
+                                                        <div class="form-group" style="width: 100%">
+                                                            <input required type="time" name="time_delivery"
+                                                                data-parsley-required-message="الرجاء إدخال التاريخ "
+                                                                class="form-control" value="{{ old('time_delivery') }}">
+                                                        </div>
                                                     </div>
-                                                    <div class="col-12">
-                                                        <label for="price"> التاريخ ووقت التسليم <span
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="price"> الحالة <span class="required_span"> *
+                                                            </span> </label>
+                                                        <select required name="status" id="" class="form-control">
+                                                            <option value="رف الاستلام" {{ old('status')=='رف الاستلام'
+                                                                ? 'selected' : '' }}>
+                                                                رف الاستلام</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="name"> رمز الجهاز </label>
+                                                        <input type="text" id="device_text_password"
+                                                            class="form-control" placeholder=""
+                                                            name="device_text_password"
+                                                            value="{{ old('device_text_password') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <div class="d-flex">
+                                                            <input type="number" min="1" max="12" name="pattern[]"
+                                                                value="{{ old('pattern.0') }}">
+                                                            <input type="number" min="1" max="12" name="pattern[]"
+                                                                value="{{ old('pattern.1') }}">
+                                                            <input type="number" min="1" max="12" name="pattern[]"
+                                                                value="{{ old('pattern.2') }}">
+                                                        </div>
+                                                        <div class="d-flex">
+                                                            <input type="number" min="1" max="12" name="pattern[]"
+                                                                value="{{ old('pattern.3') }}">
+                                                            <input type="number" min="1" max="12" name="pattern[]"
+                                                                value="{{ old('pattern.4') }}">
+                                                            <input type="number" min="1" max="12" name="pattern[]"
+                                                                value="{{ old('pattern.5') }}">
+                                                        </div>
+                                                        <div class="d-flex">
+                                                            <input type="number" min="1" max="12" name="pattern[]"
+                                                                value="{{ old('pattern.6') }}">
+                                                            <input type="number" min="1" max="12" name="pattern[]"
+                                                                value="{{ old('pattern.7') }}">
+                                                            <input type="number" min="1" max="12" name="pattern[]"
+                                                                value="{{ old('pattern.8') }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {{-- <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <label for="price"> حدد مصدر القطعة <span class="required_span">
+                                                                *
+                                                            </span> </label>
+                                                        <select required name="piece_resource" id=""
+                                                            data-parsley-required-message=" من فضلك حدد مصدر القطعة  "
+                                                            class="form-control">
+                                                            <option value="" selected disabled> -- حدد مصدر
+                                                                القطعة -- </option>
+                                                            @foreach ($piece_resources as $resource)
+                                                            <option @selected(old('piece_resource')==$resource->id)
+                                                                value="{{ $resource->id }}">
+                                                                {{ $resource->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div> --}}
+
+                                            <!-- اضافة المرفقات -->
+                                            <!-- اضافة المرفقات -->
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <label for="address"> تصوير حالة الجهاز <span
                                                                 class="required_span"> * </span> </label>
-                                                        <div class="justify-between d-flex flex-column">
-                                                            <div class="form-group" style="width: 100%">
-                                                                <input required type="date" name="date_delivery"
-                                                                    data-parsley-required-message="الرجاء إدخال التاريخ "
-                                                                    class="form-control"
-                                                                    value="{{ old('date_delivery') }}">
-                                                            </div>
-                                                            <div class="form-group" style="width: 100%">
-                                                                <input required type="time" name="time_delivery"
-                                                                    data-parsley-required-message="الرجاء إدخال التاريخ "
-                                                                    class="form-control"
-                                                                    value="{{ old('time_delivery') }}">
-                                                            </div>
-                                                        </div>
+                                                        <input required type="file" name="files_images[]"
+                                                            data-parsley-required-message="الرجاء إدخال المرفقات "
+                                                            class="form-control" multiple id="imageInput">
                                                     </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="price"> الحالة <span class="required_span"> *
-                                                                </span> </label>
-                                                            <select required name="status" id=""
-                                                                class="form-control">
-                                                                <option value="رف الاستلام"
-                                                                    {{ old('status') == 'رف الاستلام' ? 'selected' : '' }}>
-                                                                    رف الاستلام</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
+                                                    <div id="imagePreview" class="flex-wrap mt-3 d-flex"></div>
                                                 </div>
+                                            </div>
 
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="name"> رمز الجهاز </label>
-                                                            <input type="text" id="device_text_password"
-                                                                class="form-control" placeholder=""
-                                                                name="device_text_password"
-                                                                value="{{ old('device_text_password') }}">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <div class="d-flex">
-                                                                <input type="number" min="1" max="12"
-                                                                    name="pattern[]" value="{{ old('pattern.0') }}">
-                                                                <input type="number" min="1" max="12"
-                                                                    name="pattern[]" value="{{ old('pattern.1') }}">
-                                                                <input type="number" min="1" max="12"
-                                                                    name="pattern[]" value="{{ old('pattern.2') }}">
-                                                            </div>
-                                                            <div class="d-flex">
-                                                                <input type="number" min="1" max="12"
-                                                                    name="pattern[]" value="{{ old('pattern.3') }}">
-                                                                <input type="number" min="1" max="12"
-                                                                    name="pattern[]" value="{{ old('pattern.4') }}">
-                                                                <input type="number" min="1" max="12"
-                                                                    name="pattern[]" value="{{ old('pattern.5') }}">
-                                                            </div>
-                                                            <div class="d-flex">
-                                                                <input type="number" min="1" max="12"
-                                                                    name="pattern[]" value="{{ old('pattern.6') }}">
-                                                                <input type="number" min="1" max="12"
-                                                                    name="pattern[]" value="{{ old('pattern.7') }}">
-                                                                <input type="number" min="1" max="12"
-                                                                    name="pattern[]" value="{{ old('pattern.8') }}">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                {{-- <div class="row">
-                                                    <div class="col-lg-12">
-                                                        <div class="form-group">
-                                                            <label for="price"> حدد مصدر القطعة <span
-                                                                    class="required_span"> *
-                                                                </span> </label>
-                                                            <select required name="piece_resource" id=""
-                                                                data-parsley-required-message=" من فضلك حدد مصدر القطعة  "
-                                                                class="form-control">
-                                                                <option value="" selected disabled> -- حدد مصدر
-                                                                    القطعة -- </option>
-                                                                @foreach ($piece_resources as $resource)
-                                                                    <option @selected(old('piece_resource') == $resource->id)
-                                                                        value="{{ $resource->id }}">
-                                                                        {{ $resource->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div> --}}
-
-                                                <!-- اضافة المرفقات -->
-                                                <!-- اضافة المرفقات -->
-                                                <div class="row">
-                                                    <div class="col-lg-12">
-                                                        <div class="form-group">
-                                                            <label for="address"> تصوير حالة الجهاز <span
-                                                                    class="required_span"> * </span> </label>
-                                                            <input required type="file" name="files_images[]"
-                                                                data-parsley-required-message="الرجاء إدخال المرفقات "
-                                                                class="form-control" multiple id="imageInput">
-                                                        </div>
-                                                        <div id="imagePreview" class="flex-wrap mt-3 d-flex"></div>
-                                                    </div>
-                                                </div>
-
-                                                <script>
-                                                    let imageInput = document.getElementById('imageInput');
+                                            <script>
+                                                let imageInput = document.getElementById('imageInput');
                                                     let imagePreview = document.getElementById('imagePreview');
                                                     let dt = new DataTransfer(); // لتخزين الملفات
 
@@ -716,84 +885,86 @@
                                                             reader.readAsDataURL(file);
                                                         });
                                                     });
-                                                </script>
+                                            </script>
 
 
 
-                                                <!-- عنصر التوقيع -->
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label>توقيع العميل <span class="required_span"> * </span> </label>
-                                                        <div id="signature-pad" class="signature-pad">
-                                                            <div class="signature-pad-body">
-                                                                {{-- <canvas id="signatureCanvas"></canvas> --}}
-                                                                <canvas id="signatureCanvas" width="550"
-                                                                    height="250"></canvas>
-                                                            </div>
-                                                            <div class="signature-pad-footer">
-                                                                <button type="button" id="clear-signature"
-                                                                    class="mt-2 btn btn-danger">مسح التوقيع</button>
-                                                                <button type="button" id="test-signature"
-                                                                    class="mt-2 btn btn-info btn-sm">اختبار التوقيع</button>
-                                                            </div>
+                                            <!-- عنصر التوقيع -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>توقيع العميل <span class="required_span"> * </span> </label>
+                                                    <div id="signature-pad" class="signature-pad">
+                                                        <div class="signature-pad-body">
+                                                            {{-- <canvas id="signatureCanvas"></canvas> --}}
+                                                            <canvas id="signatureCanvas" width="550"
+                                                                height="250"></canvas>
                                                         </div>
-                                                        <input required type="text" readonly style="opacity: 0"
-                                                            name="signature" id="signature"
-                                                            data-parsley-required-message=" الرجاء التوقيع  "
-                                                            value="">
-                                                    </div>
-                                                </div>
-
-                                                <!-- الموافقة علي الشروط -->
-                                                <div class="row">
-                                                    <div class="col-lg-12">
-                                                        <div class="form-check">
-                                                            <input required class="form-check-input" type="checkbox"
-                                                                value="1" id="flexCheckDefault"
-                                                                {{ old('flexCheckDefault') ? 'checked' : '' }}>
-                                                            <label class="form-check-label" for="flexCheckDefault">
-                                                                الموافقة علي الشروط والاحكام
-                                                            </label>
+                                                        <div class="signature-pad-footer">
+                                                            <button type="button" id="clear-signature"
+                                                                class="mt-2 btn btn-danger">مسح التوقيع</button>
+                                                            <button type="button" id="test-signature"
+                                                                class="mt-2 btn btn-info btn-sm">اختبار التوقيع</button>
                                                         </div>
                                                     </div>
+                                                    <input required type="text" readonly style="opacity: 0"
+                                                        name="signature" id="signature"
+                                                        data-parsley-required-message=" الرجاء التوقيع  " value="">
                                                 </div>
                                             </div>
 
-                                            <div class="form-actions">
-                                                {{-- #### --}}
-                                                <button type="submit" id="submitInvoice" class="btn btn-primary">
-                                                    <i class="la la-check-square-o"></i> حفظ
-                                                </button>
-                                                {{-- ##### --}}
-                                                <button type="button" class="mr-1 btn btn-warning">
-                                                    <i class="ft-x"></i> رجوع
-                                                </button>
-                                                <p id="loadingMessage" class="mt-3 text-center font-weight-bold" style="display: none; color: #007bff; font-size: 16px;">
-                                                    <i class="la la-spinner la-spin"></i> جاري حفظ الفاتورة، الرجاء الانتظار...
-                                                </p>
-                                                <p id="signatureError" class="mt-2 text-danger" style="display: none;">
-                                                    الرجاء التوقيع على الفاتورة
-                                                </p>
-                                                <p id="ImagesError" class="mt-2 text-danger" style="display: none;">
-                                                    الرجاء رفع صورة من الفاتورة
-                                                </p>
-                                                <p id="ChecksError" class="mt-2 text-danger" style="display: none;">
-                                                    من فضلك حدد الاعطال المناسبة حسب نوع الفحص
-                                                </p>
+                                            <!-- الموافقة علي الشروط -->
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-check">
+                                                        <input required class="form-check-input" type="checkbox"
+                                                            value="1" id="flexCheckDefault" {{ old('flexCheckDefault')
+                                                            ? 'checked' : '' }}>
+                                                        <label class="form-check-label" for="flexCheckDefault">
+                                                            الموافقة علي الشروط والاحكام
+                                                        </label>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </form>
+                                        </div>
+
+                                        <div class="form-actions">
+                                            {{-- #### --}}
+                                            <button type="submit" id="submitInvoice" class="btn btn-primary">
+                                                <i class="la la-check-square-o"></i> حفظ
+                                            </button>
+                                            {{-- ##### --}}
+                                            <button type="button" class="mr-1 btn btn-warning">
+                                                <i class="ft-x"></i> رجوع
+                                            </button>
+                                            <p id="loadingMessage" class="mt-3 text-center font-weight-bold"
+                                                style="display: none; color: #007bff; font-size: 16px;">
+                                                <i class="la la-spinner la-spin"></i> جاري حفظ الفاتورة، الرجاء
+                                                الانتظار...
+                                            </p>
+                                            <p id="signatureError" class="mt-2 text-danger" style="display: none;">
+                                                الرجاء التوقيع على الفاتورة
+                                            </p>
+                                            <p id="ImagesError" class="mt-2 text-danger" style="display: none;">
+                                                الرجاء رفع صورة من الفاتورة
+                                            </p>
+                                            <p id="ChecksError" class="mt-2 text-danger" style="display: none;">
+                                                من فضلك حدد الاعطال المناسبة حسب نوع الفحص
+                                            </p>
+                                        </div>
+                                    </form>
 
 
-                                        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-                                            integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-                                            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-                                        <!--------------- Start SignaturePad ############ -->
-                                        <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.3.4/signature_pad.min.js"
-                                            integrity="sha512-Mtr2f9aMp/TVEdDWcRlcREy9NfgsvXvApdxrm3/gK8lAMWnXrFsYaoW01B5eJhrUpBT7hmIjLeaQe0hnL7Oh1w=="
-                                            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                                    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+                                        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+                                        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                                    <!--------------- Start SignaturePad ############ -->
+                                    <script
+                                        src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.3.4/signature_pad.min.js"
+                                        integrity="sha512-Mtr2f9aMp/TVEdDWcRlcREy9NfgsvXvApdxrm3/gK8lAMWnXrFsYaoW01B5eJhrUpBT7hmIjLeaQe0hnL7Oh1w=="
+                                        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-                                        <script>
-                                            // Wait for DOM to be fully loaded
+                                    <script>
+                                        // Wait for DOM to be fully loaded
                                             document.addEventListener("DOMContentLoaded", function() {
                                                 var signcanvas = document.getElementById("signatureCanvas");
 
@@ -900,6 +1071,8 @@
                                                         let problem_all_check = document.getElementById('problem_all_check');
                                                         let problem_programe_check = document.getElementById('problem_programe_check');
                                                         let problem_speed_check = document.getElementById('problem_speed_check');
+                                                        let problem_sony_check = document.getElementById('problem_sony_check');
+                                                        let problem_pc_check = document.getElementById('problem_pc_check');
 
                                                         // تحديد العنصر الذي يجب التحقق منه حسب نوع الفحص
                                                         let activeProblemContainer;
@@ -909,6 +1082,10 @@
                                                             activeProblemContainer = problem_programe_check;
                                                         } else if (checkoutType === "فحص جهاز سريع") {
                                                             activeProblemContainer = problem_speed_check;
+                                                        }else if (checkoutType === "فحص جهاز سوني") {
+                                                            activeProblemContainer = problem_sony_check;
+                                                        }else if (checkoutType === "فحص جهاز pc") {
+                                                            activeProblemContainer = problem_pc_check;
                                                         }
 
                                                         if (activeProblemContainer) {
@@ -963,68 +1140,68 @@
                                                     console.error('Signature canvas not found');
                                                 }
                                             });
-                                        </script>
+                                    </script>
 
-                                    </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
+
                 </div>
-            </div>
         </div>
     </div>
-    <style>
-        .remove-button {
-            cursor: pointer;
-            width: 33px;
-            height: 33px;
-            line-height: 9px;
-            text-align: center;
-            left: -15px;
-            top: -12px;
-        }
+</div>
+</div>
+<style>
+    .remove-button {
+        cursor: pointer;
+        width: 33px;
+        height: 33px;
+        line-height: 9px;
+        text-align: center;
+        left: -15px;
+        top: -12px;
+    }
 
 
 
-        .signature-pad-body {
-            width: 100%;
-        }
+    .signature-pad-body {
+        width: 100%;
+    }
 
-        #signatureCanvas {
-            border: 1px solid #999;
-            border-radius: 8px;
-            cursor: crosshair;
-            touch-action: none;
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
+    #signatureCanvas {
+        border: 1px solid #999;
+        border-radius: 8px;
+        cursor: crosshair;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
 
-        #signature-pad {
-            touch-action: none;
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
+    #signature-pad {
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
 
-        .signature-pad-body {
-            width: 100%;
-            touch-action: none;
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-    </style>
+    .signature-pad-body {
+        width: 100%;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
+</style>
 
 @endsection
 @section('js')
-    <script>
-        // Global variable to prevent multiple submissions
+<script>
+    // Global variable to prevent multiple submissions
         let isSubmitting = false;
 
         function preventMultipleSubmissions(event) {
@@ -1081,44 +1258,78 @@
                 loadingMsg.style.display = "none";
             }
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>
-        eruda.init();
-    </script>
-    <script src="{{ asset('assets/admin/') }}/vendors/js/forms/icheck/icheck.min.js" type="text/javascript"></script>
-    <script src="{{ asset('assets/admin/') }}/js/scripts/forms/checkbox-radio.js" type="text/javascript"></script>
-    <script src="https://cdn.jsdelivr.net/npm/parsleyjs"></script>
-    <script>
-        $('#invoice-form').parsley();
-    </script>
-    <script>
-        $(document).ready(function() {
+</script>
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+    eruda.init();
+</script>
+<script src="{{ asset('assets/admin/') }}/vendors/js/forms/icheck/icheck.min.js" type="text/javascript"></script>
+<script src="{{ asset('assets/admin/') }}/js/scripts/forms/checkbox-radio.js" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/parsleyjs"></script>
+<script>
+    $('#invoice-form').parsley();
+</script>
+<script>
+    $(document).ready(function() {
             function toggleCheckoutSections(type) {
                 if (type == 'فحص كامل') {
                     $('#full_check').show();
                     $('#problem_all_check').show();
                     $('#programe_check').hide();
                     $('#speed_check').hide();
+                    $('#sony_check').hide();
+                    $('#pc_check').hide();
                     $("#problem_programe_check").hide();
                     $("#problem_speed_check").hide();
+                    $('#problem_sony_check').hide();
+                    $('#problem_pc_check').hide();
                 } else if (type == 'فحص جهاز برمجة') {
                     $('#programe_check').show();
                     $('#full_check').hide();
                     $('#speed_check').hide();
+                     $('#sony_check').hide();
+                    $('#pc_check').hide();
                     $("#problem_programe_check").show();
                     $("#problem_speed_check").hide();
                     $('#problem_all_check').hide();
+                    $('#problem_sony_check').hide();
+                    $('#problem_pc_check').hide();
                 } else if (type == 'فحص جهاز سريع') {
                     $('#speed_check').show();
                     $('#full_check').hide();
                     $('#programe_check').hide();
+                    $('#pc_check').hide();
+                    $('#sony_check').hide();
                     $("#problem_programe_check").hide();
                     $("#problem_speed_check").show();
                     $('#problem_all_check').hide();
+                    $('#problem_sony_check').hide();
+                    $('#problem_pc_check').hide();
+                  }  else if (type == 'فحص جهاز سوني') {
+                    $('#sony_check').show();
+                    $('#speed_check').hide();
+                    $('#pc_check').hide();
+                    $('#full_check').hide();
+                    $('#programe_check').hide();
+                    $("#problem_programe_check").hide();
+                    $("#problem_speed_check").hide();
+                    $("#problem_pc_check").hide();
+                    $('#problem_all_check').hide();
+                    $('#problem_sony_check').show();
+                    } else if (type == 'فحص جهاز pc') {
+                    $('#sony_check').hide();
+                    $('#speed_check').hide();
+                    $('#pc_check').show();
+                    $('#full_check').hide();
+                    $('#programe_check').hide();
+                    $("#problem_programe_check").hide();
+                    $("#problem_speed_check").hide();
+                    $("#problem_pc_check").show();
+                    $('#problem_all_check').hide();
+                    $('#sony_sony_check').hide();
                 } else {
                     // إخفاء الكل عند الاختيار الافتراضي أو لا شيء
-                    $('#full_check, #programe_check, #speed_check, #problem_all_check, #problem_programe_check, #problem_speed_check')
+                    $('#full_check, #programe_check, #speed_check, #problem_all_check, #problem_programe_check, #problem_speed_check,#sony_check,#pc_check,#problem_pc_check,#problem_sony_check')
                         .hide();
                 }
             }
@@ -1134,9 +1345,9 @@
                 toggleCheckoutSections(oldValue);
             }
         });
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
             const disableCheckIds = [1, 3]; // IDs الخاصة بالخيار "خلل يعوق الفحص" أو أي خيار يمنع الفحص
 
             // دالة تتحقق إن كان أحد الـ checkboxes المختارة مفعلة
@@ -1174,7 +1385,7 @@
                 }
             });
         });
-    </script>
+</script>
 
 
 @endsection

@@ -1,28 +1,32 @@
 <?php
 
+use App\Http\Controllers\dashboard\AdminController;
+use App\Http\Controllers\dashboard\auth\AuthController;
+use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
+use App\Http\Controllers\dashboard\auth\ResetPasswordController;
+use App\Http\Controllers\dashboard\CheckTextController;
+use App\Http\Controllers\dashboard\InvoiceController;
+use App\Http\Controllers\dashboard\MessageController;
 use App\Http\Controllers\dashboard\MoreCheckController;
+use App\Http\Controllers\dashboard\NotificationController;
+use App\Http\Controllers\dashboard\PcDeviceController;
+use App\Http\Controllers\dashboard\PcProblemCategoryController;
+use App\Http\Controllers\dashboard\PieceResourceController;
+use App\Http\Controllers\dashboard\ProblemCategoryController;
+use App\Http\Controllers\dashboard\ProgrameDeviceController;
+use App\Http\Controllers\dashboard\ProgrameProblemCategoryController;
+use App\Http\Controllers\dashboard\PublicInvoiceController;
+use App\Http\Controllers\dashboard\RolesController;
+use App\Http\Controllers\dashboard\SettingController;
+use App\Http\Controllers\dashboard\SonyDeviceController;
+use App\Http\Controllers\dashboard\SonyProblemCategoryController;
+use App\Http\Controllers\dashboard\SpeedDeviceController;
+use App\Http\Controllers\dashboard\SpeedProblemCategoryController;
+use App\Http\Controllers\dashboard\TechInvoicesController;
+use App\Http\Controllers\dashboard\WelcomeController;
 use App\Models\dashboard\CheckText;
 use App\Models\dashboard\SpeedDevice;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\dashboard\AdminController;
-use App\Http\Controllers\dashboard\RolesController;
-use App\Http\Controllers\dashboard\InvoiceController;
-use App\Http\Controllers\dashboard\MessageController;
-use App\Http\Controllers\dashboard\SettingController;
-use App\Http\Controllers\dashboard\WelcomeController;
-use App\Http\Controllers\dashboard\auth\AuthController;
-use App\Http\Controllers\dashboard\CheckTextController;
-use App\Http\Controllers\dashboard\SpeedDeviceController;
-use App\Http\Controllers\dashboard\NotificationController;
-use App\Http\Controllers\dashboard\TechInvoicesController;
-use App\Http\Controllers\dashboard\PublicInvoiceController;
-use App\Http\Controllers\dashboard\ProgrameDeviceController;
-use App\Http\Controllers\dashboard\ProblemCategoryController;
-use App\Http\Controllers\dashboard\auth\ResetPasswordController;
-use App\Http\Controllers\dashboard\auth\ForgetPasswordController;
-use App\Http\Controllers\dashboard\PieceResourceController;
-use App\Http\Controllers\dashboard\ProgrameProblemCategoryController;
-use App\Http\Controllers\dashboard\SpeedProblemCategoryController;
 
 Route::group([
     'prefix' => '/dashboard',
@@ -133,6 +137,31 @@ Route::group([
         });
         ###################### End  Problem Category Speed Device  #################
 
+        ###################### Start Problem Category Sony Device  #################
+        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'sony_problem_categories', 'as' => 'sony_problem_categories.'], function () {
+            Route::controller(SonyProblemCategoryController::class)->group(function () {
+                Route::get('index', 'index')->name('index');
+                Route::match(['get', 'post'], 'create', 'create')->name('create');
+                Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
+            });
+        });
+        ###################### End  Problem Category Sony Device  #################
+
+
+        ###################### Start Problem Category PC Device  #################
+        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'pc_problem_categories', 'as' => 'pc_problem_categories.'], function () {
+            Route::controller(PcProblemCategoryController::class)->group(function () {
+                Route::get('index', 'index')->name('index');
+                Route::match(['get', 'post'], 'create', 'create')->name('create');
+                Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
+            });
+        });
+        ###################### End  Problem Category PC Device  #################
+
+
+
 
         ###################### Start Check Text  #################
         Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'check_text', 'as' => 'checktexts.'], function () {
@@ -164,6 +193,29 @@ Route::group([
             });
         });
         ##################### End Programe Device  ###################
+
+        ###################### Start Sony  Device   #################
+        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'sony_device', 'as' => 'sony_devices.'], function () {
+            Route::controller(SonyDeviceController::class)->group(function () {
+                Route::get('index', 'index')->name('index');
+                Route::match(['get', 'post'], 'create', 'create')->name('create');
+                Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
+            });
+        });
+        ##################### End Sony  Device   ###################
+
+        ###################### Start Pc Device   #################
+        Route::group(['middleware' => 'can:problem_categories', 'prefix' => 'pc_device', 'as' => 'pc_devices.'], function () {
+            Route::controller(PcDeviceController::class)->group(function () {
+                Route::get('index', 'index')->name('index');
+                Route::match(['get', 'post'], 'create', 'create')->name('create');
+                Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');
+                Route::match(['post', 'get'], 'destroy/{id}', 'destroy')->name('destroy');
+            });
+        });
+        ##################### End Pc Device   ###################
+
         ###################### Start PieceResource Controller   #################
         Route::group(['middleware' => 'can:admins', 'prefix' => 'piece_resource', 'as' => 'piece_resources.'], function () {
             Route::controller(PieceResourceController::class)->group(function () {

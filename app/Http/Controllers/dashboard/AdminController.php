@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers\dashboard;
 
-use Illuminate\Http\Request;
-use App\Models\dashboard\Role;
+use App\Http\Controllers\Controller;
+use App\Http\Traits\Message_Trait;
 use App\Models\dashboard\Admin;
 use App\Models\dashboard\Invoice;
-use App\Http\Traits\Message_Trait;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
+use App\Models\dashboard\PcProblemCategory;
 use App\Models\dashboard\ProblemCategory;
 use App\Models\dashboard\ProgrameProblemCategory;
+use App\Models\dashboard\Role;
+use App\Models\dashboard\SonyProblemCategory;
 use App\Models\dashboard\SpeedProblemCategory;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
@@ -165,7 +167,9 @@ class AdminController extends Controller
         $problems = ProblemCategory::all();
         $programe_problems = ProgrameProblemCategory::all();
         $speed_problems = SpeedProblemCategory::all();
-        return view('dashboard.admins.update_tech_page', compact('admin', 'problems', 'programe_problems', 'speed_problems'));
+        $sony_problems = SonyProblemCategory::all();
+        $pc_problems = PcProblemCategory::all();
+        return view('dashboard.admins.update_tech_page', compact('admin', 'problems', 'programe_problems', 'speed_problems', 'sony_problems', 'pc_problems'));
     }
 
     ###################### Get The Tech Invoices #######################

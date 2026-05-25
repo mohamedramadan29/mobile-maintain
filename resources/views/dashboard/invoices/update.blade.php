@@ -79,6 +79,12 @@
                                                                 <option
                                                                     {{ $invoice->checkout_type == 'فحص جهاز سريع' ? 'selected' : '' }}
                                                                     value="فحص جهاز سريع"> فحص جهاز سريع </option>
+                                                                <option
+                                                                    {{ $invoice->checkout_type == 'فحص جهاز سوني' ? 'selected' : '' }}
+                                                                    value="فحص جهاز سوني"> فحص جهاز سوني </option>
+                                                                <option
+                                                                    {{ $invoice->checkout_type == 'فحص جهاز pc' ? 'selected' : '' }}
+                                                                    value="فحص جهاز pc"> فحص جهاز pc </option>
                                                             </select>
 
                                                         </div>
@@ -283,6 +289,140 @@
                                                     </div>
                                                 </div>
                                                 <!--################### End Programe Device Check  #####################-->
+
+                                                <!--################### Start Sony Device Check  ###################-->
+                                                <div class="row" id="sony_check"
+                                                    style="{{ $invoice->checkout_type === 'فحص جهاز سوني' ? 'display: block' : 'display: none' }}">
+                                                    <h5> فحص جهاز سوني <span class="required_span"> * </span> </h5>
+                                                    <div class="table-responsive">
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th> # </th>
+                                                                    <th> اساسيات الفحص </th>
+                                                                    <th> يعمل </th>
+                                                                    <th> لا يعمل </th>
+                                                                    <th> ملاحظات </th>
+                                                                    <th> بعد الفحص </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($sony_devices as $sony)
+                                                                    @php
+                                                                        $sonyResult = $invoice
+                                                                            ->sonyResults()
+                                                                            ->where('sony_id', $sony->id)
+                                                                            ->where('invoice_id', $invoice->id)
+                                                                            ->first();
+                                                                    @endphp
+                                                                    <tr>
+                                                                        <td> {{ $loop->iteration }}</td>
+                                                                        <td>
+                                                                            <input type="hidden" name="sony_id[]"
+                                                                                value="{{ $sony->id }}">
+                                                                            <input readonly type="text"
+                                                                                value="{{ $sony->name }}"
+                                                                                class="form-control"
+                                                                                name="check_sony_name[]">
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="radio" value="1"
+                                                                                class="form-control"
+                                                                                name="sonywork_{{ $sony->id }}"
+                                                                                {{ isset($sonyResult) && $sonyResult->work == 1 ? 'checked' : '' }}>
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="radio" value="0"
+                                                                                class="form-control"
+                                                                                name="sonywork_{{ $sony->id }}"
+                                                                                {{ isset($sonyResult) && $sonyResult->work == 0 ? 'checked' : '' }}>
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="text"
+                                                                                value="{{ $sonyResult->notes ?? '' }}"
+                                                                                class="form-control"
+                                                                                name="sony_notes[]">
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="text"
+                                                                                value="{{ $sonyResult->after_check ?? '' }}"
+                                                                                class="form-control"
+                                                                                name="after_check_sony[]">
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <!--################### End Sony Device Check  #####################-->
+
+                                                <!--################### Start Pc Device Check  ###################-->
+                                                <div class="row" id="pc_check"
+                                                    style="{{ $invoice->checkout_type === 'فحص جهاز pc' ? 'display: block' : 'display: none' }}">
+                                                    <h5> فحص جهاز pc <span class="required_span"> * </span> </h5>
+                                                    <div class="table-responsive">
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th> # </th>
+                                                                    <th> اساسيات الفحص </th>
+                                                                    <th> يعمل </th>
+                                                                    <th> لا يعمل </th>
+                                                                    <th> ملاحظات </th>
+                                                                    <th> بعد الفحص </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($pc_devices as $pc)
+                                                                    @php
+                                                                        $pcResult = $invoice
+                                                                            ->pcResults()
+                                                                            ->where('pc_id', $pc->id)
+                                                                            ->where('invoice_id', $invoice->id)
+                                                                            ->first();
+                                                                    @endphp
+                                                                    <tr>
+                                                                        <td> {{ $loop->iteration }}</td>
+                                                                        <td>
+                                                                            <input type="hidden" name="pc_id[]"
+                                                                                value="{{ $pc->id }}">
+                                                                            <input readonly type="text"
+                                                                                value="{{ $pc->name }}"
+                                                                                class="form-control"
+                                                                                name="check_pc_name[]">
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="radio" value="1"
+                                                                                class="form-control"
+                                                                                name="pcwork_{{ $pc->id }}"
+                                                                                {{ isset($pcResult) && $pcResult->work == 1 ? 'checked' : '' }}>
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="radio" value="0"
+                                                                                class="form-control"
+                                                                                name="pcwork_{{ $pc->id }}"
+                                                                                {{ isset($pcResult) && $pcResult->work == 0 ? 'checked' : '' }}>
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="text"
+                                                                                value="{{ $pcResult->notes ?? '' }}"
+                                                                                class="form-control"
+                                                                                name="pc_notes[]">
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="text"
+                                                                                value="{{ $pcResult->after_check ?? '' }}"
+                                                                                class="form-control"
+                                                                                name="after_check_pc[]">
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <!--################### End Pc Device Check  #####################-->
                                                 @php
                                                     $selectedChecks =
                                                         json_decode($invoice->invoice_more_checks, true) ?? [];
@@ -405,6 +545,45 @@
                                                                 </div>
                                                                 <!-------############# End  Programe Check ##################-------------->
 
+                                                                <!-------############# Start Sony Check ##################-------------->
+                                                                <div class="col-md-12 col-sm-12 problem_check_box"
+                                                                    style="{{ $invoice->checkout_type === 'فحص جهاز سوني' ? 'display: block' : 'display: none' }}"
+                                                                    id="problem_sony_check">
+                                                                    @foreach ($sony_problems as $sony_problem)
+                                                                        <fieldset>
+                                                                            <input
+                                                                                {{ in_array($sony_problem->name, json_decode($invoice->problems)) ? 'checked' : '' }}
+                                                                                type="checkbox"
+                                                                                id="inputsony-{{ $sony_problem->id }}"
+                                                                                name="problems[]"
+                                                                                value="{{ $sony_problem->name }}">
+                                                                            <label
+                                                                                for="inputsony-{{ $sony_problem->id }}">
+                                                                                {{ $sony_problem->name }} </label>
+                                                                        </fieldset>
+                                                                    @endforeach
+                                                                </div>
+                                                                <!-------############# End  Sony Check ##################-------------->
+
+                                                                <!-------############# Start Pc Check ##################-------------->
+                                                                <div class="col-md-12 col-sm-12 problem_check_box"
+                                                                    style="{{ $invoice->checkout_type === 'فحص جهاز pc' ? 'display: block' : 'display: none' }}"
+                                                                    id="problem_pc_check">
+                                                                    @foreach ($pc_problems as $pc_problem)
+                                                                        <fieldset>
+                                                                            <input
+                                                                                {{ in_array($pc_problem->name, json_decode($invoice->problems)) ? 'checked' : '' }}
+                                                                                type="checkbox"
+                                                                                id="inputpc-{{ $pc_problem->id }}"
+                                                                                name="problems[]"
+                                                                                value="{{ $pc_problem->name }}">
+                                                                            <label
+                                                                                for="inputpc-{{ $pc_problem->id }}">
+                                                                                {{ $pc_problem->name }} </label>
+                                                                        </fieldset>
+                                                                    @endforeach
+                                                                </div>
+                                                                <!-------############# End  Pc Check ##################-------------->
 
                                                             </div>
                                                         </div>
@@ -820,27 +999,26 @@
     <script>
         $(document).ready(function() {
             $('#checkout_type').change(function() {
+                // إخفاء الكل أولاً
+                $('#full_check, #programe_check, #speed_check, #sony_check, #pc_check').hide();
+                $('#problem_all_check, #problem_programe_check, #problem_speed_check, #problem_sony_check, #problem_pc_check').hide();
+
+                // إظهار المطلوب بناءً على الاختيار
                 if ($(this).val() == 'فحص كامل') {
                     $('#full_check').show();
                     $('#problem_all_check').show();
-                    $('#programe_check').hide();
-                    $('#speed_check').hide();
-                    $("#problem_programe_check").hide();
-                    $("#problem_speed_check").hide();
                 } else if ($(this).val() == 'فحص جهاز برمجة') {
                     $('#programe_check').show();
-                    $('#full_check').hide();
-                    $('#speed_check').hide();
-                    $("#problem_programe_check").show();
-                    $("#problem_speed_check").hide();
-                    $('#problem_all_check').hide();
+                    $('#problem_programe_check').show();
                 } else if ($(this).val() == 'فحص جهاز سريع') {
                     $('#speed_check').show();
-                    $('#full_check').hide();
-                    $('#programe_check').hide();
-                    $("#problem_programe_check").hide();
-                    $("#problem_speed_check").show();
-                    $('#problem_all_check').hide();
+                    $('#problem_speed_check').show();
+                } else if ($(this).val() == 'فحص جهاز سوني') {
+                    $('#sony_check').show();
+                    $('#problem_sony_check').show();
+                } else if ($(this).val() == 'فحص جهاز pc') {
+                    $('#pc_check').show();
+                    $('#problem_pc_check').show();
                 }
             });
         });
