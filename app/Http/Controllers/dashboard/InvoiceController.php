@@ -1180,6 +1180,13 @@ class InvoiceController extends Controller
         $invoice->save();
         return $this->success_message('  تم ارجاع الجهاز الي رف الاستلام بنجاح  ');
     }
+    public function ReturnToUndeliveryStatus($invoice_id)
+    {
+        $invoice = Invoice::find($invoice_id);
+        $invoice->delivery_status = 0;
+        $invoice->save();
+        return $this->success_message(' تم ارجاع الجهاز لحالة لم يتم التسليم  ');
+    }
 
     ################### ################### Start Delivery Status WithDetails ###################
     #################

@@ -19,7 +19,7 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard.welcome') }}">الرئيسية </a>
                                 </li>
-                                <li class="breadcrumb-item active"> فواتير تم تسليمها 
+                                <li class="breadcrumb-item active"> فواتير تم تسليمها
                                 </li>
                             </ol>
                         </div>
@@ -246,7 +246,7 @@
                                                             {{ $invoice->actual_time_delivery ? date('h:i A', strtotime($invoice->actual_time_delivery)) : '' }}
                                                         </td>
                                                         <td>
-                                                            <div class="mb-1 mr-1 btn-group">
+                                                            <div class="mr-1 mb-1 btn-group">
                                                                 <button type="button"
                                                                     class="btn btn-primary btn-block dropdown-toggle btn-sm"
                                                                     data-toggle="dropdown" aria-haspopup="true"
@@ -265,6 +265,11 @@
                                                                     <a href="{{ route('dashboard.invoices.print_barcode', $invoice->id) }}"
                                                                         class="dropdown-item" type="button"> طباعة باركود
                                                                     </a>
+                                                                     @if ($invoice->delivery_status == 1)
+                                                                        <a href="{{ route('dashboard.invoices.ReturnToUndeliveryStatus', $invoice->id) }}"
+                                                                            class="dropdown-item" type="button"> ارجاع الي حالة لم يتم التسليم
+                                                                        </a>
+                                                                    @endif
                                                                     @if ($invoice->status != 'رف الاستلام')
                                                                         <a href="{{ route('dashboard.invoices.ReturnToRoof', $invoice->id) }}"
                                                                             class="dropdown-item" type="button"> ارجاع الي

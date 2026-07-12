@@ -36,7 +36,7 @@
                                                     <th>#</th>
                                                     <th> رقم الفاتورة </th>
                                                     <th> اسم العميل </th>
-                                                    <th>  رقم الهاتف </th>
+                                                    <th> رقم الهاتف </th>
                                                     <th> العنوان </th>
                                                     <th> المشاكل </th>
                                                     <th> الحالة </th>
@@ -87,9 +87,17 @@
                                                                     href="{{ route('dashboard.tech_invoices.show', $invoice->id) }}"><i
                                                                         class="la la-eye"></i> تفاصيل الجهاز </a>
 
-                                                                <a class="btn btn-warning btn-sm"
+                                                                {{-- <a class="btn btn-warning btn-sm"
                                                                     href="{{ route('dashboard.tech_invoices.checkout', $invoice->id) }}"><i
-                                                                        class="la la-eye"></i> استلام الجهاز </a>
+                                                                        class="la la-eye"></i> استلام الجهاز </a> --}}
+                                                                <form id='invoice-form'
+                                                                    action="{{ route('dashboard.tech_invoices.checkout', $invoice->id) }}"
+                                                                    method="POST">
+                                                                    @csrf
+                                                                    <button type="submit" class="btn btn-warning btn-sm">
+                                                                        استلام
+                                                                        الجهاز </button>
+                                                                </form>
                                                                 {{-- <button type="button" class="btn btn-warning btn-sm"
                                                                     data-toggle="modal"
                                                                     data-target="#checkout_invoice_{{ $invoice->id }}">
@@ -144,4 +152,4 @@
         });
     </script>
 
-    @endsection
+@endsection

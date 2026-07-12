@@ -150,6 +150,7 @@
                                                                         class="form-control" name="notes[]">
                                                                 </td>
                                                                 <td>
+
                                                                     <input type="text"
                                                                         value="{{ old('after_check.' . $loop->index) }}"
                                                                         class="form-control" name="after_check[]">

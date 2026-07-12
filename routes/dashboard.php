@@ -274,6 +274,8 @@ Route::group([
                 Route::get('/device_deliverd', 'deviceDeliverd')->name('deviceDeliverd');
                 Route::get('/device_undeliverd', 'deviceUnDeliverd')->name('deviceUnDeliverd');
 
+                 Route::match(['get', 'post'], '/return-to-undeliver-status/{id}', 'ReturnToUndeliveryStatus')->name('ReturnToUndeliveryStatus');
+
                 // Archive routes
                 Route::group(['prefix' => 'archives', 'as' => 'archives.'], function () {
                     Route::get('/', [\App\Http\Controllers\dashboard\InvoiceArchiveController::class, 'index'])->name('index');

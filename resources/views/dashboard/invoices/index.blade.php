@@ -288,6 +288,11 @@
                                                                     <a href="{{ route('dashboard.invoices.print_barcode', $invoice->id) }}"
                                                                         class="dropdown-item" type="button"> طباعة باركود
                                                                     </a>
+                                                                    @if ($invoice->delivery_status == 1)
+                                                                        <a href="{{ route('dashboard.invoices.ReturnToUndeliveryStatus', $invoice->id) }}"
+                                                                            class="dropdown-item" type="button"> ارجاع الي حالة لم يتم التسليم
+                                                                        </a>
+                                                                    @endif
                                                                     @if ($invoice->status != 'رف الاستلام')
                                                                         <a href="{{ route('dashboard.invoices.ReturnToRoof', $invoice->id) }}"
                                                                             class="dropdown-item" type="button"> ارجاع الي
