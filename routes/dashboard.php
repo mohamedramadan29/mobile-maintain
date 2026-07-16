@@ -275,6 +275,7 @@ Route::group([
                 Route::get('/device_undeliverd', 'deviceUnDeliverd')->name('deviceUnDeliverd');
 
                  Route::match(['get', 'post'], '/return-to-undeliver-status/{id}', 'ReturnToUndeliveryStatus')->name('ReturnToUndeliveryStatus');
+                  Route::match(['get', 'post'], '/return-to-tech/{id}', 'ReturnToTech')->name('ReturnToTech');
 
                 // Archive routes
                 Route::group(['prefix' => 'archives', 'as' => 'archives.'], function () {
@@ -302,6 +303,7 @@ Route::group([
                 Route::post('client-connect/{id}', 'ClientConnect')->name('client-connect');
                 Route::get('show-compelete-invoice/{id}', 'showCompeleteInvoice')->name('show-compelete-invoice');
                 Route::match(['get', 'post'], '/return-to-rouf/{id}', 'ReturnToRoof')->name('ReturnToRoof');
+
             });
         });
         ################# End Tech Invoices #####################

@@ -87,11 +87,13 @@
                                         </div>
                                         <div class="form-group" style="margin-left: 20px">
                                             <label> من تاريخ </label>
-                                            <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control">
+                                            <input type="date" name="from_date" value="{{ request('from_date') }}"
+                                                class="form-control">
                                         </div>
                                         <div class="form-group" style="margin-left: 20px">
                                             <label> الي تاريخ </label>
-                                            <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
+                                            <input type="date" name="to_date" value="{{ request('to_date') }}"
+                                                class="form-control">
                                         </div>
                                         <div class="form-group" style="margin-left: 20px">
                                             <label> حالة الفاتورة </label>
@@ -114,7 +116,8 @@
                                                     تم
                                                     الاصلاح</option>
                                                 <option value="لم يتم الاصلاح"
-                                                    {{ request('invoice_status') == 'لم يتم الاصلاح' ? 'selected' : '' }}>لم
+                                                    {{ request('invoice_status') == 'لم يتم الاصلاح' ? 'selected' : '' }}>
+                                                    لم
                                                     يتم الاصلاح</option>
                                                 <option value="معلق"
                                                     {{ request('invoice_status') == 'معلق' ? 'selected' : '' }}>معلق
@@ -139,26 +142,30 @@
                                 </form>
                             </div>
                             <div class="card-content collapse show">
-                                 <div class="card-body">
+                                <div class="card-body">
                                     <div class="mb-2">
                                         <div class="alert alert-danger" id="alert_no_invoices" style="display: none;">
                                             من فضلك اختر فواتير لحذفها.
                                         </div>
                                         <div class="alert alert-danger" id="alert_delete_invoices" style="display: none;">
                                             هل انت متاكد من حذف الفواتير المحددة؟
-                                            <button type="button" class="btn btn-danger btn-sm" onclick="submitBulkDelete()">نعم</button>
+                                            <button type="button" class="btn btn-danger btn-sm"
+                                                onclick="submitBulkDelete()">نعم</button>
                                         </div>
                                         @can('delete_invoice')
                                             <button type="button" class="btn btn-danger btn-sm" onclick="submitBulkDelete()">
                                                 حذف المحدد
                                             </button>
-                                            <button type="button" class="ml-2 btn btn-warning btn-sm" onclick="submitBulkArchive()">
+                                            <button type="button" class="ml-2 btn btn-warning btn-sm"
+                                                onclick="submitBulkArchive()">
                                                 أرشفة المحدد
                                             </button>
-                                            <button type="button" class="ml-2 btn btn-info btn-sm" onclick="submitBulkFilter()">
+                                            <button type="button" class="ml-2 btn btn-info btn-sm"
+                                                onclick="submitBulkFilter()">
                                                 تصفية الفواتير
                                             </button>
-                                            <button type="button" class="ml-2 btn btn-success btn-sm" onclick="submitBulkDelivery()">
+                                            <button type="button" class="ml-2 btn btn-success btn-sm"
+                                                onclick="submitBulkDelivery()">
                                                 تسليم المحدد
                                             </button>
                                         @endcan
@@ -290,19 +297,22 @@
                                                                     </a>
                                                                     @if ($invoice->delivery_status == 1)
                                                                         <a href="{{ route('dashboard.invoices.ReturnToUndeliveryStatus', $invoice->id) }}"
-                                                                            class="dropdown-item" type="button"> ارجاع الي حالة لم يتم التسليم
+                                                                            class="dropdown-item" type="button"> ارجاع
+                                                                            الي حالة لم يتم التسليم
                                                                         </a>
                                                                     @endif
                                                                     @if ($invoice->status != 'رف الاستلام')
                                                                         <a href="{{ route('dashboard.invoices.ReturnToRoof', $invoice->id) }}"
-                                                                            class="dropdown-item" type="button"> ارجاع الي
+                                                                            class="dropdown-item" type="button"> ارجاع
+                                                                            الي
                                                                             رف
                                                                             الاستلام
                                                                         </a>
                                                                     @endif
-                                                                     @if ($invoice->status == 'تم الاصلاح')
-                                                                        <a href="{{ route('dashboard.invoices.ReturnToRoof', $invoice->id) }}"
-                                                                            class="dropdown-item" type="button"> ارجاع الي الفني
+                                                                    @if ($invoice->status == 'تم الاصلاح')
+                                                                        <a href="{{ route('dashboard.invoices.ReturnToTech', $invoice->id) }}"
+                                                                            class="dropdown-item" type="button"> ارجاع
+                                                                            الي الفني
                                                                         </a>
                                                                     @endif
 
@@ -341,11 +351,21 @@
                                                                     </a>
                                                                 @endif
                                                                 @if ($invoice->delivery_status == 0 && ($invoice->status == 'تم الاصلاح' || $invoice->status == 'لم يتم الاصلاح'))
-                                                                    <a href="{{ route('dashboard.invoices.delivery', $invoice->id) }}?redirect_to={{ urlencode(url()->full()) }}"
+                                                                    {{-- <a href="{{ route('dashboard.invoices.delivery', $invoice->id) }}?redirect_to={{ urlencode(url()->full()) }}"
                                                                         class="btn btn-success btn-sm">
                                                                         <i style="font-size:12px" class="la la-check"></i>
                                                                         تسليم الجهاز
-                                                                    </a>
+                                                                    </a> --}}
+                                                                    <form id="delivery_form"
+                                                                        action="{{ route('dashboard.invoices.delivery', $invoice->id) }}"
+                                                                        method="POST">
+                                                                        @csrf
+                                                                        <button type="submit"
+                                                                            class="btn btn-success btn-sm"
+                                                                            id="delivery_button">
+                                                                            تسليم الجهاز
+                                                                        </button>
+                                                                    </form>
                                                                 @elseif ($invoice->delivery_status == 1)
                                                                     <a href="{{ route('dashboard.invoices.undelivery', $invoice->id) }}?redirect_to={{ urlencode(url()->full()) }}"
                                                                         class="btn btn-danger btn-sm">
@@ -367,7 +387,7 @@
 
                                             </tfoot>
                                         </table>
-                                         {{-- {{ $invoices->links() }} --}}
+                                        {{-- {{ $invoices->links() }} --}}
                                     </div>
                                 </div>
 

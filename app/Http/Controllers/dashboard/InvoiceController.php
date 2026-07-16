@@ -1188,6 +1188,16 @@ class InvoiceController extends Controller
         return $this->success_message(' تم ارجاع الجهاز لحالة لم يتم التسليم  ');
     }
 
+    public function ReturnToTech($invoice_id){
+        $invoice = Invoice::find($invoice_id);
+        $invoice->delivery_status = 0;
+        $invoice->status = 'تحت الصيانة';
+        $invoice->actual_date_delivery = null;
+        $invoice->actual_time_delivery = null;
+        $invoice->save();
+        return $this->success_message(' تم ارجاع الجهاز الي الفني  ');
+    }
+
     ################### ################### Start Delivery Status WithDetails ###################
     #################
 

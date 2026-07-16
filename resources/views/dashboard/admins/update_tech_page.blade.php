@@ -32,7 +32,7 @@
                                             @csrf
                                             <div class="form-group">
                                                 <label>عدد الاجهزة المسموح بها في نفس الوقت</label>
-                                                <input type="number" min='1' max="10" class="form-control" name="device_nums"
+                                                <input type="number" min='1' max="100" class="form-control" name="device_nums"
                                                     value="{{ $admin->device_nums }}">
                                             </div>
                                             <div class="form-group">
