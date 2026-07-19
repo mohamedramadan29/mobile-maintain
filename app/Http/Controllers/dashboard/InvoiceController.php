@@ -1304,8 +1304,8 @@ class InvoiceController extends Controller
         // تحديث الفواتير المحددة
         Invoice::whereIn('id', $invoiceIds)->update([
             'status' => 'تم الاصلاح',
-            'delivery_status' => 1,
-            'admin_repair_id'=>17,
+            'delivery_status' => 1,$invoice->admin_repair_id ?? 17,
+            'admin_repair_id'=>
         ]);
 
         return response()->json([
