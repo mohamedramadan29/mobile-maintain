@@ -49,7 +49,8 @@ class InvoiceController extends Controller
     use Upload_Images;
     public function index(Request $request)
     {
-        $query = Invoice::query();
+        // eager loading يمنع تنفيذ استعلامين لكل صف عند عرض اسم الاستقبال والفني
+        $query = Invoice::query()->with(['Recieved:id,name', 'Technical:id,name']);
 
         // البحث العام (رقم الفاتورة، الاسم، الهاتف)
         if ($request->has('search') && !empty($request->search)) {
@@ -63,10 +64,10 @@ class InvoiceController extends Controller
 
         // Date range filter
         if ($request->has('from_date') && !empty($request->from_date)) {
-            $query->whereDate('created_at', '>=', $request->from_date);
+            $query->where('created_at', '>=', $request->from_date . ' 00:00:00');
         }
         if ($request->has('to_date') && !empty($request->to_date)) {
-            $query->whereDate('created_at', '<=', $request->to_date);
+            $query->where('created_at', '<=', $request->to_date . ' 23:59:59');
         }
 
         // Exclude archived invoices for better performance, unless searching specifically
@@ -94,16 +95,16 @@ class InvoiceController extends Controller
         // Calculate statistics based on the same date range filters
         $statsQuery = Invoice::query();
         if ($request->has('from_date') && !empty($request->from_date)) {
-            $statsQuery->whereDate('created_at', '>=', $request->from_date);
+            $statsQuery->where('created_at', '>=', $request->from_date . ' 00:00:00');
         }
         if ($request->has('to_date') && !empty($request->to_date)) {
-            $statsQuery->whereDate('created_at', '<=', $request->to_date);
+            $statsQuery->where('created_at', '<=', $request->to_date . ' 23:59:59');
         }
 
         $total_delivered = (clone $statsQuery)->where('delivery_status', 1)->count();
         $total_undelivered = (clone $statsQuery)->where('delivery_status', 0)->count();
 
-        $invoices = $query->orderBy('id', 'desc')->paginate(1000)->appends($request->all());
+        $invoices = $query->orderBy('id', 'desc')->paginate(50)->appends($request->all());
         $techs = Admin::where('type', 'فني')->get();
 
         return view('dashboard.invoices.index', compact('invoices', 'techs', 'total_delivered', 'total_undelivered'));
@@ -113,7 +114,8 @@ class InvoiceController extends Controller
     ########################################################################################
     public function deviceDeliverd(Request $request)
     {
-        $query = Invoice::query();
+        // eager loading يمنع تنفيذ استعلامين لكل صف عند عرض اسم الاستقبال والفني
+        $query = Invoice::query()->with(['Recieved:id,name', 'Technical:id,name']);
 
         // البحث العام (رقم الفاتورة، الاسم، الهاتف)
         if ($request->has('search') && !empty($request->search)) {
@@ -127,10 +129,10 @@ class InvoiceController extends Controller
 
         // Date range filter
         if ($request->has('from_date') && !empty($request->from_date)) {
-            $query->whereDate('created_at', '>=', $request->from_date);
+            $query->where('created_at', '>=', $request->from_date . ' 00:00:00');
         }
         if ($request->has('to_date') && !empty($request->to_date)) {
-            $query->whereDate('created_at', '<=', $request->to_date);
+            $query->where('created_at', '<=', $request->to_date . ' 23:59:59');
         }
 
         // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
@@ -147,16 +149,16 @@ class InvoiceController extends Controller
         // Calculate statistics based on the same date range filters
         $statsQuery = Invoice::query();
         if ($request->has('from_date') && !empty($request->from_date)) {
-            $statsQuery->whereDate('created_at', '>=', $request->from_date);
+            $statsQuery->where('created_at', '>=', $request->from_date . ' 00:00:00');
         }
         if ($request->has('to_date') && !empty($request->to_date)) {
-            $statsQuery->whereDate('created_at', '<=', $request->to_date);
+            $statsQuery->where('created_at', '<=', $request->to_date . ' 23:59:59');
         }
 
         $total_delivered = (clone $statsQuery)->where('delivery_status', 1)->count();
         $total_undelivered = (clone $statsQuery)->where('delivery_status', 0)->count();
 
-        $invoices = $query->orderBy('id', 'desc')->where('delivery_status', 1)->paginate(1000)->appends($request->all());
+        $invoices = $query->orderBy('id', 'desc')->where('delivery_status', 1)->paginate(50)->appends($request->all());
         $techs = Admin::where('type', 'فني')->get();
 
         return view('dashboard.invoices.device_deliverd', compact('invoices', 'techs', 'total_delivered', 'total_undelivered'));
@@ -164,7 +166,8 @@ class InvoiceController extends Controller
 
     public function deviceUnDeliverd(Request $request)
     {
-        $query = Invoice::query();
+        // eager loading يمنع تنفيذ استعلامين لكل صف عند عرض اسم الاستقبال والفني
+        $query = Invoice::query()->with(['Recieved:id,name', 'Technical:id,name']);
 
         // البحث العام (رقم الفاتورة، الاسم، الهاتف)
         if ($request->has('search') && !empty($request->search)) {
@@ -178,10 +181,10 @@ class InvoiceController extends Controller
 
         // Date range filter
         if ($request->has('from_date') && !empty($request->from_date)) {
-            $query->whereDate('created_at', '>=', $request->from_date);
+            $query->where('created_at', '>=', $request->from_date . ' 00:00:00');
         }
         if ($request->has('to_date') && !empty($request->to_date)) {
-            $query->whereDate('created_at', '<=', $request->to_date);
+            $query->where('created_at', '<=', $request->to_date . ' 23:59:59');
         }
 
         // تحقق مما إذا كان هناك بحث عن حالة الفاتورة
@@ -198,16 +201,16 @@ class InvoiceController extends Controller
         // Calculate statistics based on the same date range filters
         $statsQuery = Invoice::query();
         if ($request->has('from_date') && !empty($request->from_date)) {
-            $statsQuery->whereDate('created_at', '>=', $request->from_date);
+            $statsQuery->where('created_at', '>=', $request->from_date . ' 00:00:00');
         }
         if ($request->has('to_date') && !empty($request->to_date)) {
-            $statsQuery->whereDate('created_at', '<=', $request->to_date);
+            $statsQuery->where('created_at', '<=', $request->to_date . ' 23:59:59');
         }
 
         $total_delivered = (clone $statsQuery)->where('delivery_status', 1)->count();
         $total_undelivered = (clone $statsQuery)->where('delivery_status', 0)->count();
 
-        $invoices = $query->orderBy('id', 'desc')->where('delivery_status', 0)->paginate(1000)->appends($request->all());
+        $invoices = $query->orderBy('id', 'desc')->where('delivery_status', 0)->paginate(50)->appends($request->all());
         $techs = Admin::where('type', 'فني')->get();
 
         return view('dashboard.invoices.device_undeliverd', compact('invoices', 'techs', 'total_delivered', 'total_undelivered'));
@@ -550,7 +553,7 @@ class InvoiceController extends Controller
                 $filesiguture = 'signature_' . time() . '.png';
 
                 // مسار حفظ الصورة
-                $signuturepath = public_path('assets/uploads/invoices_files/' . $filesiguture);
+                $signuturepath = 'assets/uploads/invoices_files/' . $filesiguture;
 
                 // حفظ الصورة في المسار المحدد
                 file_put_contents($signuturepath, $imageData);
@@ -583,7 +586,7 @@ class InvoiceController extends Controller
                 if ($request->hasFile('files_images')) {
                     // $files = $request->file('files');
                     foreach ($request->file('files_images') as $image) {
-                        $filename = $this->saveImage($image, public_path('assets/uploads/invoices_files'));
+                        $filename = $this->saveImage($image, 'assets/uploads/invoices_files');
                         $invoice_image = new InvoiceImage();
                         $invoice_image->invoice_id = $invoice->id;
                         $invoice_image->image = $filename;
@@ -601,7 +604,7 @@ class InvoiceController extends Controller
 
                             // إنشاء اسم فريد للصورة
                             $fileName = uniqid() . '.' . $extension;
-                            $path = public_path('assets/uploads/invoices_files/') . $fileName;
+                            $path ='assets/uploads/invoices_files/' . $fileName;
 
                             // حفظ الصورة في المجلد
                             file_put_contents($path, $imageData);
@@ -725,7 +728,10 @@ class InvoiceController extends Controller
                     [$invoice->name, $invoice->id, $invoice->phone, $invoice->date_delivery, $invoice->time_delivery, $invoice->description ?? "لا توجد ملاحظات", $invoice_link],
                     $message_temp
                 );
-                SendCreateMessage::dispatch($invoice, $message);
+                ######
+                ########
+                #########
+                // SendCreateMessage::dispatch($invoice, $message);
 
                 // DB::commit();
                 // إعادة توجيه مع رسالة نجاح وبيانات إضافية
@@ -862,7 +868,7 @@ class InvoiceController extends Controller
                 if ($request->hasFile('files_images')) {
                     // $files = $request->file('files');
                     foreach ($request->file('files_images') as $image) {
-                        $filename = $this->saveImage($image, public_path('assets/uploads/invoices_files'));
+                        $filename = $this->saveImage($image, 'assets/uploads/invoices_files');
                         $invoice_image = new InvoiceImage();
                         $invoice_image->invoice_id = $invoice->id;
                         $invoice_image->image = $filename;
@@ -1011,7 +1017,7 @@ class InvoiceController extends Controller
                 ////////// Delete Files
                 $files = InvoiceImage::where('invoice_id', $id)->get();
                 foreach ($files as $file) {
-                    @unlink(public_path('assets/uploads/invoices_files/' . $file->image));
+                    @unlink('assets/uploads/invoices_files/' . $file->image);
                     $file->delete();
                 }
                 $invoice->delete();
@@ -1028,7 +1034,7 @@ class InvoiceController extends Controller
     {
         try {
             $file = InvoiceImage::find($id);
-            @unlink(public_path('assets/uploads/invoices_files/' . $file->image));
+            @unlink('assets/uploads/invoices_files/' . $file->image);
             $file->delete();
             return $this->success_message(' تم حذف الملف بنجاح');
         } catch (Exception $e) {
@@ -1180,6 +1186,8 @@ class InvoiceController extends Controller
         $invoice->save();
         return $this->success_message('  تم ارجاع الجهاز الي رف الاستلام بنجاح  ');
     }
+
+
     public function ReturnToUndeliveryStatus($invoice_id)
     {
         $invoice = Invoice::find($invoice_id);
@@ -1188,7 +1196,7 @@ class InvoiceController extends Controller
         return $this->success_message(' تم ارجاع الجهاز لحالة لم يتم التسليم  ');
     }
 
-    public function ReturnToTech($invoice_id){
+     public function ReturnToTech($invoice_id){
         $invoice = Invoice::find($invoice_id);
         $invoice->delivery_status = 0;
         $invoice->status = 'تحت الصيانة';
@@ -1304,8 +1312,9 @@ class InvoiceController extends Controller
         // تحديث الفواتير المحددة
         Invoice::whereIn('id', $invoiceIds)->update([
             'status' => 'تم الاصلاح',
-            'delivery_status' => 1,$invoice->admin_repair_id ?? 17,
-            'admin_repair_id'=>
+            'delivery_status' => 1,
+            // الإبقاء على الفني الحالي لكل فاتورة، وتعيين 17 فقط لمن ليس له فني
+            'admin_repair_id' => DB::raw('COALESCE(admin_repair_id, 17)'),
         ]);
 
         return response()->json([

@@ -31,7 +31,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/css-rtl/core/colors/palette-gradient.css">
     <!-- END Page Level CSS-->
     <!-- BEGIN Custom CSS-->
-    <link rel="stylesheet" type="text/css" href="../../../assets/css/style-rtl.css">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style-rtl.css') }}">
    @yield('css')
     @toastifyCss
     <!-- END Custom CSS-->

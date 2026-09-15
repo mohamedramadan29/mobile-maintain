@@ -809,83 +809,105 @@
 
                                             <script>
                                                 let imageInput = document.getElementById('imageInput');
-                                                    let imagePreview = document.getElementById('imagePreview');
-                                                    let dt = new DataTransfer(); // لتخزين الملفات
+                                                let imagePreview = document.getElementById('imagePreview');
+                                                let dt = new DataTransfer(); // لتخزين الملفات
 
-                                                    imageInput.addEventListener('change', function(event) {
-                                                        Array.from(event.target.files).forEach(file => {
-                                                            // فقط صور
-                                                            if (!file.type.startsWith('image/')) return;
+                                                // أبعاد وجودة الصورة المرفوعة
+                                                const MAX_WIDTH = 1600;
+                                                const MAX_HEIGHT = 1600;
+                                                const JPEG_QUALITY = 0.8;
 
-                                                            let reader = new FileReader();
-                                                            reader.onload = function(e) {
-                                                                let img = new Image();
-                                                                img.onload = function() {
-                                                                    const MAX_WIDTH = 800;
-                                                                    const MAX_HEIGHT = 800;
-                                                                    let width = img.width;
-                                                                    let height = img.height;
+                                                imageInput.addEventListener('change', function(event) {
+                                                    Array.from(event.target.files).forEach(file => {
+                                                        // فقط صور
+                                                        if (!file.type.startsWith('image/')) return;
 
-                                                                    if (width > height) {
-                                                                        if (width > MAX_WIDTH) {
-                                                                            height *= MAX_WIDTH / width;
-                                                                            width = MAX_WIDTH;
-                                                                        }
-                                                                    } else {
-                                                                        if (height > MAX_HEIGHT) {
-                                                                            width *= MAX_HEIGHT / height;
-                                                                            height = MAX_HEIGHT;
-                                                                        }
+                                                        let reader = new FileReader();
+                                                        reader.onload = function(e) {
+                                                            let img = new Image();
+                                                            img.onload = function() {
+                                                                let width = img.width;
+                                                                let height = img.height;
+
+                                                                if (width > height) {
+                                                                    if (width > MAX_WIDTH) {
+                                                                        height *= MAX_WIDTH / width;
+                                                                        width = MAX_WIDTH;
+                                                                    }
+                                                                } else {
+                                                                    if (height > MAX_HEIGHT) {
+                                                                        width *= MAX_HEIGHT / height;
+                                                                        height = MAX_HEIGHT;
+                                                                    }
+                                                                }
+
+                                                                let canvas = document.createElement("canvas");
+                                                                canvas.width = width;
+                                                                canvas.height = height;
+                                                                let ctx = canvas.getContext("2d");
+                                                                ctx.drawImage(img, 0, 0, width, height);
+
+                                                                // تحويل canvas لصورة مضغوطة
+                                                                let compressedDataUrl = canvas.toDataURL('image/jpeg', JPEG_QUALITY);
+
+                                                                // إنشاء حاوية الصورة
+                                                                let imgContainer = document.createElement("div");
+                                                                imgContainer.classList.add("position-relative", "m-2");
+
+                                                                let imgElement = document.createElement("img");
+                                                                imgElement.src = compressedDataUrl;
+                                                                imgElement.classList.add("rounded", "shadow", "border", "p-1");
+                                                                imgElement.style.width = "120px";
+                                                                imgElement.style.height = "120px";
+
+                                                                let removeBtn = document.createElement("span");
+                                                                removeBtn.innerHTML = "&times;";
+                                                                removeBtn.classList.add("position-absolute", "remove-button", "top-0",
+                                                                    "end-0", "bg-danger", "text-white", "rounded-circle", "p-1");
+                                                                removeBtn.style.cursor = "pointer";
+
+                                                                imgContainer.appendChild(imgElement);
+                                                                imgContainer.appendChild(removeBtn);
+                                                                imagePreview.appendChild(imgContainer);
+
+                                                                // رفع النسخة المضغوطة بدل الملف الأصلي (كان يُرفع الأصل كاملًا)
+                                                                canvas.toBlob(function(blob) {
+                                                                    if (!blob) { // احتياط: تعذّر الضغط، نرفع الأصل
+                                                                        dt.items.add(file);
+                                                                        imageInput.files = dt.files;
+                                                                        removeBtn.onclick = function() {
+                                                                            let i = Array.from(dt.files).indexOf(file);
+                                                                            if (i > -1) { dt.items.remove(i); imageInput.files = dt.files; }
+                                                                            imgContainer.remove();
+                                                                        };
+                                                                        return;
                                                                     }
 
-                                                                    let canvas = document.createElement("canvas");
-                                                                    canvas.width = width;
-                                                                    canvas.height = height;
-                                                                    let ctx = canvas.getContext("2d");
-                                                                    ctx.drawImage(img, 0, 0, width, height);
+                                                                    let newName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+                                                                    let compressedFile = new File([blob], newName, {
+                                                                        type: 'image/jpeg',
+                                                                        lastModified: Date.now()
+                                                                    });
 
-                                                                    // تحويل canvas لصورة مضغوطة
-                                                                    let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                                                                    dt.items.add(compressedFile);
+                                                                    imageInput.files = dt.files;
 
-                                                                    // إنشاء حاوية الصورة
-                                                                    let imgContainer = document.createElement("div");
-                                                                    imgContainer.classList.add("position-relative", "m-2");
-
-                                                                    let imgElement = document.createElement("img");
-                                                                    imgElement.src = compressedDataUrl;
-                                                                    imgElement.classList.add("rounded", "shadow", "border", "p-1");
-                                                                    imgElement.style.width = "120px";
-                                                                    imgElement.style.height = "120px";
-
-                                                                    let removeBtn = document.createElement("span");
-                                                                    removeBtn.innerHTML = "&times;";
-                                                                    removeBtn.classList.add("position-absolute", "remove-button", "top-0",
-                                                                        "end-0", "bg-danger", "text-white", "rounded-circle", "p-1");
-                                                                    removeBtn.style.cursor = "pointer";
-
+                                                                    // الحذف يعتمد على الملف نفسه لا على الاسم (تفاديًا لتكرار الأسماء)
                                                                     removeBtn.onclick = function() {
-                                                                        let index = Array.from(dt.files).findIndex(f => f.name === file
-                                                                            .name);
-                                                                        if (index > -1) {
-                                                                            dt.items.remove(index);
+                                                                        let i = Array.from(dt.files).indexOf(compressedFile);
+                                                                        if (i > -1) {
+                                                                            dt.items.remove(i);
                                                                             imageInput.files = dt.files;
                                                                         }
                                                                         imgContainer.remove();
                                                                     };
-
-                                                                    imgContainer.appendChild(imgElement);
-                                                                    imgContainer.appendChild(removeBtn);
-                                                                    imagePreview.appendChild(imgContainer);
-
-                                                                    // إضافة الملف الأصلي إلى input
-                                                                    dt.items.add(file);
-                                                                    imageInput.files = dt.files;
-                                                                };
-                                                                img.src = e.target.result;
+                                                                }, 'image/jpeg', JPEG_QUALITY);
                                                             };
-                                                            reader.readAsDataURL(file);
-                                                        });
+                                                            img.src = e.target.result;
+                                                        };
+                                                        reader.readAsDataURL(file);
                                                     });
+                                                });
                                             </script>
 
 
@@ -955,9 +977,6 @@
                                     </form>
 
 
-                                    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-                                        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-                                        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
                                     <!--------------- Start SignaturePad ############ -->
                                     <script
                                         src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.3.4/signature_pad.min.js"
@@ -1259,10 +1278,6 @@
                 loadingMsg.style.display = "none";
             }
         }
-</script>
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>
-    eruda.init();
 </script>
 <script src="{{ asset('assets/admin/') }}/vendors/js/forms/icheck/icheck.min.js" type="text/javascript"></script>
 <script src="{{ asset('assets/admin/') }}/js/scripts/forms/checkbox-radio.js" type="text/javascript"></script>

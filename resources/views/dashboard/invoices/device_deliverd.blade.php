@@ -146,7 +146,7 @@
                                             @csrf
                                             <input type="hidden" name="invoice_ids" id="invoice_ids">
                                         </form>
-                                        <table class="table table-striped table-bordered zero-configuration dataTable"
+                                        <table class="table table-striped table-bordered dataTable"
                                             id="DataTables_Table_0">
                                             <thead>
                                                 <tr>
@@ -362,7 +362,7 @@
                                                 تصفية الفواتير
                                             </button>
                                         @endcan
-                                        {{-- {{ $invoices->links() }} --}}
+                                        <div class="d-flex justify-content-center mt-2">{{ $invoices->links() }}</div>
                                     </div>
                                 </div>
 
@@ -381,16 +381,21 @@
 @section('js')
     <script src="{{ asset('assets/admin/') }}/vendors/js/tables/datatable/datatables.min.js" type="text/javascript">
     </script>
-    <script src="{{ asset('assets/admin/') }}/js/scripts/tables/datatables/datatable-basic.js" type="text/javascript">
-    </script>
     <script>
         $(document).ready(function() {
             // if (!$.fn.DataTable.isDataTable('#DataTables_Table_0')) {
             $('#DataTables_Table_0').DataTable({
-                pageLength: 100,
-                language: lang === 'ar' ? {
-                    url: '//cdn.datatables.net/plug-ins/2.2.2/i18n/ar.json',
-                } : {},
+                // التصفح والبحث والترتيب تتم من جهة الخادم الآن
+                order: [], // لا ترتيب أولي: نحترم ترتيب الخادم التنازلي حسب رقم الفاتورة
+                columnDefs: [{ orderable: false, targets: [0, -1] }], // مربع الاختيار وعمود العمليات
+                paging: false,
+                searching: false,
+                info: false,
+                language: {
+                    emptyTable: 'لا توجد بيانات',
+                    zeroRecords: 'لا توجد نتائج مطابقة',
+                    aria: { orderable: 'ترتيب حسب هذا العمود', orderableReverse: 'ترتيب عكسي حسب هذا العمود' }
+                },
             });
             // }
             // $('.zero-configuration').DataTable({
