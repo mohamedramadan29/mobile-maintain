@@ -52,6 +52,51 @@ class Invoice extends Model
         return $this->belongsTo(Admin::class, 'admin_repair_id');
     }
 
+    /**
+     * الموظف الذي أتم تسليم الجهاز للعميل.
+     */
+    public function Delivered()
+    {
+        return $this->belongsTo(Admin::class, 'delivered_by');
+    }
+
+    /**
+     * صور/فيديوهات حالة الجهاز بعد الصيانة (المرفقات المطلوبة عند التسليم).
+     */
+    public function statusFiles()
+    {
+        return $this->hasMany(InvoiceImage::class, 'invoice_id')->where('file_type', 'status');
+    }
+
+    /**
+     * حالات الإصلاح المقبولة كشرط أساسي للتسليم.
+     */
+    public const REPAIR_STATUSES = ['تم الاصلاح', 'لم يتم الاصلاح'];
+
+    /**
+     * هل حُدِّدت حالة الإصلاح (تم / لم يتم)؟
+     */
+    public function hasRepairStatus(): bool
+    {
+        return in_array($this->status, self::REPAIR_STATUSES, true);
+    }
+
+    /**
+     * هل تتوفر صورة أو فيديو لحالة الجهاز؟
+     */
+    public function hasStatusMedia(): bool
+    {
+        return $this->statusFiles()->exists();
+    }
+
+    /**
+     * جهاز مكتمل = له صورة/فيديو حالة وحالة إصلاح محددة، فيُجهَّز للتسليم مباشرة.
+     */
+    public function isReadyForDelivery(): bool
+    {
+        return $this->hasRepairStatus() && $this->hasStatusMedia();
+    }
+
     public function Steps()
     {
         return $this->hasMany(InvoiceSteps::class, 'invoice_id');

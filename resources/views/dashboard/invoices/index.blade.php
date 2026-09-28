@@ -160,16 +160,19 @@
                                                 onclick="submitBulkArchive()">
                                                 أرشفة المحدد
                                             </button>
+                                        @endcan
+                                        @can('deliver_invoice')
                                             <button type="button" class="ml-2 btn btn-info btn-sm"
                                                 onclick="submitBulkFilter()">
                                                 تصفية الفواتير
                                             </button>
                                             <button type="button" class="ml-2 btn btn-success btn-sm"
                                                 onclick="submitBulkDelivery()">
-                                                تسليم المحدد
+                                                تسليم الأجهزة المحددة
                                             </button>
                                         @endcan
                                     </div>
+                                    @include('dashboard.invoices.partials._bulk_delivery_panel')
                                     <div class="table-responsive">
                                         <form id="bulkDeleteForm" action="{{ route('dashboard.invoices.bulk_delete') }}"
                                             method="POST" style="display: none;">
@@ -557,47 +560,9 @@
             });
         }
 
-        // Function for bulk delivery
-        function submitBulkDelivery() {
-            var selectedInvoices = [];
-            $('input[name="invoice_select"]:checked').each(function() {
-                selectedInvoices.push($(this).val());
-            });
-
-            if (selectedInvoices.length === 0) {
-                document.getElementById('alert_no_invoices').style.display = 'block';
-                return;
-            }
-
-            if (!confirm('هل أنت متأكد من تسليم جميع الأجهزة المختارة؟')) return;
-
-            // إرسال طلب لتسليم الفواتير
-            $.ajax({
-                url: "{{ route('dashboard.invoices.bulk.delivery') }}",
-                method: 'POST',
-                data: {
-                    invoice_ids: selectedInvoices.join(','),
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    if (response.success) {
-                        alert(response.message || 'تم تسليم الفواتير بنجاح');
-                        // إعادة تحميل الصفحة لعرض التغييرات
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1000);
-                    } else {
-                        alert(response.message || 'حدث خطأ أثناء تسليم الفواتير');
-                    }
-                },
-                error: function(xhr) {
-                    var errorMessage = 'حدث خطأ أثناء تسليم الفواتير';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMessage = xhr.responseJSON.message;
-                    }
-                    alert(errorMessage);
-                }
-            });
-        }
+        // دالة التسليم الجماعي معرّفة في partials/_bulk_delivery_scripts
+        // (فحص الأجهزة ثم سيكشن التحديث السريع أعلى الجدول ثم التسليم دفعة واحدة)
     </script>
+
+    @include('dashboard.invoices.partials._bulk_delivery_scripts')
 @endsection

@@ -38,6 +38,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Intervention\Image\Facades\Image;
 use Mpdf\Mpdf;
 use Picqer\Barcode\BarcodeGeneratorPNG;
@@ -1322,33 +1323,290 @@ class InvoiceController extends Controller
             'message' => 'تم تصفية الفواتير المختارة بنجاح'
         ]);
     }
-    public function bulkDelivery(Request $request)
+    /**
+     * الحد الأقصى لعدد الأجهزة في الدفعة الواحدة.
+     * سبب التحديد: post_max_size = 20M و max_file_uploads = 20 على السيرفر،
+     * لذلك تُرفع المرفقات بطلب منفصل لكل جهاز ويبقى حجم الدفعة معقولاً.
+     */
+    public const BULK_DELIVERY_MAX = 15;
+
+    /**
+     * تحويل مدخل المعرفات (نص مفصول بفواصل أو مصفوفة) إلى مصفوفة أرقام فريدة.
+     */
+    private function parseInvoiceIds($input): array
     {
-        // التحقق من الإدخال
+        $ids = is_array($input) ? $input : explode(',', (string) $input);
+
+        return collect($ids)
+            ->map(fn($id) => (int) trim((string) $id))
+            ->filter(fn($id) => $id > 0)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * الحد الأقصى لحجم المرفق الواحد بالكيلوبايت، حسب إعدادات PHP على السيرفر.
+     */
+    private function maxUploadKb(): int
+    {
+        $toKb = function ($value) {
+            $value = trim((string) $value);
+            $unit = strtolower(substr($value, -1));
+            $number = (float) $value;
+
+            return (int) match ($unit) {
+                'g' => $number * 1024 * 1024,
+                'm' => $number * 1024,
+                'k' => $number,
+                default => $number / 1024,
+            };
+        };
+
+        $limits = array_filter([$toKb(ini_get('upload_max_filesize')), $toKb(ini_get('post_max_size'))]);
+
+        return $limits ? (int) min($limits) : 20480;
+    }
+
+    /**
+     * فحص الأجهزة المحددة قبل التسليم الجماعي.
+     * يُرجع الأجهزة المكتملة (جاهزة للتسليم مباشرة) والأجهزة الناقصة
+     * (تحتاج صورة/فيديو أو تحديد حالة الإصلاح) لعرضها في نافذة التحديث السريع.
+     */
+    public function bulkDeliveryCheck(Request $request)
+    {
+        $request->validate(['invoice_ids' => 'required']);
+
+        $ids = $this->parseInvoiceIds($request->input('invoice_ids'));
+
+        if (empty($ids)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لم يتم اختيار أي أجهزة',
+            ]);
+        }
+
+        if (count($ids) > self::BULK_DELIVERY_MAX) {
+            return response()->json([
+                'success' => false,
+                'message' => 'الحد الأقصى ' . self::BULK_DELIVERY_MAX . ' جهاز في الدفعة الواحدة، وقد حددت ' . count($ids) . ' جهاز. من فضلك قسّمها على أكثر من دفعة.',
+            ]);
+        }
+
+        $invoices = Invoice::with('statusFiles:id,invoice_id')
+            ->whereIn('id', $ids)
+            ->where('delivery_status', 0)
+            ->get();
+
+        $ready = [];
+        $incomplete = [];
+
+        foreach ($invoices as $invoice) {
+            $hasStatus = $invoice->hasRepairStatus();
+            $hasMedia = $invoice->statusFiles->isNotEmpty();
+
+            if ($hasStatus && $hasMedia) {
+                $ready[] = $invoice->id;
+                continue;
+            }
+
+            $incomplete[] = [
+                'id' => $invoice->id,
+                'device' => $invoice->title,
+                'name' => $invoice->name,
+                'phone' => $invoice->phone,
+                'status' => $hasStatus ? $invoice->status : null,
+                'has_status' => $hasStatus,
+                'has_media' => $hasMedia,
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'ready' => $ready,
+            'incomplete' => $incomplete,
+            'unavailable' => array_values(array_diff($ids, $invoices->pluck('id')->all())),
+            'repair_statuses' => Invoice::REPAIR_STATUSES,
+            'max_upload_kb' => $this->maxUploadKb(),
+        ]);
+    }
+
+    /**
+     * التحديث السريع لجهاز واحد من نافذة التسليم الجماعي:
+     * حفظ حالة الإصلاح ورفع صورة/فيديو الحالة.
+     * المرفق يُرفع بطلب منفصل لكل جهاز احتراماً لحدود post_max_size على السيرفر.
+     */
+    public function bulkDeliveryQuickUpdate(Request $request)
+    {
         $request->validate([
-            'invoice_ids' => 'required',
+            'invoice_id' => 'required|integer|exists:invoices,id',
+            'status' => ['nullable', 'string', Rule::in(Invoice::REPAIR_STATUSES)],
+            'file' => 'nullable|file|mimes:jpg,jpeg,png,webp,heic,heif,mp4,mov,m4v,3gp|max:' . $this->maxUploadKb(),
+        ], [
+            'file.max' => 'حجم المرفق أكبر من الحد المسموح (' . round($this->maxUploadKb() / 1024) . ' ميجابايت).',
+            'file.mimes' => 'نوع المرفق غير مدعوم، المسموح: صور (jpg, png, heic) أو فيديو (mp4, mov).',
         ]);
 
-        // الحصول على معرفات الفواتير
-        $invoiceIds = explode(',', $request->input('invoice_ids'));
-        $invoices = Invoice::whereIn('id', $invoiceIds)->where('delivery_status', 0)->get();
+        $invoice = Invoice::findOrFail($request->invoice_id);
+
+        if ($invoice->delivery_status == 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'الجهاز رقم ' . $invoice->id . ' مسلَّم بالفعل',
+            ]);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            if ($request->filled('status') && $request->status !== $invoice->status) {
+                $invoice->status = $request->status;
+                $invoice->save();
+
+                $invoice_step = new InvoiceSteps();
+                $invoice_step->invoice_id = $invoice->id;
+                $invoice_step->admin_id = Auth::id();
+                $invoice_step->step_details = 'تحديث سريع لحالة الجهاز إلى (' . $request->status . ') من شاشة التسليم الجماعي';
+                $invoice_step->save();
+            }
+
+            if ($request->hasFile('file')) {
+                $filename = $this->saveImage($request->file('file'), public_path('assets/uploads/invoices_files'));
+
+                $file = new InvoiceImage();
+                $file->invoice_id = $invoice->id;
+                $file->image = $filename;
+                $file->user_upload = Auth::id();
+                $file->title = 'صورة حالة الجهاز عند التسليم';
+                $file->file_type = 'status';
+                $file->save();
+            }
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Bulk delivery quick update failed', [
+                'invoice_id' => $invoice->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'تعذّر حفظ بيانات الجهاز رقم ' . $invoice->id,
+            ], 500);
+        }
+
+        $invoice->refresh()->load('statusFiles:id,invoice_id');
+
+        return response()->json([
+            'success' => true,
+            'invoice_id' => $invoice->id,
+            'has_status' => $invoice->hasRepairStatus(),
+            'has_media' => $invoice->statusFiles->isNotEmpty(),
+        ]);
+    }
+
+    /**
+     * التسليم الجماعي للأجهزة المحددة.
+     * تحقق مرن: حالة الإصلاح شرط أساسي، أما الصورة فاختيارية
+     * بشرط وصول إشارة تأكيد صريحة من الموظف (confirm_without_image).
+     */
+    public function bulkDelivery(Request $request)
+    {
+        $request->validate([
+            'invoice_ids' => 'required',
+            'confirm_without_image' => 'nullable',
+        ]);
+
+        $ids = $this->parseInvoiceIds($request->input('invoice_ids'));
+        $confirmedWithoutImage = $this->parseInvoiceIds($request->input('confirm_without_image', []));
+
+        if (empty($ids)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لم يتم اختيار أي أجهزة',
+            ]);
+        }
+
+        if (count($ids) > self::BULK_DELIVERY_MAX) {
+            return response()->json([
+                'success' => false,
+                'message' => 'الحد الأقصى ' . self::BULK_DELIVERY_MAX . ' جهاز في الدفعة الواحدة',
+            ]);
+        }
+
+        $invoices = Invoice::with('statusFiles:id,invoice_id')
+            ->whereIn('id', $ids)
+            ->where('delivery_status', 0)
+            ->get();
 
         if ($invoices->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'لم يتم العثور على فواتير صالحة للتسليم'
+                'message' => 'لم يتم العثور على أجهزة صالحة للتسليم',
             ]);
         }
+
+        $delivered = [];
+        $rejected = [];
 
         // إعداد الرسالة المرسلة للعميل
         $message_temp = Message::where('message_type', 'تسليم الجهاز')->value('template_text');
 
         foreach ($invoices as $invoice) {
-            // تحديث حالة التسليم
-            $invoice->delivery_status = 1;
-            $invoice->actual_date_delivery = date('Y-m-d');
-            $invoice->actual_time_delivery = date('H:i:s');
-            $invoice->save();
+            if (!$invoice->hasRepairStatus()) {
+                $rejected[] = [
+                    'id' => $invoice->id,
+                    'reason' => 'لم تُحدَّد حالة الإصلاح (تم / لم يتم)',
+                ];
+                continue;
+            }
+
+            $hasMedia = $invoice->statusFiles->isNotEmpty();
+
+            if (!$hasMedia && !in_array($invoice->id, $confirmedWithoutImage, true)) {
+                $rejected[] = [
+                    'id' => $invoice->id,
+                    'reason' => 'لا توجد صورة/فيديو ولم يتم تأكيد التسليم بدونها',
+                ];
+                continue;
+            }
+
+            try {
+                DB::beginTransaction();
+
+                $invoice->delivery_status = 1;
+                $invoice->actual_date_delivery = date('Y-m-d');
+                $invoice->actual_time_delivery = date('H:i:s');
+                $invoice->delivered_at = now();
+                $invoice->delivered_by = Auth::id();
+                $invoice->delivery_without_image = $hasMedia ? 0 : 1;
+                $invoice->save();
+
+                $invoice_step = new InvoiceSteps();
+                $invoice_step->invoice_id = $invoice->id;
+                $invoice_step->admin_id = Auth::id();
+                $invoice_step->step_details = $hasMedia
+                    ? 'تم التسليم ضمن دفعة تسليم جماعي'
+                    : 'تم التسليم ضمن دفعة تسليم جماعي بدون إرفاق صورة بتأكيد الموظف';
+                $invoice_step->save();
+
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollBack();
+                Log::error('Bulk delivery failed for invoice', [
+                    'invoice_id' => $invoice->id,
+                    'error' => $e->getMessage(),
+                ]);
+
+                $rejected[] = [
+                    'id' => $invoice->id,
+                    'reason' => 'خطأ أثناء الحفظ، لم يتم التسليم',
+                ];
+                continue;
+            }
+
+            $delivered[] = $invoice->id;
 
             // إرسال رسالة الواتساب إذا وجد قالب
             if ($message_temp) {
@@ -1357,9 +1615,26 @@ class InvoiceController extends Controller
             }
         }
 
+        if (empty($delivered)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لم يتم تسليم أي جهاز',
+                'delivered' => [],
+                'rejected' => $rejected,
+            ]);
+        }
+
+        $message = 'تم تسليم ' . count($delivered) . ' جهاز بنجاح';
+
+        if (!empty($rejected)) {
+            $message .= ' — وتم تجاهل ' . count($rejected) . ' جهاز';
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'تم تسليم الفواتير المختارة بنجاح وإرسال رسائل الواتساب'
+            'message' => $message,
+            'delivered' => $delivered,
+            'rejected' => $rejected,
         ]);
     }
 }
