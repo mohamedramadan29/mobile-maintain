@@ -5,6 +5,7 @@ namespace App\Http\Controllers\dashboard;
 use Exception;
 use Illuminate\Http\Request;
 use App\Jobs\SendReviewMessage;
+use App\Jobs\SendStatusMessage;
 use App\Models\dashboard\Invoice;
 use App\Models\dashboard\Message;
 use App\Http\Traits\Message_Trait;
@@ -187,6 +188,7 @@ class TechInvoicesController extends Controller
             //dd($request->all());
             try {
                 DB::beginTransaction();
+                $pending_status_message = null;
                 $status_changed = $request->status != $old_invoice->status;
                 $invoice->status = $request->status;
                 $invoice->tech_notes = $request->tech_notes;
@@ -239,27 +241,13 @@ class TechInvoicesController extends Controller
                     );
                     // dd($message);
 
-                    // تعريف المتغير
-                    $params = array(
-                        'instanceid' => '138796',
-                        'token' => '3fc4ad69-3ea3-4307-923c-7080f7aa0d8e',
-                        'phone' => $new_phone,
-                        'body' => $message,
-                    );
-                    $queryString = http_build_query($params); // تحويل المصفوفة إلى سلسلة نصية
-                    $curl = curl_init();
-                    curl_setopt_array($curl, array(
-                        CURLOPT_URL => "https://api.4whats.net/sendMessage/?" . $queryString, // إضافة سلسلة الاستعلام إلى عنوان URL
-                        CURLOPT_RETURNTRANSFER => true,
-                        CURLOPT_ENCODING => "",
-                        CURLOPT_MAXREDIRS => 10,
-                        CURLOPT_TIMEOUT => 30,
-                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                        CURLOPT_CUSTOMREQUEST => "GET",
-                    ));
-                    $response = curl_exec($curl);
-                    $err = curl_error($curl);
-                    curl_close($curl);
+                    ######
+                    ########
+                    #########
+                    // رسالة الواتساب موقوفة حاليًا بناءً على الطلب (مثل رسالة اضافة فاتورة).
+                    // لإعادة تفعيلها: أزل التعليق عن السطر التالي وعن سطر الإرسال بعد DB::commit().
+                    // $pending_status_message = [$new_phone, $message, $invoice->id];
+
                     if ($request->status === "تم الاصلاح") {
                         // جدولة إرسال رسالة التقييم بعد 20 دقيقة
                         SendReviewMessage::dispatch($invoice)->delay(now()->addMinutes(20));
@@ -296,6 +284,12 @@ class TechInvoicesController extends Controller
                 }
                 // return $this->success_message(' تم اضافة المرفق بنجاح  ');
                 DB::commit();
+
+                // بعد نجاح المعاملة فقط، ويُنفَّذ فعليًا بعد إرسال الرد للمتصفح
+                // if ($pending_status_message) {
+                //     SendStatusMessage::dispatchAfterResponse(...$pending_status_message);
+                // }
+
                 return $this->success_message('تم تحديث حالة الجهاز بنجاح');
             } catch (Exception $e) {
                 dd($e);

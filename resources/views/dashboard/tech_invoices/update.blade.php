@@ -622,7 +622,7 @@
                                                 <div class="col-6">
                                                     <div class="form-group">
                                                         <label for="address"> صورة المرفق </label>
-                                                        <input type="file" name="file" class="form-control">
+                                                        <input type="file" name="file" class="form-control" accept="image/*" data-compress>
                                                     </div>
                                                 </div>
                                                 <div class="col-6 d-none">
@@ -659,7 +659,7 @@
                                                 <div class="col-6">
                                                     <div class="form-group">
                                                         <label for="address"> صورة </label>
-                                                        <input type="file" name="file_status" class="form-control">
+                                                        <input type="file" name="file_status" class="form-control" accept="image/*" data-compress>
                                                     </div>
                                                 </div>
                                                 <div class="col-6">
@@ -910,5 +910,6 @@
 @section('js')
     <script src="{{ asset('assets/admin/') }}/vendors/js/forms/icheck/icheck.min.js" type="text/javascript"></script>
     <script src="{{ asset('assets/admin/') }}/js/scripts/forms/checkbox-radio.js" type="text/javascript"></script>
+    @include('dashboard.layouts._image_compress')
 
 @endsection
