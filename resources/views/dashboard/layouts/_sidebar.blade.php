@@ -42,6 +42,11 @@
                             data-i18n="nav.users.user_profile"> الفواتير المؤرشفة
                         </a>
                     </li>
+                    <li class="{{ Route::is('dashboard.invoices.peak-times') ? 'active' : '' }}">
+                        <a class="menu-item" href="{{ route('dashboard.invoices.peak-times') }}"
+                            data-i18n="nav.users.user_profile"> تقرير أوقات الذروة
+                        </a>
+                    </li>
                 </ul>
             </li>
             @endcan

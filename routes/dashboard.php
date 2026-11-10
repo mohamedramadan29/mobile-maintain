@@ -239,6 +239,8 @@ Route::group([
         ################### Start Invoices #######################
         Route::group(['middleware' => 'can:invoices', 'prefix' => 'invoices', 'as' => 'invoices.'], function () {
             Route::controller(InvoiceController::class)->group(function () {
+                // تقرير أوقات الذروة في إدخال الفواتير
+                Route::get('peak-times', 'peakTimesReport')->name('peak-times');
                 Route::get('index', 'index')->name('index');
                 Route::match(['get', 'post'], 'create', 'create')->name('create');
                 Route::match(['post', 'get'], 'update/{id}', 'update')->name('update');

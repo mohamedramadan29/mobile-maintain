@@ -2,6 +2,15 @@
 
 @section('title', ' تفاصيل الفاتورة كاملة ')
 @section('css')
+<style>
+    .terms-ack { display:inline-flex; align-items:center; gap:.45rem; padding:.45rem .7rem;
+                 border-radius:.4rem; background:#ecfdf5; border:1px solid #a7f3d0;
+                 color:#065f46; font-size:.88rem; }
+    .terms-ack-mark { flex:none; width:20px; height:20px; border-radius:50%; background:#059669;
+                      color:#fff; display:flex; align-items:center; justify-content:center;
+                      font-weight:700; font-size:.8rem; }
+    .terms-ack a { color:inherit; text-decoration:underline; }
+</style>
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/icheck.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/vendors/css/forms/icheck/custom.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/') }}/css-rtl/plugins/forms/checkboxes-radios.css">
@@ -691,6 +700,17 @@
                                                             <img width="100" height="100"
                                                                 src="{{ asset('assets/uploads/invoices_files/' . $invoice->signature) }}"
                                                                 alt="">
+                                                        </div>
+
+                                                        {{-- الموافقة على الشروط والأحكام إلزامية عند إضافة الفاتورة --}}
+                                                        <div class="form-group">
+                                                            <div class="terms-ack">
+                                                                <span class="terms-ack-mark">&check;</span>
+                                                                <span>الموافقة على
+                                                                    <a href="{{ route('dashboard.terms') }}"
+                                                                        target="_blank">الشروط والأحكام</a>
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                     </div>
 

@@ -1300,6 +1300,177 @@ class InvoiceController extends Controller
         return view('dashboard.invoices.delivery_with_details', compact('invoice', 'programe_problems', 'speed_problems', 'piece_resources', 'problems', 'checks', 'speed_devices', 'programe_devices', 'invoice_more_checks'));
     }
 
+    ######################## تقرير أوقات الذروة ########################
+
+    /**
+     * تقرير أوقات الذروة: يوضح أكثر ساعات اليوم وأيام الأسبوع ازدحامًا
+     * بإدخال الفواتير (أي استلام الأجهزة)، لمساعدة الإدارة على توزيع الموظفين.
+     */
+    public function peakTimesReport(Request $request)
+    {
+        $from = $request->input('from_date');
+        $to   = $request->input('to_date');
+
+        $base = function () use ($from, $to) {
+            $q = Invoice::query();
+            // مقارنة مباشرة على العمود حتى يُستخدم فهرس created_at
+            if (!empty($from)) {
+                $q->where('created_at', '>=', $from . ' 00:00:00');
+            }
+            if (!empty($to)) {
+                $q->where('created_at', '<=', $to . ' 23:59:59');
+            }
+            return $q;
+        };
+
+        // استعلام واحد يغطي الساعات وأيام الأسبوع والخريطة الحرارية معًا (168 صفًا كحد أقصى)
+        $grid = $base()
+            ->selectRaw('DAYOFWEEK(created_at) as day_num, HOUR(created_at) as hour_num, COUNT(*) as total')
+            ->groupBy('day_num', 'hour_num')
+            ->get();
+
+        $hourly = array_fill(0, 24, 0);
+        $weekly = array_fill(1, 7, 0);
+        $heatmap = [];
+        for ($d = 1; $d <= 7; $d++) {
+            $heatmap[$d] = array_fill(0, 24, 0);
+        }
+
+        foreach ($grid as $row) {
+            $d = (int) $row->day_num;
+            $h = (int) $row->hour_num;
+            $c = (int) $row->total;
+            $hourly[$h] += $c;
+            $weekly[$d] += $c;
+            $heatmap[$d][$h] = $c;
+        }
+
+        $total = array_sum($hourly);
+
+        // تقسيم اليوم إلى 6 فترات من 4 ساعات (يُحسب من المصفوفة أعلاه بلا استعلام إضافي)
+        $block_names = [
+            0  => 'من ١٢ منتصف الليل إلى ٤ فجرًا',
+            4  => 'من ٤ فجرًا إلى ٨ صباحًا',
+            8  => 'من ٨ صباحًا إلى ١٢ ظهرًا',
+            12 => 'من ١٢ ظهرًا إلى ٤ عصرًا',
+            16 => 'من ٤ عصرًا إلى ٨ مساءً',
+            20 => 'من ٨ مساءً إلى ١٢ منتصف الليل',
+        ];
+        $block_short = [
+            0 => '١٢ ص – ٤ ص', 4 => '٤ ص – ٨ ص', 8 => '٨ ص – ١٢ ظ',
+            12 => '١٢ ظ – ٤ م', 16 => '٤ م – ٨ م', 20 => '٨ م – ١٢ ص',
+        ];
+
+        $blocks = [];
+        foreach (array_keys($block_names) as $start) {
+            $count = 0;
+            for ($i = $start; $i < $start + 4; $i++) {
+                $count += $hourly[$i];
+            }
+            $blocks[$start] = [
+                'start' => $start,
+                'name'  => $block_names[$start],
+                'short' => $block_short[$start],
+                'count' => $count,
+                'pct'   => $total ? round($count / $total * 100, 1) : 0,
+            ];
+        }
+        $peak_block = $total ? collect($blocks)->sortByDesc('count')->first() : null;
+
+        // نفس التقسيم لكل يوم من أيام الأسبوع
+        $blocks_by_day = [];
+        for ($d = 1; $d <= 7; $d++) {
+            foreach (array_keys($block_names) as $start) {
+                $c = 0;
+                for ($i = $start; $i < $start + 4; $i++) {
+                    $c += $heatmap[$d][$i];
+                }
+                $blocks_by_day[$d][$start] = $c;
+            }
+        }
+
+        // أعلى ساعة وأعلى يوم
+        $peak_hour = $total ? array_search(max($hourly), $hourly) : null;
+        $peak_hour_count = $total ? max($hourly) : 0;
+        $peak_day = $total ? array_search(max($weekly), $weekly) : null;
+        $peak_day_count = $total ? max($weekly) : 0;
+
+        // أزحم ثلاثة أيام فعلية + متوسط اليوم الواحد
+        $busiest_dates = $base()
+            ->selectRaw('DATE(created_at) as the_date, COUNT(*) as total')
+            ->groupBy('the_date')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
+        $working_days = $base()->selectRaw('COUNT(DISTINCT DATE(created_at)) as d')->value('d');
+        $avg_per_day = $working_days ? round($total / $working_days, 1) : 0;
+
+        // أفضل نافذة متصلة من 3 ساعات (مفيدة لتحديد وقت تكثيف الموظفين)
+        $best_window = ['start' => null, 'count' => 0];
+        if ($total) {
+            for ($h = 0; $h < 24; $h++) {
+                $sum = $hourly[$h] + $hourly[($h + 1) % 24] + $hourly[($h + 2) % 24];
+                if ($sum > $best_window['count']) {
+                    $best_window = ['start' => $h, 'count' => $sum];
+                }
+            }
+        }
+
+        // تسميات الساعات بنظام 12 ساعة (ص/م) لأن نظام 24 ساعة ملتبس على المستخدم
+        $hour_labels = [];
+        for ($h = 0; $h < 24; $h++) {
+            $suffix = $h < 12 ? 'ص' : 'م';
+            $h12 = $h % 12;
+            if ($h12 === 0) {
+                $h12 = 12;
+            }
+            $hour_labels[$h] = [
+                'short' => $h12 . ' ' . $suffix,                       // ٩ م
+                'long'  => $h12 . ' ' . ($h < 12 ? 'صباحًا' : 'مساءً'), // ٩ مساءً
+                'h24'   => sprintf('%02d:00', $h),                      // 21:00
+            ];
+        }
+        // منتصف الليل والظهر: نوضحهما صراحة لإزالة أي لبس
+        $hour_labels[0]['long']  = '١٢ منتصف الليل';
+        $hour_labels[0]['short'] = '12 ص';
+        $hour_labels[12]['long'] = '١٢ ظهرًا';
+
+        // ترقيم MySQL لـ DAYOFWEEK يبدأ من الأحد = 1
+        $days_ar = [
+            1 => 'الأحد',
+            2 => 'الاثنين',
+            3 => 'الثلاثاء',
+            4 => 'الأربعاء',
+            5 => 'الخميس',
+            6 => 'الجمعة',
+            7 => 'السبت',
+        ];
+
+        return view('dashboard.invoices.peak_times', compact(
+            'days_ar',
+            'hour_labels',
+            'blocks',
+            'peak_block',
+            'blocks_by_day',
+            'block_short',
+            'hourly',
+            'weekly',
+            'heatmap',
+            'total',
+            'peak_hour',
+            'peak_hour_count',
+            'peak_day',
+            'peak_day_count',
+            'busiest_dates',
+            'avg_per_day',
+            'working_days',
+            'best_window',
+            'from',
+            'to'
+        ));
+    }
+
     public function bulkFilter(Request $request)
     {
         // التحقق من الإدخال
